@@ -19,6 +19,7 @@ use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PendingCourseController;
 use App\Http\Controllers\CourseNotificatioController;
+use App\Http\Controllers\InstructorFinalExamController; // ADD THIS
 
 // ===================
 // Public / Login Routes
@@ -47,8 +48,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     Route::get('/admin_panel/manage_resources', [ResourceController::class,'viewCourses']);
     
-
-
     // Manage Users
     Route::get('/admin_panel/manage_user', [StudentController::class, 'manageUsers']);
     Route::get('/admin_panel/manage_user/view_enrolled_student', [StudentController::class, 'enrolledStudents']);
@@ -61,17 +60,17 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/courses/{course}/modules/{module}/quizzes', [QuizController::class, 'store'])->name('quiz.store');
 
     // Upload & Cloud
-    
     Route::post('/admin/upload', [UploadController::class, 'upload'])->name('admin.upload');
     Route::post('/admin/cloud', [UploadController::class, 'uploadToCloudinary'])->name('upload.cloudinary');
     Route::post('/admin/mux-upload-url', [UploadController::class, 'getUploadUrl'])->name('mux.direct.upload.url');
+    
+    // Pending Courses
     Route::get('/pending-courses', [CourseNotificatioController::class, 'index'])
         ->name('admin.pending_courses');
     Route::get('/submitted-courses/{course}/review', [CourseNotificatioController::class, 'show_modules'])
         ->name('admin.courses.review');
-        Route::post('/submitted-courses/{course}/approve', [CourseNotificatioController::class, 'approve'])
+    Route::post('/submitted-courses/{course}/approve', [CourseNotificatioController::class, 'approve'])
         ->name('admin.courses.approve');
-
     Route::post('/submitted-courses/{course}/reject', [CourseNotificatioController::class, 'reject'])
         ->name('admin.courses.reject');
     Route::post('/admin/courses/{course}/ask-edit', [CourseNotificatioController::class, 'askForEdit'])->name('admin.courses.ask-edit');
@@ -84,24 +83,67 @@ Route::get('/admin_panel/manage_resources/{course_id}/modules', [ResourceControl
 Route::get('/admin_panel/courses/{course}/modules/{module}/module/create', [ResourceController::class, 'addModule'])->name('module.create');
 Route::get('/admin_panel/manage_resources/{course_id}/modules/{module_id}/edit', [ResourceController::class, 'editModule']);
 Route::post('/resources/{course_id}/modules/{module_id}/upload', [UploadController::class, 'handleUpload'])->name('upload.resources');
- Route::get('/admin/upload', function() {
-        return view('Resources.upload');
-    })->name('admin.upload.form');
-    Route::get('/admin/cloud', function() {
-        return view('Resources.uploadToCloud');
-    });
-    Route::get('/admin/view', function() {
-        return view('Resources.viewVideo');
-    });
-    
-    Route::get('admin/manage_courses/courses/{id}/edit', [CourseController::class, 'editCourse']);
-    Route::put('admin/manage_courses/courses/{id}/edit', [CourseController::class, 'update']);
-    Route::delete('/admin_panel/manage_courses/delete-course/{id}', [CourseController::class, 'destroy']);
-    Route::get('/admin_panel/courses/{course}/modules/{module}/quiz/create', [QuizController::class, 'create'])->name('quiz.create');
-    Route::post('/courses/{course}/modules/{module}/quizzes', [QuizController::class, 'store'])->name('quiz.store');
+Route::get('/admin/upload', function() {
+    return view('Resources.upload');
+})->name('admin.upload.form');
+Route::get('/admin/cloud', function() {
+    return view('Resources.uploadToCloud');
+});
+Route::get('/admin/view', function() {
+    return view('Resources.viewVideo');
+});
+
+Route::get('admin/manage_courses/courses/{id}/edit', [CourseController::class, 'editCourse']);
+Route::put('admin/manage_courses/courses/{id}/edit', [CourseController::class, 'update']);
+Route::delete('/admin_panel/manage_courses/delete-course/{id}', [CourseController::class, 'destroy']);
+Route::get('/admin_panel/courses/{course}/modules/{module}/quiz/create', [QuizController::class, 'create'])->name('quiz.create');
+Route::post('/courses/{course}/modules/{module}/quizzes', [QuizController::class, 'store'])->name('quiz.store');
+
 // ===================
 // Instructor Routes
 // ===================
+Route::middleware(['auth'])->prefix('instructor')->group(function () {
+    
+    // 🆕 FINAL EXAM ROUTES - MOVED HERE FROM ADMIN SECTION
+    Route::get('/final-exams', [InstructorFinalExamController::class, 'index'])
+        ->name('instructor.final-exams.index');
+    
+    Route::get('/final-exams/create', [InstructorFinalExamController::class, 'create'])
+        ->name('instructor.final-exams.create');
+    
+    Route::post('/final-exams', [InstructorFinalExamController::class, 'store'])
+        ->name('instructor.final-exams.store');
+    
+    Route::get('/final-exams/{id}', [InstructorFinalExamController::class, 'show'])
+        ->name('instructor.final-exams.show');
+    
+    Route::get('/final-exams/{id}/edit', [InstructorFinalExamController::class, 'edit'])
+        ->name('instructor.final-exams.edit');
+    
+    Route::put('/final-exams/{id}', [InstructorFinalExamController::class, 'update'])
+        ->name('instructor.final-exams.update');
+    
+    Route::delete('/final-exams/{id}', [InstructorFinalExamController::class, 'destroy'])
+        ->name('instructor.final-exams.destroy');
+    
+    Route::post('/final-exams/{id}/publish', [InstructorFinalExamController::class, 'publish'])
+        ->name('instructor.final-exams.publish');
+    
+    Route::post('/final-exams/{id}/unpublish', [InstructorFinalExamController::class, 'unpublish'])
+        ->name('instructor.final-exams.unpublish');
+    
+    // Grading Routes
+    Route::get('/final-exams/{examId}/submissions', [InstructorFinalExamController::class, 'viewSubmissions'])
+        ->name('instructor.final-exams.submissions');
+    
+    Route::get('/final-exam-submissions/{submissionId}/grade', [InstructorFinalExamController::class, 'gradeSubmission'])
+        ->name('instructor.final-exams.grade-submission');
+    
+    Route::post('/final-exam-submissions/{submissionId}/save-grades', [InstructorFinalExamController::class, 'saveGrades'])
+        ->name('instructor.final-exams.save-grades');
+});
+
+// Other Instructor Routes (without prefix)
 Route::get('/instructor_homepage', [InstructorController::class, 'viewInstructorHomepage'])
     ->middleware('auth');
 Route::post('/instructor/manage_courses/create', [PendingCourseController::class, 'store']);
@@ -142,6 +184,7 @@ Route::get('/view_pending_resources/{courseId}/{moduleNumber}', [PendingCourseCo
      
 Route::get('/view/inside-module/{courseId}/{moduleNumber}', [ResourceController::class, 'showInsideModule'])->name('inside.module2');
 Route::get('/instructor/rejected_courses', [InstructorController::class, 'showRejectedCourses'])->name('rejected.course.show');
+
 // Notification routes
 Route::middleware('auth')->group(function () {
     // Mark all notifications as read

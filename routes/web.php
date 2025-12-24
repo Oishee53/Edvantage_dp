@@ -147,6 +147,63 @@ Route::get('/student/questions/{id}', [NotificationController::class, 'show'])
     ->name('student.questions.show');
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ Route::get('/courses/{courseId}/final-exam', [StudentFinalExamController::class, 'show'])
+        ->name('student.final-exam.show');
+    
+    // Start exam
+    Route::post('/final-exams/{examId}/start', [StudentFinalExamController::class, 'start'])
+        ->name('student.final-exam.start');
+    
+    // Upload answer images (AJAX)
+    Route::post('/final-exam-submissions/{submissionId}/questions/{questionId}/upload-answer', 
+        [StudentFinalExamController::class, 'uploadAnswer'])
+        ->name('student.final-exam.upload-answer');
+    
+    // Delete answer image (AJAX)
+    Route::delete('/final-exam-submissions/{submissionId}/questions/{questionId}/delete-image', 
+        [StudentFinalExamController::class, 'deleteAnswerImage'])
+        ->name('student.final-exam.delete-image');
+    
+    // Submit exam
+    Route::post('/final-exam-submissions/{submissionId}/submit', [StudentFinalExamController::class, 'submit'])
+        ->name('student.final-exam.submit');
+    
+    // View results
+    Route::get('/final-exam-submissions/{submissionId}/result', [StudentFinalExamController::class, 'result'])
+        ->name('student.final-exam.result');
+    
+    // My submissions
+    Route::get('/my-final-exam-submissions', [StudentFinalExamController::class, 'mySubmissions'])
+        ->name('student.final-exam.my-submissions');
+
+
+
+
+
+
+
+
+
 });
 
 Route::get('/certificate/{userId}/{courseId}', [CertificateController::class, 'generate'])
