@@ -994,8 +994,11 @@
 <body>
     <!-- Place the category bar immediately after the header -->
     <div class="category-bar" style="top:56px; font-weight: 50;">
-        @foreach($uniqueCategories as $category)
-            <a href="#" class="category-link">{{$category}}</a>
+      @foreach($uniqueCategories as $category)
+    <a href="{{ route('guest.courses.search', ['category' => $category]) }}"
+       class="category-link">
+        {{ $category }}
+    </a>
         @endforeach
     </div>
    <!-- Main Navigation Bar -->
@@ -1149,15 +1152,34 @@
                         <img src="https://via.placeholder.com/300x140?text=Course+Image" alt="{{ $course->title }}" class="course-image">
                     @endif
                     <!-- Course Content -->
-                    <div class="course-content">
-                        <h3 class="course-title">{{ $course->title }}</h3>
-                        @if(isset($course->category))
-                            <span class="course-category-badge">{{ $course->category }}</span>
-                        @endif
-                      
-                        <div class="course-price">
-                            <span class="taka-bold">৳</span> {{ number_format($course->price ?? 0, 0) }}
-                        </div>
+                   <div class="course-content">
+    <h3 class="course-title">{{ $course->title }}</h3>
+
+    @if(isset($course->category))
+        <span class="course-category-badge">{{ $course->category }}</span>
+    @endif
+
+    {{-- ⭐ STEP 9: Average Rating --}}
+    @if($course->ratings->count())
+        <div class="course-rating">
+            <span class="stars">
+                @for($i = 1; $i <= floor($course->averageRating()); $i++)
+                    ★
+                @endfor
+            </span>
+            <span class="rating-number">
+                {{ $course->averageRating() }}
+            </span>
+            <span class="rating-count">
+                ({{ $course->ratings->count() }})
+            </span>
+        </div>
+    @endif
+
+    <div class="course-price">
+        <span class="taka-bold">৳</span> {{ number_format($course->price ?? 0, 0) }}
+    </div>
+
                         <div class="course-actions">
                             <a href="{{ route('courses.details', $course->id) }}" class="btn-details">
                                 Details

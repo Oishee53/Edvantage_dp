@@ -156,3 +156,10 @@ Route::get('/pdf/view/{id}', [EnrollmentController::class, 'viewPDF'])
     ->name('secure.pdf.view');
 
 Route::get('/guest/search', [CourseController::class, 'guest_user_search'])->name('guest.courses.search');
+Route::post('/course/rate', [CourseController::class, 'submitRating'])
+    ->name('course.rate')
+    ->middleware('auth');
+
+
+Route::get('/courses/{id}', [CourseController::class, 'show'])
+    ->name('courses.details');

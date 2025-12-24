@@ -796,6 +796,30 @@
                         {{ $course->description }}
                     </div>
                 </div>
+               @php
+    $ratingCount = $course->ratings->count();
+    $avgRating = $ratingCount > 0
+        ? round($course->ratings->avg('rating'), 1)
+        : 0;
+@endphp
+
+
+@if($ratingCount > 0)
+    <div class="course-hero-meta">
+        <span class="stars">
+            @for($i = 1; $i <= 5; $i++)
+                @if($i <= floor($avgRating))
+                    ★
+                @else
+                    ☆
+                @endif
+            @endfor
+        </span>
+        <span class="rating-number">{{ $avgRating }}</span>
+        </span>
+    </div>
+@endif
+
                 
                 <!-- Right: Course Card - positioned absolutely -->
                 <div class="course-sidebar-card">
@@ -917,6 +941,43 @@
                         </li>
                     </ul>
                 </div>
+                <div class="content-card">
+    <h3><i class="fa-solid fa-star"></i> Rating</h3>
+
+    @if($course->ratings->count() > 0)
+        <ul style="list-style:none; padding:0;">
+            @foreach($course->ratings as $rating)
+                <li style="padding:12px 0; border-bottom:1px solid #e5e7eb;">
+                    
+                    <strong>{{ $rating->user->name }}</strong>
+
+                    <div style="color:#ffd700; margin:4px 0;">
+                        @for($i = 1; $i <= 5; $i++)
+                            @if($i <= $rating->rating)
+                                ★
+                            @else
+                                ☆
+                            @endif
+                        @endfor
+                    </div>
+
+                    @if($rating->review)
+                        <p style="margin:4px 0; color:#374151;">
+                            {{ $rating->review }}
+                        </p>
+                    @endif
+
+                    <small style="color:#9ca3af;">
+                        {{ $rating->created_at->format('d M Y') }}
+                    </small>
+                </li>
+            @endforeach
+        </ul>
+    @else
+        <p style="color:#6b7280;">No ratings yet.</p>
+    @endif
+</div>
+
             </div>
 
             <!-- Right sidebar space - reserved for positioned sidebar -->
@@ -963,6 +1024,23 @@
                 }, index * 150);
             });
         });
+        <h3>Student Reviews</h3>
+
+@if($course->ratings->count())
+    @foreach($course->ratings as $rating)
+        <div style="border-bottom:1px solid #ddd; padding:10px 0;">
+            <strong>{{ $rating->user->name }}</strong>
+            <span>⭐ {{ $rating->rating }}/5</span>
+
+            @if($rating->review)
+                <p>{{ $rating->review }}</p>
+            @endif
+        </div>
+    @endforeach
+@else
+    <p>No reviews yet.</p>
+@endif
+
     </script>
 </body>
 </html>

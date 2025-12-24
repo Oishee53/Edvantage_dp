@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use App\Models\CourseRating;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Resource;
 
@@ -51,4 +51,14 @@ public function quizzes()
             $course->enrollments()->delete(); // optional
         });
     }
+    public function ratings()
+    {
+        return $this->hasMany(CourseRating::class, 'course_id');
+    }
+
+public function averageRating()
+{
+    return round($this->ratings()->avg('rating'), 1);
+}
+
 }

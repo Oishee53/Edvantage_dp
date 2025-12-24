@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Providers;
-
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View; // ← important
@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
         // Register admin routes
         Route::middleware('web')
             ->group(base_path('routes/admin.php'));
-
+  Schema::defaultStringLength(191);
         // Sidebar pending courses count for all admin views
         View::composer('Admin.*', function ($view) {
             $pendingCoursesCount = CourseNotification::where('status', 'pending')->count();

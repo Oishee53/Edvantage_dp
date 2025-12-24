@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\CourseRating;
 
 use App\Models\Courses;
 use Illuminate\Http\Request;
@@ -22,11 +23,17 @@ public function viewCourses()
 }
 public function show($id)
 {
-    // Load course with instructor
-    $course = Courses::with('instructor')->findOrFail($id);
+    $course = Courses::with([
+    'instructor',
+    'ratings.user'
+])->findOrFail($id);
+
     $user = auth()->user();
+
     return view('courses.course_details', compact('course','user'));
 }
+
+
  public function create()
 {
     return view('courses.create_course');
@@ -177,6 +184,30 @@ public function markAsReadNotification($id)
 
         
     }
+   public function submitRating(Request $request)
+{
+    $request->validate([
+        'course_id' => 'required|exists:courses,id',
+        'rating' => 'required|integer|min:1|max:5',
+        'review' => 'nullable|string',
+    ]);
+
+    CourseRating::updateOrCreate(
+        [
+            'course_id' => $request->course_id,
+            'user_id' => auth()->id(),
+        ],
+        [
+            'rating' => $request->rating,
+            'review' => $request->review,
+        ]
+    );
+
+     // 🔥 THIS LINE DOWNLOADS THE CERTIFICATE
+    return redirect($request->certificate_url);
+}
+
+
 
 
 
