@@ -40,6 +40,22 @@ public function quizzes()
         return $this->hasMany(Quiz::class, 'course_id', 'id');
     }
 
+
+    public function finalExam()
+{
+    return $this->hasOne(FinalExam::class, 'course_id');
+}
+
+/**
+ * Check if course has a published final exam
+ */
+public function hasPublishedFinalExam()
+{
+    return $this->finalExam()
+        ->where('status', 'published')
+        ->exists();
+}
+
  public function instructor()
     {
         return $this->belongsTo(User::class, 'instructor_id');
@@ -50,10 +66,5 @@ public function quizzes()
             $course->resources()->delete();
             $course->enrollments()->delete(); // optional
         });
-    }
-
-    public function forums()
-    {
-    return $this->hasMany(DiscussionForum::class, 'course_id');
     }
 }
