@@ -6,18 +6,22 @@ use App\Models\FinalExam;
 use App\Models\FinalExamSubmission;
 use App\Models\FinalExamAnswer;
 use App\Models\Enrollment;
+use App\Models\Courses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
+
 class StudentFinalExamController extends Controller
 {
     /**
-     * Show final exam for a course (if exists and approved)
+     * Show final exam overview for a course
      */
     public function show($courseId)
     {
+        $course = Courses::findOrFail($courseId);
+        
         // Check if student is enrolled
         $enrollment = Enrollment::where('user_id', Auth::id())
             ->where('course_id', $courseId)
@@ -49,7 +53,7 @@ class StudentFinalExamController extends Controller
             ]
         );
 
-        return view('User.final_exam.show', compact('exam', 'submission'));
+        return view('User.final_exam.show', compact('course', 'exam', 'submission'));
     }
 
     /**
@@ -69,7 +73,7 @@ class StudentFinalExamController extends Controller
         }
 
         // Get or create submission
-        $submission = FinalExamSubmission::firstOrCreate(
+        $submission = FinalExamSubmission::with('answers.question')->firstOrCreate(
             [
                 'final_exam_id' => $exam->id,
                 'user_id' => Auth::id()
@@ -92,74 +96,185 @@ class StudentFinalExamController extends Controller
             ]);
         }
 
+        // Create answer records for all questions if they don't exist
+        foreach ($exam->questions as $question) {
+            FinalExamAnswer::firstOrCreate([
+                'submission_id' => $submission->id,
+                'question_id' => $question->id
+            ]);
+        }
+
+        // Reload submission with answers
+        $submission->load('answers.question');
+
         return view('User.final_exam.take', compact('exam', 'submission'));
     }
 
     /**
-     * Upload answer images for a question
+     * Upload answer image for a question (AJAX - handles ONE image at a time)
      */
-    public function uploadAnswer(Request $request, $submissionId, $questionId)
-    {
-        $submission = FinalExamSubmission::findOrFail($submissionId);
-
-        // Check authorization
-        if ($submission->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized');
-        }
-
-        // Cannot upload if already submitted
-        if ($submission->status !== 'in_progress') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cannot upload answers after submission'
-            ], 400);
-        }
-
+ public function uploadAnswer(Request $request, $submissionId, $questionId)
+{
+    try {
+        // Validate
         $request->validate([
-            'images' => 'required|array|min:1|max:5', // Max 5 images per question
-            'images.*' => 'image|mimes:jpeg,png,jpg|max:5120' // 5MB per image
+            'image' => 'required|image|mimes:jpeg,png,jpg|max:5120'
         ]);
 
-        try {
-            $imageUrls = [];
+        // Get submission
+        $submission = FinalExamSubmission::findOrFail($submissionId);
 
-            // Upload each image to Cloudinary
-            foreach ($request->file('images') as $image) {
-                $result = Cloudinary::upload($image->getRealPath(), [
-                    'folder' => "final_exams/submission_{$submissionId}/question_{$questionId}",
-                    'resource_type' => 'image'
-                ]);
-
-                $imageUrls[] = $result->getSecurePath();
-            }
-
-            // Save or update answer
-            $answer = FinalExamAnswer::updateOrCreate(
-                [
-                    'submission_id' => $submissionId,
-                    'question_id' => $questionId
-                ],
-                [
-                    'answer_images' => $imageUrls
-                ]
-            );
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Answer uploaded successfully',
-                'images' => $imageUrls
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to upload images: ' . $e->getMessage()
-            ], 500);
+        // Authorization
+        if ($submission->user_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
+
+        // Status check
+        if ($submission->status !== 'in_progress') {
+            return response()->json(['error' => 'Cannot upload after submission'], 400);
+        }
+
+        // Get or create answer record
+        $answer = FinalExamAnswer::where('submission_id', $submissionId)
+            ->where('question_id', $questionId)
+            ->first();
+
+        if (!$answer) {
+            $answer = FinalExamAnswer::create([
+                'submission_id' => $submissionId,
+                'question_id' => $questionId,
+                'answer_images' => json_encode([])
+            ]);
+        }
+
+        // Get existing images
+        $existingImages = $answer->answer_images ? json_decode($answer->answer_images, true) : [];
+        if (!is_array($existingImages)) {
+            $existingImages = [];
+        }
+
+        // Check limit
+        if (count($existingImages) >= 5) {
+            return response()->json(['error' => 'Maximum 5 images per question'], 400);
+        }
+
+        // ✅ Upload to Cloudinary - SAME METHOD as your UploadController
+        $uploadedFile = $request->file('image');
+        
+        $result = Cloudinary::uploadApi()->upload($uploadedFile->getRealPath(), [
+            'resource_type' => 'image',
+            'folder' => "final_exams/submission_{$submissionId}/question_{$questionId}",
+        ]);
+
+        $imageUrl = $result['secure_url'];
+
+        // Add to array
+        $existingImages[] = $imageUrl;
+
+        // Save
+        $answer->answer_images = json_encode($existingImages);
+        $answer->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Image uploaded successfully',
+            'image_url' => $imageUrl,
+            'images' => $existingImages
+        ]);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'error' => 'Validation failed',
+            'details' => $e->errors()
+        ], 422);
+
+    } catch (\Exception $e) {
+        \Log::error('Upload failed', [
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ]);
+
+        return response()->json([
+            'error' => 'Upload failed: ' . $e->getMessage()
+        ], 500);
     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
-     * Delete an uploaded answer image
+     * Delete an answer image (AJAX)
      */
     public function deleteAnswerImage(Request $request, $submissionId, $questionId)
     {
@@ -167,44 +282,50 @@ class StudentFinalExamController extends Controller
 
         // Check authorization
         if ($submission->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized');
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         // Cannot delete if already submitted
         if ($submission->status !== 'in_progress') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cannot modify answers after submission'
-            ], 400);
+            return response()->json(['error' => 'Cannot delete after submission'], 400);
         }
 
         $request->validate([
             'image_url' => 'required|string'
         ]);
 
-        $answer = FinalExamAnswer::where('submission_id', $submissionId)
-            ->where('question_id', $questionId)
-            ->first();
+        try {
+            $answer = FinalExamAnswer::where('submission_id', $submissionId)
+                ->where('question_id', $questionId)
+                ->first();
 
-        if (!$answer) {
+            if (!$answer) {
+                return response()->json(['error' => 'Answer not found'], 404);
+            }
+
+            // Get existing images
+            $images = $answer->answer_images ? json_decode($answer->answer_images, true) : [];
+
+            // Remove the specified image
+            $images = array_values(array_filter($images, function($url) use ($request) {
+                return $url !== $request->image_url;
+            }));
+
+            // Update answer
+            $answer->answer_images = json_encode($images);
+            $answer->save();
+
             return response()->json([
-                'success' => false,
-                'message' => 'Answer not found'
-            ], 404);
+                'success' => true,
+                'message' => 'Image deleted successfully',
+                'images' => $images
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Delete failed: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Remove image from array
-        $images = $answer->answer_images;
-        $images = array_values(array_filter($images, function($url) use ($request) {
-            return $url !== $request->image_url;
-        }));
-
-        $answer->update(['answer_images' => $images]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Image deleted successfully'
-        ]);
     }
 
     /**
@@ -212,8 +333,7 @@ class StudentFinalExamController extends Controller
      */
     public function submit($submissionId)
     {
-        $submission = FinalExamSubmission::with('exam.questions')
-            ->findOrFail($submissionId);
+        $submission = FinalExamSubmission::with('answers')->findOrFail($submissionId);
 
         // Check authorization
         if ($submission->user_id !== Auth::id()) {
@@ -221,31 +341,27 @@ class StudentFinalExamController extends Controller
         }
 
         // Check if already submitted
-        if ($submission->status !== 'in_progress') {
-            return redirect()->route('student.final-exam.result', $submissionId)
+        if ($submission->status === 'submitted' || $submission->status === 'graded') {
+            return redirect()->route('student.final-exam.show', $submission->exam->course_id)
                 ->with('info', 'Exam already submitted');
         }
 
-        // Validate all questions have answers
-        $totalQuestions = $submission->exam->questions()->count();
-        $answeredQuestions = FinalExamAnswer::where('submission_id', $submissionId)
-            ->whereNotNull('answer_images')
-            ->count();
-
-        if ($answeredQuestions < $totalQuestions) {
-            return back()->with('error', 
-                "Please answer all questions. ($answeredQuestions/$totalQuestions answered)"
-            );
+        // Validate all questions have at least one image
+        foreach ($submission->answers as $answer) {
+            $images = $answer->answer_images ? json_decode($answer->answer_images, true) : [];
+            if (empty($images)) {
+                return back()->with('error', 'Please upload at least one image for each question');
+            }
         }
 
-        // Submit the exam
+        // Update submission
         $submission->update([
             'status' => 'submitted',
             'submitted_at' => now()
         ]);
 
-        return redirect()->route('student.final-exam.result', $submissionId)
-            ->with('success', 'Exam submitted successfully! Your answers will be graded within 7 days.');
+        return redirect()->route('student.final-exam.show', $submission->exam->course_id)
+            ->with('success', 'Exam submitted successfully! Your instructor will grade it soon.');
     }
 
     /**
@@ -254,9 +370,10 @@ class StudentFinalExamController extends Controller
     public function result($submissionId)
     {
         $submission = FinalExamSubmission::with([
+            'exam.course',
             'exam.questions',
             'answers.question',
-            'grader'
+            'user'
         ])->findOrFail($submissionId);
 
         // Check authorization
@@ -264,19 +381,54 @@ class StudentFinalExamController extends Controller
             abort(403, 'Unauthorized');
         }
 
+        // Check if graded
+        if ($submission->status !== 'graded') {
+            return redirect()->route('student.final-exam.show', $submission->exam->course_id)
+                ->with('info', 'Exam not yet graded. Please wait for instructor to grade your submission.');
+        }
+
         return view('User.final_exam.result', compact('submission'));
     }
 
     /**
-     * View my final exam submissions across all courses
+     * Get remaining time (AJAX)
      */
-    public function mySubmissions()
+    public function getRemainingTime($submissionId)
     {
-        $submissions = FinalExamSubmission::where('user_id', Auth::id())
-            ->with(['exam.course'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $submission = FinalExamSubmission::with('exam')->findOrFail($submissionId);
 
-        return view('User.final_exam.my_submissions', compact('submissions'));
+        // Check authorization
+        if ($submission->user_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if ($submission->status !== 'in_progress') {
+            return response()->json(['error' => 'Exam not in progress'], 400);
+        }
+
+        // Calculate remaining time
+        $startedAt = $submission->started_at;
+        $durationMinutes = $submission->exam->duration_minutes;
+        $endTime = $startedAt->copy()->addMinutes($durationMinutes);
+        $remainingSeconds = now()->diffInSeconds($endTime, false);
+
+        // If time expired
+        if ($remainingSeconds <= 0) {
+            if ($submission->status === 'in_progress') {
+                $submission->update([
+                    'status' => 'submitted',
+                    'submitted_at' => now()
+                ]);
+            }
+            return response()->json([
+                'expired' => true,
+                'remaining_seconds' => 0
+            ]);
+        }
+
+        return response()->json([
+            'expired' => false,
+            'remaining_seconds' => max(0, $remainingSeconds)
+        ]);
     }
 }
