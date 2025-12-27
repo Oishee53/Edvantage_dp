@@ -18,4 +18,9 @@ class Resource extends Model
         return $this->belongsTo(Courses::class, 'courseId');
     }
     
+    public function forum()
+    {
+        return $this->hasOne(DiscussionForum::class, 'module_id');
+    }
+    
 }

@@ -51,4 +51,9 @@ public function quizzes()
             $course->enrollments()->delete(); // optional
         });
     }
+
+    public function forums()
+    {
+    return $this->hasMany(DiscussionForum::class, 'course_id');
+    }
 }

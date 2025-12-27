@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\View; // ← important
+use App\Models\Resource;
 use App\Services\MuxService;
+use App\Observers\ResourceObserver;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\View; // ← important
 use App\Models\CourseNotification;  // ← import your model
 
 class AppServiceProvider extends ServiceProvider
@@ -44,5 +46,7 @@ class AppServiceProvider extends ServiceProvider
             $pendingCoursesCount = CourseNotification::where('status', 'pending')->count();
             $view->with('pendingCoursesCount', $pendingCoursesCount);
         });
+
+        Resource::observe(ResourceObserver::class);
     }
 }

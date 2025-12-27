@@ -25,6 +25,7 @@ use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\VideoProgressController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\DiscussionForumController;
 
 Route::get('/', [LandingController::class, 'showLanding']);
 
@@ -156,3 +157,16 @@ Route::get('/pdf/view/{id}', [EnrollmentController::class, 'viewPDF'])
     ->name('secure.pdf.view');
 
 Route::get('/guest/search', [CourseController::class, 'guest_user_search'])->name('guest.courses.search');
+
+Route::post('/discussion/thread', [DiscussionForumController::class, 'storeThread'])
+        ->name('discussion.thread.store');
+
+Route::get('/discussion/forum/{forum}/thread/{thread}', [DiscussionForumController::class, 'showThread'])
+        ->name('discussion.thread.show');
+
+Route::get('/discussion/forum/{forum}', [DiscussionForumController::class, 'showForum'])
+        ->name('discussion.forum.show');
+
+Route::post('/discussion/thread/{thread}/reply', [DiscussionForumController::class, 'storeReply'])
+        ->name('discussion.reply.store');
+
