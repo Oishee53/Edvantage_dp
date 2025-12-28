@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exam Results - {{ $submission->exam->title }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <style>
         * {
             margin: 0;
@@ -14,111 +14,168 @@
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 2rem;
+            background-color: #f9fafb;
+            color: #333;
         }
 
         .container {
             max-width: 900px;
             margin: 0 auto;
+            padding: 2rem 1rem;
         }
 
-        .result-card {
+        /* Header Card - COMPACT */
+        .result-header {
             background: white;
-            border-radius: 1rem;
-            padding: 2rem;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            margin-bottom: 1.5rem;
-        }
-
-        .header {
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
             text-align: center;
-            padding-bottom: 1.5rem;
-            border-bottom: 3px solid #f3f4f6;
-            margin-bottom: 2rem;
         }
 
         .exam-title {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 0.5rem;
+            color: #0E1B33;
+            margin-bottom: 0.375rem;
         }
 
         .course-name {
             color: #6b7280;
-            font-size: 1rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
         }
 
-        /* Result Badge */
+        /* Result Badge - COMPACT */
         .result-badge {
             display: inline-block;
-            padding: 1rem 2rem;
-            border-radius: 3rem;
-            font-size: 2rem;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
             font-weight: 700;
-            margin: 1.5rem 0;
+            margin: 0.75rem 0;
+            border: 2px solid;
         }
 
         .result-pass {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
+            background: #f0fdf4;
+            color: #166534;
+            border-color: #bbf7d0;
         }
 
         .result-fail {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
+            background: #fef2f2;
+            color: #991b1b;
+            border-color: #fecaca;
         }
 
-        /* Score Grid */
+        /* Score Grid - COMPACT */
         .score-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin: 2rem 0;
+            gap: 0.75rem;
+            margin: 1rem 0;
         }
 
         .score-item {
             text-align: center;
-            padding: 1.5rem;
+            padding: 0.875rem;
             background: #f9fafb;
-            border-radius: 0.75rem;
-            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            border: 1px solid #f3f4f6;
         }
 
         .score-label {
-            font-size: 0.875rem;
+            font-size: 0.7rem;
             color: #6b7280;
             text-transform: uppercase;
-            margin-bottom: 0.5rem;
+            letter-spacing: 0.03em;
+            margin-bottom: 0.375rem;
         }
 
         .score-value {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            color: #1f2937;
+            color: #0E1B33;
         }
 
-        .score-percentage {
-            font-size: 2.5rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        /* Submission Details - COMPACT */
+        .submission-details {
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.75rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #f3f4f6;
         }
 
-        /* Question Results */
+        .submission-details p {
+            margin: 0.125rem 0;
+        }
+
+        .submission-details strong {
+            color: #0E1B33;
+            font-weight: 600;
+        }
+
+        /* Overall Feedback Card - COMPACT */
+        .feedback-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+        }
+
+        .feedback-title {
+            font-weight: 700;
+            color: #0E1B33;
+            margin-bottom: 0.625rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feedback-text {
+            color: #4b5563;
+            line-height: 1.5;
+            font-size: 0.875rem;
+        }
+
+        /* Question Results Card - COMPACT */
+        .questions-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+        }
+
+        .questions-header {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0E1B33;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         .question-result {
             background: #f9fafb;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border-left: 4px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid #e5e7eb;
         }
 
         .question-result.full-marks {
-            border-left-color: #10b981;
+            border-left-color: #22c55e;
             background: #f0fdf4;
         }
 
@@ -136,123 +193,111 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.625rem;
         }
 
         .question-number {
             font-weight: 700;
-            color: #1f2937;
-            font-size: 1.1rem;
+            color: #0E1B33;
+            font-size: 0.95rem;
         }
 
         .marks-badge {
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 6px;
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
+            border: 1px solid;
         }
 
         .marks-full {
-            background: #d1fae5;
-            color: #065f46;
+            background: #dcfce7;
+            color: #166534;
+            border-color: #86efac;
         }
 
         .marks-partial {
             background: #fef3c7;
             color: #92400e;
+            border-color: #fde68a;
         }
 
         .marks-zero {
             background: #fee2e2;
             color: #991b1b;
+            border-color: #fecaca;
         }
 
         .question-text {
             color: #4b5563;
-            margin-bottom: 1rem;
-            line-height: 1.6;
+            margin-bottom: 0.625rem;
+            line-height: 1.4;
+            font-size: 0.875rem;
         }
 
         .instructor-comment {
             background: white;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            border-left: 3px solid #3b82f6;
-            margin-top: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 6px;
+            border-left: 3px solid #0E1B33;
+            margin-top: 0.625rem;
         }
 
         .comment-label {
-            font-size: 0.75rem;
-            color: #3b82f6;
+            font-size: 0.65rem;
+            color: #6b7280;
             font-weight: 600;
             text-transform: uppercase;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.3rem;
+            letter-spacing: 0.03em;
         }
 
         .comment-text {
             color: #1f2937;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
+            line-height: 1.4;
         }
 
-        /* Overall Feedback */
-        .overall-feedback {
-            background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%);
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            margin: 2rem 0;
+        /* Action Buttons - COMPACT */
+        .actions-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
         }
 
-        .feedback-title {
-            font-weight: 700;
-            color: #4c1d95;
-            margin-bottom: 0.75rem;
-            font-size: 1.1rem;
-        }
-
-        .feedback-text {
-            color: #5b21b6;
-            line-height: 1.6;
-        }
-
-        /* Buttons */
         .button-group {
             display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
+            gap: 0.75rem;
         }
 
         .btn {
             flex: 1;
-            padding: 1rem;
-            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
             font-weight: 600;
+            font-size: 0.875rem;
             text-align: center;
             text-decoration: none;
-            transition: all 0.3s;
+            transition: all 0.2s;
             border: none;
             cursor: pointer;
-            font-size: 1rem;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #0E1B33;
             color: white;
+            border: 2px solid #0E1B33;
+            display: block;
+            text-align: center;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
-        }
-
-        .btn-secondary:hover {
-            background: #667eea;
-            color: white;
+            background: #1a2645;
+            border-color: #1a2645;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(14, 27, 51, 0.15);
         }
 
         @media (max-width: 768px) {
@@ -263,28 +308,34 @@
             .button-group {
                 flex-direction: column;
             }
+
+            body {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 0;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Main Result Card -->
-        <div class="result-card">
-            <div class="header">
-                <h1 class="exam-title">{{ $submission->exam->title }}</h1>
-                <p class="course-name">{{ $submission->exam->course->title }}</p>
+        <!-- Result Header Card -->
+        <div class="result-header">
+            <h1 class="exam-title">{{ $submission->exam->title }}</h1>
+            <p class="course-name">{{ $submission->exam->course->title }}</p>
 
-                <!-- Pass/Fail Badge -->
-                @if($submission->percentage >= 70)
-                    <div class="result-badge result-pass">
-                        ✅ PASSED
-                    </div>
-                @else
-                    <div class="result-badge result-fail">
-                        ❌ FAILED
-                    </div>
-                @endif
-            </div>
+            <!-- Pass/Fail Badge -->
+            @if($submission->percentage >= 70)
+                <div class="result-badge result-pass">
+                    PASSED
+                </div>
+            @else
+                <div class="result-badge result-fail">
+                    FAILED
+                </div>
+            @endif
 
             <!-- Score Grid -->
             <div class="score-grid">
@@ -294,40 +345,46 @@
                 </div>
                 <div class="score-item">
                     <div class="score-label">Percentage</div>
-                    <div class="score-value score-percentage">{{ number_format($submission->percentage, 1) }}%</div>
+                    <div class="score-value">{{ number_format($submission->percentage, 1) }}%</div>
                 </div>
                 <div class="score-item">
-                    <div class="score-label">Passing Marks</div>
+                    <div class="score-label">Passing</div>
                     <div class="score-value">{{ $submission->exam->passing_marks }}</div>
                 </div>
             </div>
 
             <!-- Submission Details -->
-            <div style="text-align: center; color: #6b7280; font-size: 0.875rem; margin: 1rem 0;">
-                <p><strong>Submitted:</strong> {{ $submission->submitted_at->format('M d, Y g:i A') }}</p>
-                <p><strong>Graded:</strong> {{ $submission->graded_at->format('M d, Y g:i A') }}</p>
+            <div class="submission-details">
+                <p><strong>Submitted:</strong> {{ $submission->submitted_at->format('M d, Y - g:i A') }}</p>
+                <p><strong>Graded:</strong> {{ $submission->graded_at->format('M d, Y - g:i A') }}</p>
             </div>
         </div>
 
         <!-- Overall Feedback -->
         @if($submission->instructor_feedback)
-            <div class="result-card">
-                <div class="overall-feedback">
-                    <div class="feedback-title">📝 Instructor's Overall Feedback</div>
-                    <div class="feedback-text">{{ $submission->instructor_feedback }}</div>
-                </div>
+            <div class="feedback-card">
+                <h3 class="feedback-title">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                    </svg>
+                    Instructor's Overall Feedback
+                </h3>
+                <p class="feedback-text">{{ $submission->instructor_feedback }}</p>
             </div>
         @endif
 
         <!-- Question-wise Results -->
-        <div class="result-card">
-            <h2 style="font-size: 1.5rem; font-weight: 700; color: #1f2937; margin-bottom: 1.5rem;">
-                📊 Question-wise Results
+        <div class="questions-card">
+            <h2 class="questions-header">
+                <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                Question-wise Results
             </h2>
 
             @foreach($submission->answers as $answer)
                 @php
-                    $percentage = ($answer->marks_obtained / $answer->question->marks) * 100;
+                    $percentage = $answer->question->marks > 0 ? ($answer->marks_obtained / $answer->question->marks) * 100 : 0;
                     $class = $percentage >= 100 ? 'full-marks' : ($percentage >= 50 ? 'partial-marks' : 'no-marks');
                     $badgeClass = $percentage >= 100 ? 'marks-full' : ($percentage >= 50 ? 'marks-partial' : 'marks-zero');
                 @endphp
@@ -353,19 +410,11 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="result-card">
-            <div class="button-group">
-                @if($submission->percentage >= 70)
-                    <a href="{{ route('certificate.generate', ['userId' => auth()->id(), 'courseId' => $submission->exam->course_id]) }}" 
-                       class="btn btn-primary">
-                        🏆 Download Certificate
-                    </a>
-                @endif
-                <a href="{{ route('user.course.modules', $submission->exam->course_id) }}" 
-                   class="btn btn-secondary">
-                    ← Back to Course
-                </a>
-            </div>
+        <div class="actions-card">
+            <a href="{{ route('user.course.modules', $submission->exam->course_id) }}" 
+               class="btn btn-primary" style="display: block;">
+                Back to Course
+            </a>
         </div>
     </div>
 </body>
