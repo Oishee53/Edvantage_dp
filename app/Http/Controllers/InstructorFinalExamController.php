@@ -454,62 +454,135 @@ class InstructorFinalExamController extends Controller
     /**
      * Save grades for a submission
      */
-    public function saveGrades(Request $request, $submissionId)
-    {
-        $submission = FinalExamSubmission::with('exam.questions')
-            ->findOrFail($submissionId);
+   public function saveGrades(Request $request, $submissionId)
+{
+    $submission = FinalExamSubmission::with(['exam.questions', 'answers.question'])
+        ->findOrFail($submissionId);
 
-        // Check authorization
-        if ($submission->exam->instructor_id !== Auth::id()) {
-            abort(403, 'Unauthorized');
-        }
+    // Check authorization
+    if ($submission->exam->instructor_id !== Auth::id()) {
+        abort(403, 'Unauthorized');
+    }
 
-        $validated = $request->validate([
-            'answers' => 'required|array',
-            'answers.*.question_id' => 'required|exists:final_exam_questions,id',
-            'answers.*.marks_obtained' => 'required|integer|min:0',
-            'answers.*.instructor_comment' => 'nullable|string',
-            'instructor_feedback' => 'nullable|string'
-        ]);
+    // Validate input
+    $validated = $request->validate([
+        'marks' => 'required|array',
+        'marks.*' => 'required|numeric|min:0',
+        'comments' => 'nullable|array',
+        'comments.*' => 'nullable|string',
+        'overall_feedback' => 'nullable|string|max:2000'
+    ]);
 
-        try {
-            DB::beginTransaction();
+    try {
+        DB::beginTransaction();
+        
+        $totalScore = 0;
+
+        // Process each answer
+        foreach ($validated['marks'] as $answerId => $marksObtained) {
+            $answer = FinalExamAnswer::findOrFail($answerId);
             
-            // Update each answer with marks and comments
-            foreach ($validated['answers'] as $answerData) {
-                $answer = FinalExamAnswer::where('submission_id', $submission->id)
-                    ->where('question_id', $answerData['question_id'])
-                    ->first();
-
-                if ($answer) {
-                    $question = FinalExamQuestion::find($answerData['question_id']);
-                    $maxMarks = $question->marks;
-                    $marksObtained = min($answerData['marks_obtained'], $maxMarks);
-
-                    $answer->marks_obtained = $marksObtained;
-                    $answer->instructor_comment = $answerData['instructor_comment'] ?? null;
-                    $answer->save();
-                }
+            // Validate marks don't exceed question max marks
+            if ($marksObtained > $answer->question->marks) {
+                DB::rollBack();
+                return back()->withErrors([
+                    'marks' => "Marks for Question {$answer->question->question_number} cannot exceed {$answer->question->marks}"
+                ])->withInput();
             }
 
-            // Update overall feedback
-            $submission->instructor_feedback = $validated['instructor_feedback'] ?? null;
-            $submission->save();
+            // Update answer with marks and comment
+            $answer->marks_obtained = $marksObtained;
+            $answer->instructor_comment = $validated['comments'][$answerId] ?? null;
+            $answer->save();
 
-            // Calculate and update total score
-            $submission->calculateTotalScore();
-            
-            DB::commit();
-
-            return redirect()->route('instructor.final-exams.submissions', $submission->exam->id)
-                ->with('success', 'Submission graded successfully!');
-                
-        } catch (\Exception $e) {
-            DB::rollBack();
-            
-            return back()
-                ->withErrors(['error' => 'Failed to save grades: ' . $e->getMessage()])
-                ->withInput();
+            $totalScore += $marksObtained;
         }
+
+        // Calculate percentage
+        $percentage = ($totalScore / $submission->exam->total_marks) * 100;
+
+        // Update submission with grading info
+        $submission->status = 'graded';
+        $submission->total_score = $totalScore;
+        $submission->percentage = round($percentage, 2);
+        $submission->instructor_feedback = $validated['overall_feedback'] ?? null;
+        $submission->graded_at = now();
+        $submission->graded_by = Auth::id();
+        $submission->save();
+        
+        DB::commit();
+
+        return redirect()->route('instructor.final-exams.submissions', $submission->exam->id)
+            ->with('success', 'Exam graded successfully! Student has been notified.');
+            
+    } catch (\Exception $e) {
+        DB::rollBack();
+        
+        \Log::error('Failed to save grades', [
+            'error' => $e->getMessage(),
+            'submission_id' => $submissionId
+        ]);
+        
+        return back()
+            ->withErrors(['error' => 'Failed to save grades: ' . $e->getMessage()])
+            ->withInput();
     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
