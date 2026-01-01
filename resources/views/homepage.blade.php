@@ -1233,9 +1233,13 @@
             <div class="courses-grid" id="coursesGrid">
         
 
-                @foreach($courses as $index => $course)
-                 @if(!auth()->user()->enrolledCourses->contains($course->id))
-                <div class="course-card" style="{{ $index >= 4 ? 'display:none;' : '' }}">
+                @php $visibleCount = 0; @endphp
+                @foreach($courses as $course)
+
+                @if(!auth()->check() || !auth()->user()->enrolledCourses->contains($course->id))
+
+                <div class="course-card" style="{{ $visibleCount >= 4 ? 'display:none;' : '' }}"
+>
                     <!-- Course Image -->
                     @if($course->image)
                         <img src="{{ asset('storage/' . $course->image) }}" alt="{{ $course->title }}" class="course-image">
@@ -1264,6 +1268,8 @@
             <span class="rating-count">
                 ({{ $course->ratings->count() }})
             </span>
+            @php $visibleCount++; @endphp
+
         </div>
     @endif
 
