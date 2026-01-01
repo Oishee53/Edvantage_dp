@@ -415,10 +415,11 @@
     <!-- Place the category bar immediately after the header -->
     <div class="category-bar" style="top:56px; font-weight: 50;">
        @foreach($uniqueCategories as $category)
-    <a href="{{ route('guest.courses.search', ['category' => $category]) }}"
-       class="category-link">
-        {{ $category }}
-    </a>
+    <a href="{{ route('guest.courses.search', ['search' => $category]) }}"
+   class="category-link">
+    {{ $category }}
+</a>
+
 @endforeach
 
     </div>

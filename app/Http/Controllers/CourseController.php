@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\CourseRating;
+use App\Models\UserSearch;
 
 use App\Models\Courses;
 use Illuminate\Http\Request;
@@ -84,20 +85,27 @@ public function logged_in_search(Request $request)
 {
     $searchTerm = $request->get('search');
     $user = auth()->user();
-    
+
     if (empty($searchTerm)) {
         return redirect()->route('home');
     }
-    
+
+    // 🔥 STEP 3: SAVE SEARCH KEYWORD
+    UserSearch::create([
+        'user_id' => $user->id,
+        'keyword' => $searchTerm,
+    ]);
+
     $courses = Courses::where('title', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('description', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('category', 'LIKE', "%{$searchTerm}%")
                     ->paginate(12);
-    
+
     $uniqueCategories = Courses::distinct()->pluck('category');
 
     return view('user.logged_in_search_results', compact('courses', 'user', 'searchTerm', 'uniqueCategories'));
 }
+
 
 public function guest_user_search(Request $request)
 {
