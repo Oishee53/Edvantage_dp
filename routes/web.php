@@ -261,8 +261,8 @@ Route::get('/discussion/forum/{forum}', [DiscussionForumController::class, 'show
 Route::post('/discussion/thread/{thread}/reply', [DiscussionForumController::class, 'storeReply'])
         ->name('discussion.reply.store');
 
-Route::post('/discussion/thread/{thread}/{react}', [DiscussionForumController::class, 'toggleReaction'])
-        ->name('discussion.react.store');
+Route::post('/discussion/post/{post}/react/{type}', [DiscussionForumController::class, 'toggleReaction'])
+        ->name('discussion.react');
 
 Route::post('/course/rate', [CourseController::class, 'submitRating'])
     ->name('course.rate')

@@ -71,6 +71,31 @@
             <div class="prose max-w-none text-gray-700">
                 {{ $thread->content }}
             </div>
+
+                        {{-- Like/Dislike Buttons --}}
+            <div class="border-t border-gray-200 p-6 flex items-center space-x-6">
+                {{-- Like Button --}}
+                <form action="{{ route('discussion.react', ['post' => $thread->id, 'type' => 'like']) }}" method="POST" class="inline">
+                    @csrf
+                    <button 
+                        type="submit" 
+                        class="flex items-center space-x-2 hover:text-primary focus:outline-none {{ $thread->isLikedBy(auth()->user()) ? 'text-primary font-semibold' : 'text-gray-600' }}">
+                        <i class="{{ $thread->isLikedBy(auth()->user()) ? 'fas' : 'far' }} fa-thumbs-up"></i>
+                        <span>{{ $thread->like_count }}</span>
+                    </button>
+                </form>
+
+                {{-- Dislike Button --}}
+                <form action="{{ route('discussion.react', ['post' => $thread->id, 'type' => 'dislike']) }}" method="POST" class="inline">
+                    @csrf
+                    <button 
+                        type="submit" 
+                        class="flex items-center space-x-2 hover:text-red-600 focus:outline-none {{ $thread->isDislikedBy(auth()->user()) ? 'text-red-600 font-semibold' : 'text-gray-600' }}">
+                        <i class="{{ $thread->isDislikedBy(auth()->user()) ? 'fas' : 'far' }} fa-thumbs-down"></i>
+                        <span>{{ $thread->dislike_count }}</span>
+                    </button>
+                </form>
+            </div>
         </div>
 
         {{-- Replies Section --}}
@@ -93,34 +118,6 @@
                     </div>
                 @endforelse
             </div>
-
-        {{--React Post
-        <form action="{{ route('discussion.react.store', ['thread' => $thread->id, 'react' => 'like']) }}" method="POST">
-            @csrf
-            <div class="mt-6 flex items-center space-x-4">
-                <button 
-                    type="submit" 
-                    @if($thread->isLikedBy(auth()->user())) disabled @endif
-                    class="flex items-center space-x-2 text-gray-600 hover:text-primary focus:outline-none">
-                    <i class="fas fa-thumbs-up"></i>
-                    <span>Like ({{ $thread->likes()->count() }})</span>
-                </button>
-            </div>
-        </form>
-
-        <form action="{{ route('discussion.react.store', ['thread' => $thread->id, 'react' => 'dislike']) }}" method="POST">
-            @csrf
-            <div class="mt-6 flex items-center space-x-4">
-                <button 
-                    type="submit" 
-                    @if($thread->isDislikedBy(auth()->user())) disabled @endif
-                    class="flex items-center space-x-2 text-gray-600 hover:text-primary focus:outline-none">
-                    <i class="fas fa-thumbs-down"></i>
-                    <span>Dislike ({{ $thread->dislikes()->count() }})</span>
-                </button>
-            </div>
-        </form>
-    --}}
         </div>
 
         {{-- Main Reply Form --}}
