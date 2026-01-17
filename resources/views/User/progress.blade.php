@@ -1,278 +1,251 @@
 @extends('layouts.app')
-
-@if(session('error'))
-    <div class="alert alert-danger clean-alert">
-        <i class="fas fa-exclamation-triangle"></i>
-        <span>{{ session('error') }}</span>
-        <button class="alert-close">&times;</button>
-    </div>
-@endif
+ @if(session('error'))
+  <div class="alert alert-danger clean-alert"> 
+    <i class="fas fa-exclamation-triangle"></i> 
+    <span>{{ session('error') }}</span> 
+    <button class="alert-close">&times;</button> 
+</div>
+ @endif
 
 @section('content')
-
-<!-- Main Navigation Header -->
-<header class="main-header">
-    <div class="nav-container">
-        <a href="/" class="logo">
+ <!-- Main Navigation Header -->
+  <header class="main-header">
+     <div class="nav-container"> 
+        <a href="/" class="logo"> 
             <img src="/image/Edvantage.png" alt="EDVANTAGE Logo" style="height:40px; vertical-align:middle;">
-        </a>
-       <form class="search-form" action="{{ route('courses.search') }}" method="GET">
-    <input type="text" 
-           name="search" 
-           placeholder="What do you want to learn?" 
-           class="search-input"
-           value="{{ request('search') }}"
-           autocomplete="off">
-          </form>
-        <nav>
-            <ul class="nav-menu">
-                <li><a href="#about">About Us</a></li>
-                <li><a href="#contact">Contact Us</a></li>
-            </ul>
-        </nav>
-        <div class="top-icons">
-            <a href="/wishlist" class="icon-button" title="Wishlist">
-                <i class="fa-solid fa-heart"></i>
-            </a>
-            <a href="/cart" class="icon-button" title="Shopping Cart">
-                <i class="fa-solid fa-shopping-bag"></i>
-            </a>
-            <div class="user-menu">
-                <button class="user-menu-button" title="User Menu">
-                    <i class="fa-solid fa-user-circle"></i>
-                </button>
-                <div class="user-dropdown">
-                    <a href="/profile"><i class="fa-solid fa-user icon"></i> My Profile</a>
-                    <a href="{{ route('courses.enrolled') }}"><i class="fa-solid fa-graduation-cap icon"></i> My Courses</a>
-                    <a href="{{ route('user.progress') }}"><i class="fa-solid fa-chart-line icon"></i> My Progress</a>
-                    <a href="{{ route('login') }}"><i class="fa-solid fa-book-open icon"></i> Course Catalog</a>
-                   <a href="{{ route('purchase.history') }}"><i class="fa-solid fa-receipt icon"></i> Purchase History</a>
-                    <div class="separator"></div>
-                    <a href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <i class="fa-solid fa-right-from-bracket icon"></i> Logout
-                    </a>
-                </div>
-            </div>
-        </div>
-        <!-- Hidden logout form -->
-        <form id="logout-form" action="/logout" method="POST" style="display: none;">
-            @csrf
-        </form>
-        <p class="username">{{ explode(' ', auth()->user()->name)[0] }}</p>
-    </div>
-</header>
-
-<div class="clean-dashboard">
-    {{-- Welcome Header Section --}}
-    <header class="clean-header">
-        <div class="header-container">
-            <div class="header-content">
-                <div class="greeting-section">
-                    <h1 class="main-title">
-                        <span class="welcome-text">Welcome back,</span>
-                        <span class="user-name">{{ explode(' ', auth()->user()->name)[0] }}</span>
-                    </h1>
-                    <p class="subtitle">Track your learning journey</p>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <div class="main-content">
-        {{-- Stats Overview --}}
-        <section class="stats-section">
-            <div class="stats-container">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-book-open"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number">{{ count($courseProgress) }}</div>
-                        <div class="stat-label">Enrolled Courses</div>
-                        <div class="stat-description">Currently learning</div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number">{{ collect($courseProgress)->where('completion_percentage', 100)->count() }}</div>
-                        <div class="stat-label">Completed</div>
-                        <div class="stat-description">Successfully finished</div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-certificate"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number">{{ collect($courseProgress)->where('completion_percentage', 100)->where('average_percentage', '>=', 70)->count() }}</div>
-                        <div class="stat-label">Certificates</div>
-                        <div class="stat-description">Achievements earned</div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="stat-content">
-                        @php
-                            $totalProgress = collect($courseProgress)->avg('completion_percentage');
-                        @endphp
-                        <div class="stat-number">{{ round($totalProgress) }}%</div>
-                        <div class="stat-label">Average Progress</div>
-                        <div class="stat-description">Overall performance</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        {{-- Courses Section --}}
-        <section class="courses-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    Your Courses
-                </h2>
-            </div>
-
-            <div class="courses-grid">
-                @forelse($courseProgress as $progress)
-                    <div class="course-card">
-                        <div class="course-header">
-                            <div class="course-progress">
-                                <div class="progress-circle">
-                                    <svg width="60" height="60" class="progress-ring">
-                                        <circle cx="30" cy="30" r="26" 
-                                                fill="none" 
-                                                stroke="#f1f5f9" 
-                                                stroke-width="4"/>
-                                        <circle cx="30" cy="30" r="26"
-                                                fill="none"
-                                                stroke="#0E1B33"
-                                                stroke-width="4"
-                                                stroke-linecap="round"
-                                                stroke-dasharray="163"
-                                                stroke-dashoffset="calc(163 - (163 * {{ $progress['completion_percentage'] }}) / 100)"
-                                                transform="rotate(-90 30 30)"/>
-                                    </svg>
-                                    <div class="progress-text">{{ $progress['completion_percentage'] }}%</div>
-                                </div>
-                            </div>
-
-                            @if($progress['completion_percentage'] == 100 && $progress['average_percentage'] >= 70)
-                                <div class="completion-badge">
-                                    <i class="fas fa-check-circle"></i>
-                                    Completed
-                                </div>
-                            @endif
-                        </div>
-
-                        <div class="course-body">
-                            <h3 class="course-title">{{ $progress['course_name'] }}</h3>
-                            
-                            <div class="course-stats">
-                                <div class="stat">
-                                    <i class="fas fa-play-circle"></i>
-                                    <span>{{ $progress['completed_videos'] }}/{{ $progress['total_videos'] }} Videos</span>
-                                </div>
-                                @if(count($progress['quiz_marks']) > 0)
-                                    <div class="stat">
-                                        <i class="fas fa-clipboard-check"></i>
-                                        <span>{{ count($progress['quiz_marks']) }} Quizzes</span>
-                                    </div>
-                                @endif
-                            </div>
-
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: {{ $progress['completion_percentage'] }}%"></div>
-                            </div>
-
-                            <div class="course-actions">
-                                <button class="btn-primary" onclick="toggleDetails('{{ $progress['course_id'] }}')">
-                                    <i class="fas fa-eye"></i>
-                                    View Details
-                                </button>
-                                
-                                @if($progress['completion_percentage'] == 100 && $progress['average_percentage'] >= 70)
-                                    <a href="{{ route('certificate.generate', [
-                                        'userId' => auth()->id(),
-                                        'courseId' => $progress['course_id'],
-                                    ]) }}" 
-                                    class="btn-secondary" target="_blank">
-                                        <i class="fas fa-download"></i>
-                                        Certificate
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="course-details" id="details-{{ $progress['course_id'] }}" style="display: none;">
-                            <div class="details-header">
-                                <h4><i class="fas fa-chart-bar"></i> Quiz Performance</h4>
-                            </div>
-                            @if(count($progress['quiz_marks']) > 0)
-                                <div class="quiz-list">
-                                    @foreach($progress['quiz_marks'] as $quiz)
-                                        <div class="quiz-item">
-                                            <div class="quiz-info">
-                                                <span class="quiz-name">{{ $quiz['quiz_title'] }}</span>
-                                            </div>
-                                            <div class="quiz-score">{{ $quiz['score'] }}</div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @else
-                                <div class="no-quizzes">
-                                    <i class="fas fa-info-circle"></i>
-                                    <p>No quiz results available yet</p>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                @empty
-                    <div class="empty-state">
-                        <div class="empty-icon">
-                            <i class="fas fa-book-open"></i>
-                        </div>
-                        <h3>No Courses Enrolled</h3>
-                        <p>Start your learning journey by enrolling in your first course</p>
-                        <a href="/courses" class="btn-primary">
-                            <i class="fas fa-search"></i>
-                            Browse Courses
-                        </a>
-                    </div>
-                @endforelse
-            </div>
-        </section>
-    </div>
-</div>
-
+         </a> <form class="search-form" action="{{ route('courses.search') }}" method="GET">
+             <input type="text" name="search" placeholder="What do you want to learn?" class="search-input" value="{{ request('search') }}" autocomplete="off"> 
+            </form> 
+             <nav>
+                 <ul class="nav-menu">
+                     <li><a href="#about">About Us</a></li>
+                     
+                     <li><a href="#contact">Contact Us</a></li>
+                     </ul> </nav> <div class="top-icons">
+                         <a href="/wishlist" class="icon-button" title="Wishlist"> 
+                            <i class="fa-solid fa-heart"></i> </a>
+                             <a href="/cart" class="icon-button" title="Shopping Cart">
+                                 <i class="fa-solid fa-shopping-bag"></i> </a> <div class="user-menu">
+                                     <button class="user-menu-button" title="User Menu">
+                                         <i class="fa-solid fa-user-circle"></i> </button>
+                                         
+                                         
+                                         <div class="user-dropdown"> <a href="/profile">
+                                            <i class="fa-solid fa-user icon">
+                                                </i> My Profile</a> 
+                                                <a href="{{ route('courses.enrolled') }}">
+                                                    <i class="fa-solid fa-graduation-cap icon">
+                                                        </i> My Courses</a> <a href="{{ route('user.progress') }}">
+                                                            <i class="fa-solid fa-chart-line icon">
+                                                                </i> My Progress</a> <a href="{{ route('login') }}">
+                                                                    <i class="fa-solid fa-book-open icon">
+                                                                        </i> Course Catalog</a> <a href="{{ route('purchase.history') }}">
+                                                                            <i class="fa-solid fa-receipt icon"></i> Purchase History</a> 
+                                                                            <div class="separator"></div> <a href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                                                                 <i class="fa-solid fa-right-from-bracket icon"></i> Logout </a> </div> 
+                                                                                </div>
+                                                                             </div>
+                                                                              <!-- Hidden logout form -->
+                                                                               <form id="logout-form" action="/logout" method="POST" style="display: none;">
+                                                                                 @csrf </form>
+                                                                                  <p class="username">{{ explode(' ', auth()->user()->name)[0] }}</p> 
+                                                                                </div> </header> <div class="clean-dashboard">
+                                                                                     {{-- Welcome Header Section --}} 
+                                                                                     <header class="clean-header">
+                                                                                         <div class="header-container">
+                                                                                             <div class="header-content"> 
+                                                                                                <div class="greeting-section">
+                                                                                                     <h1 class="main-title">
+                                                                                                         <span class="welcome-text">Welcome back,</span>
+                                                                                                          <span class="user-name">{{ explode(' ', auth()->user()->name)[0] }}</span> 
+                                                                                                        </h1> <p class="subtitle">Track your learning journey</p>
+                                                                                                     </div>
+                                                                                                     </div> 
+                                                                                                    </div>
+                                                                                                 </header> 
+                                                                                                 <div class="main-content">
+                                                                                                     {{-- Stats Overview --}}
+                                                                                                      <section class="stats-section">
+                                                                                                         <div class="stats-container"> 
+                                                                                                            <div class="stat-card"> 
+                                                                                                                <div class="stat-icon"> 
+                                                                                                                    <i class="fas fa-book-open"></i>
+                                                                                                                 </div> 
+                                                                                                                 <div class="stat-content">
+                                                                                                                     <div class="stat-number">{{ count($courseProgress) }}</div> 
+                                                                                                                     <div class="stat-label">Enrolled Courses</div>
+                                                                                                                      <div class="stat-description">Currently learning</div> 
+                                                                                                                    </div>
+                                                                                                                 </div> 
+                                                                                                                 <div class="stat-card">
+                                                                                                                     <div class="stat-icon">
+                                                                                                                         <i class="fas fa-trophy"></i> 
+                                                                                                                        </div> 
+                                                                                                                        <div class="stat-content">
+                                                                                                                             <div class="stat-number">{{ collect($courseProgress)->where('completion_percentage', 100)->count() }}</div>
+                                                                                                                              <div class="stat-label">Completed</div>
+                                                                                                                               <div class="stat-description">Successfully finished</div>
+                                                                                                                             </div>
+                                                                                                                             </div> 
+                                                                                                                             <div class="stat-card">
+                                                                                                                                 <div class="stat-icon">
+                                                                                                                                     <i class="fas fa-certificate"></i>
+                                                                                                                                     </div> <div class="stat-content"> 
+                                                                                                                                        <div class="stat-number">{{ collect($courseProgress)->where('completion_percentage', 100)->where('average_percentage', '>=', 70)->count() }}</div>
+                                                                                                                                         <div class="stat-label">Certificates</div> 
+                                                                                                                                         <div class="stat-description">Achievements earned</div>
+                                                                                                                                         </div>
+                                                                                                                                         </div>
+                                                                                                                                          <div class="stat-card">
+                                                                                                                                             <div class="stat-icon">
+                                                                                                                                                 <i class="fas fa-chart-line"></i> </div> 
+                                                                                                                                                 <div class="stat-content"> @php $totalProgress = collect($courseProgress)->avg('completion_percentage');
+                                                                                                                                                  @endphp 
+                                                                                                                                                  <div class="stat-number">{{ round($totalProgress) }}%</div> 
+                                                                                                                                                  <div class="stat-label">Average Progress</div>
+                                                                                                                                                   <div class="stat-description">Overall performance</div>
+                                                                                                                                                 </div>
+                                                                                                                                                 </div>
+                                                                                                                                                 </div>
+                                                                                                                                                 </section>
+                                                                                                                                                  {{-- Courses Section --}}
+                                                                                                                                                   <section class="courses-section">
+                                                                                                                                                     <div class="section-header">
+                                                                                                                                                         <h2 class="section-title"> Your Courses </h2> 
+                                                                                                                                                        </div> 
+                                                                                                                                                        <div class="courses-grid">
+                                                                                                                                                             @forelse($courseProgress as $progress) 
+                                                                                                                                                             <div class="course-card">
+                                                                                                                                                                 <div class="course-header">
+                                                                                                                                                                     <div class="course-progress">
+                                                                                                                                                                         <div class="progress-circle">
+                                                                                                                                                                             <svg width="60" height="60" class="progress-ring">
+                                                                                                                                                                                 <circle cx="30" cy="30" r="26" fill="none" stroke="#f1f5f9" stroke-width="4"/> 
+                                                                                                                                                                                 <circle cx="30" cy="30" r="26" fill="none" stroke="#0E1B33" stroke-width="4" stroke-linecap="round" stroke-dasharray="163" stroke-dashoffset="calc(163 - (163 * {{ $progress['completion_percentage'] }}) / 100)" transform="rotate(-90 30 30)"/>
+                                                                                                                                                                                 </svg> 
+                                                                                                                                                                                 <div class="progress-text">{{ $progress['completion_percentage'] }}%</div> 
+                                                                                                                                                                                </div>
+                                                                                                                                                                             </div> 
+                                                                                                                                                                             @if($progress['completion_percentage'] == 100 && $progress['average_percentage'] >= 70) 
+                                                                                                                                                                             <div class="completion-badge">
+                                                                                                                                                                                 <i class="fas fa-check-circle"></i> Completed </div>
+                                                                                                                                                                                  @endif
+                                                                                                                                                                                 </div>
+                                                                                                                                                                                  <div class="course-body">
+                                                                                                                                                                                     <h3 class="course-title">{{ $progress['course_name'] }}</h3>
+                                                                                                                                                                                      <div class="course-stats"> <div class="stat">
+                                                                                                                                                                                         <i class="fas fa-play-circle"></i>
+                                                                                                                                                                                          <span>{{ $progress['completed_videos'] }}/{{ $progress['total_videos'] }} Videos</span> 
+                                                                                                                                                                                        </div>
+                                                                                                                                                                                         @if(count($progress['quiz_marks']) > 0) <div class="stat"> 
+                                                                                                                                                                                            <i class="fas fa-clipboard-check"></i>
+                                                                                                                                                                                             <span>{{ count($progress['quiz_marks']) }} Quizzes</span>
+                                                                                                                                                                                             </div>
+                                                                                                                                                                                              @endif
+                                                                                                                                                                                             </div> 
+                                                                                                                                                                                             <div class="progress-bar">
+                                                                                       
+                                                                                                                                                                                                <div class="progress-fill" style="width: {{ $progress['completion_percentage'] }}%"></div> 
+                                                                                                                                                                                                </div>
+                                                                                                                                                                                                 <div class="course-actions"> <button class="btn-primary" onclick="toggleDetails('{{ $progress['course_id'] }}')">
+                                                                                                                                                                                                     <i class="fas fa-eye"></i> View Details </button>
+                                                                                                                                                                                                      @if($progress['completion_percentage'] == 100 && $progress['average_percentage'] >= 70) 
+                                                                                                                                                                                                      <button class="btn-secondary" onclick="confirmCertificate({{ $progress['course_id'] }})">
+                                                                                                                                                                                                         Certificate
+                                                                                                                                                                                                         </button>
+                                                                                                                                                                                                       <div id="rating-{{ $progress['course_id'] }}" style="display:none; border:1px solid #ccc; padding:15px; margin-top:10px; background:#fff;"> 
+                                                                                                                                                                                                        <form method="POST" action="{{ route('course.rate') }}"> 
+                                                                                                                                                                                                            @csrf
+                                                                                                                                                                                                             <input type="hidden" name="course_id" value="{{ $progress['course_id'] }}">
+                                                                                                                                                                                                              <!-- VERY IMPORTANT --> 
+                                                                                                                                                                                                              <input type="hidden" name="certificate_url" value="{{ route('certificate.generate', [ 'userId' => auth()->id(), 'courseId' => $progress['course_id'] ]) }}">
+                                                                                                                                                                                                               <label>Rate this course</label><br>
+                                                                                                                                                                                                                <select name="rating" required>
+                                                                                                                                                                                                                     <option value="">Select rating</option> 
+                                                                                                                                                                                                                     <option value="5">★★★★★</option> 
+                                                                                                                                                                                                                     <option value="4">★★★★</option> 
+                                                                                                                                                                                                                     <option value="3">★★★</option> 
+                                                                                                                                                                                                                     <option value="2">★★</option>
+                                                                                                                                                                                                                      <option value="1">★</option> 
+                                                                                                                                                                                                                    </select>
+                                                                                                                                                                                                                     <br><br>
+                                                                                                                                                                                                                      <textarea name="review" placeholder="Write a review (optional)"></textarea>
+                                                                                                                                                                                                                       <br><br>
+                                                                                                                                                                                                                        <button type="submit" class="btn-primary"> Submit & Download Certificate </button>
+                                                                                                                                                                                                                         <a href="{{ route('certificate.generate', [ 'userId' => auth()->id(), 'courseId' => $progress['course_id'] ]) }}" class="btn-secondary"> Skip </a> </form>
+                                                                                                                                                                                                                         </div>
+                                                                                                                                                                                                                          @endif 
+                                                                                                                                                                                                                        </div> 
+                                                                                                                                                                                                                    </div> 
+                                                                                                                                                                                                                    <div class="course-details" id="details-{{ $progress['course_id'] }}" style="display: none;">
+                                                                                                                                                                                                                         <div class="details-header">
+                                                                                                                                                                                                                             <h4><i class="fas fa-chart-bar"></i> Quiz Performance</h4>
+                                                                                                                                                                                                                             </div>
+                                                                                                                                                                                                                              @if(count($progress['quiz_marks']) > 0) 
+                                                                                                                                                                                                                              <div class="quiz-list">
+                                                                                                                                                                                                                                 @foreach($progress['quiz_marks'] as $quiz)
+                                                                                                                                                                                                                                  <div class="quiz-item"> <div class="quiz-info">
+                                                                                                                                                                                                                                     <span class="quiz-name">{{ $quiz['quiz_title'] }}</span>
+                                                                                                                                                                                                                                     </div> <div class="quiz-score">{{ $quiz['score'] }}</div> 
+                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                     @endforeach
+                                                                                                                                                                                                                                     </div> 
+                                                                                                                                                                                                                                     @else 
+                                                                                                                                                                                                                                     <div class="no-quizzes">
+                                                                                                                                                                                                                                         <i class="fas fa-info-circle"></i> 
+                                                                                                                                                                                                                                         <p>No quiz results available yet</p>
+                                                                                                                                                                                                                                         </div>
+                                                                                                                                                                                                                                          @endif 
+                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                     </div>
+                                                                                                                                                                                                                                      @empty
+                                                                                                                                                                                                                                       <div class="empty-state"> 
+                                                                                                                                                                                                                                        <div class="empty-icon"> 
+                                                                                                                                                                                                                                            <i class="fas fa-book-open"></i> 
+                                                                                                                                                                                                                                        </div> 
+                                                                                                                                                                                                                                        <h3>No Courses Enrolled</h3>
+                                                                                                                                                                                                                                         <p>Start your learning journey by enrolling in your first course</p>
+                                                                                                                                                                                                                                          <a href="/courses" class="btn-primary">
+                                                                                                                                                                                                                                             <i class="fas fa-search"></i> Browse Courses </a>
+                                                                                                                                                                                                                                             </div> 
+                                                                                                                                                                                                                                             @endforelse                                                                                                                                                                                                                                    </div>                                                                                                                                                                                                                                          </section> 
+     </div>                                                                                                                                                                                                                                            </div>
 <script>
-function toggleDetails(courseId) {
-    const details = document.getElementById(`details-${courseId}`);
-    const isVisible = details.style.display !== 'none';
-    
-    if (isVisible) {
-        details.style.display = 'none';
-    } else {
-        details.style.display = 'block';
-    }
-}
+    function toggleDetails(courseId) {
+        const details = document.getElementById('details-' + courseId);
+        if (!details) return;
 
-// Close alert functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const alertClose = document.querySelector('.alert-close');
-    if (alertClose) {
-        alertClose.addEventListener('click', function() {
-            this.parentElement.style.display = 'none';
-        });
+        details.style.display =
+            details.style.display === 'none' || details.style.display === ''
+                ? 'block'
+                : 'none';
     }
-});
+
+    function confirmCertificate(courseId) {
+        if (confirm("Do you want to rate this course?")) {
+            // YES → show rating popup
+            const box = document.getElementById('rating-' + courseId);
+            if (box) {
+                box.style.display = 'block';
+                box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        } else {
+            // NO → directly download certificate
+            window.location.href = "/certificate/{{ auth()->id() }}/" + courseId;
+        }
+    }
+
+    // Close alert
+    document.addEventListener('DOMContentLoaded', function () {
+        const alertClose = document.querySelector('.alert-close');
+        if (alertClose) {
+            alertClose.addEventListener('click', function () {
+                this.parentElement.style.display = 'none';
+            });
+        }
+    });
 </script>
+
 
 <style>
 /* Import Font Awesome and Montserrat */

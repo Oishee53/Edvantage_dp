@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\CourseRating;
+use App\Models\UserSearch;
 
 use App\Models\Courses;
 use Illuminate\Http\Request;
@@ -22,11 +24,17 @@ public function viewCourses()
 }
 public function show($id)
 {
-    // Load course with instructor
-    $course = Courses::with('instructor')->findOrFail($id);
+    $course = Courses::with([
+    'instructor',
+    'ratings.user'
+])->findOrFail($id);
+
     $user = auth()->user();
+
     return view('courses.course_details', compact('course','user'));
 }
+
+
  public function create()
 {
     return view('courses.create_course');
@@ -77,20 +85,27 @@ public function logged_in_search(Request $request)
 {
     $searchTerm = $request->get('search');
     $user = auth()->user();
-    
+
     if (empty($searchTerm)) {
         return redirect()->route('home');
     }
-    
+
+    // 🔥 STEP 3: SAVE SEARCH KEYWORD
+    UserSearch::create([
+        'user_id' => $user->id,
+        'keyword' => $searchTerm,
+    ]);
+
     $courses = Courses::where('title', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('description', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('category', 'LIKE', "%{$searchTerm}%")
                     ->paginate(12);
-    
+
     $uniqueCategories = Courses::distinct()->pluck('category');
 
     return view('user.logged_in_search_results', compact('courses', 'user', 'searchTerm', 'uniqueCategories'));
 }
+
 
 public function guest_user_search(Request $request)
 {
@@ -177,6 +192,30 @@ public function markAsReadNotification($id)
 
         
     }
+   public function submitRating(Request $request)
+{
+    $request->validate([
+        'course_id' => 'required|exists:courses,id',
+        'rating' => 'required|integer|min:1|max:5',
+        'review' => 'nullable|string',
+    ]);
+
+    CourseRating::updateOrCreate(
+        [
+            'course_id' => $request->course_id,
+            'user_id' => auth()->id(),
+        ],
+        [
+            'rating' => $request->rating,
+            'review' => $request->review,
+        ]
+    );
+
+     // 🔥 THIS LINE DOWNLOADS THE CERTIFICATE
+    return redirect($request->certificate_url);
+}
+
+
 
 
 

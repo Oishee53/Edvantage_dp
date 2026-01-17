@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Enrollment extends Model
+class CourseRating extends Model
 {
-    protected $fillable = ['user_id', 'course_id', 'status'];
+    protected $fillable = ['course_id', 'user_id', 'rating', 'review'];
 
     public function user()
     {
@@ -15,10 +15,6 @@ class Enrollment extends Model
 
     public function course()
     {
-        return $this->belongsTo(Courses::class, 'course_id');
+        return $this->belongsTo(Courses::class);
     }
-
-
 }
-
-

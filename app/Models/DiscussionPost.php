@@ -52,6 +52,16 @@ class DiscussionPost extends Model
         return $this->replies()->with('allReplies');
     }
 
+    public function likes(): HasMany
+    {
+        return $this->hasMany(DiscussionLike::class, 'discussion_post_id')->where('type', 'like');
+    }
+
+    public function dislikes(): HasMany
+    {
+        return $this->hasMany(DiscussionLike::class, 'discussion_post_id')->where('type', 'dislike');
+    }
+
     // ==================== Scopes ====================
     
     // Get only threads (top-level posts)
@@ -90,6 +100,25 @@ class DiscussionPost extends Model
     public function getReplyCountAttribute(): int
     {
         return $this->replies()->count();
+    }
+    // Get like count
+    public function getLikeCountAttribute(): int
+    {
+        return $this->likes()->count();
+    }
+
+    public function getDislikeCountAttribute(): int
+    {
+        return $this->dislikes()->count();
+    }
+
+    public function isLikedBy(User $user): bool
+    {
+        return $this->likes()->where('user_id', $user->id)->exists();
+    }
+    public function isDislikedBy(User $user): bool
+    {
+        return $this->dislikes()->where('user_id', $user->id)->exists();
     }
 
     // Get the root thread (for replies)

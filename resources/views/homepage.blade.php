@@ -994,8 +994,12 @@
 <body>
     <!-- Place the category bar immediately after the header -->
     <div class="category-bar" style="top:56px; font-weight: 50;">
-        @foreach($uniqueCategories as $category)
-            <a href="#" class="category-link">{{$category}}</a>
+      @foreach($uniqueCategories as $category)
+    <a href="{{ route('courses.search', ['search' => $category]) }}"
+   class="category-link">
+    {{ $category }}
+</a>
+
         @endforeach
     </div>
    <!-- Main Navigation Bar -->
@@ -1130,6 +1134,94 @@
         <h2 class="section-title"></h2>
       </div>
 
+      {{-- ================= RECOMMENDED COURSES ================= --}}
+@if(auth()->check() && isset($recommendedCourses) && count($recommendedCourses))
+<section class="courses-section" style="padding-top: 2rem;">
+    <div class="container">
+        <div class="section-title">
+            <h2>Recommended For You</h2>
+            <p>Courses based on your searches and learning activity</p>
+        </div>
+
+        <div class="courses-grid">
+            @foreach($recommendedCourses as $course)
+                <div class="course-card">
+                    {{-- Course Image --}}
+                    @if($course->image)
+                        <img src="{{ asset('storage/' . $course->image) }}" 
+                             alt="{{ $course->title }}" 
+                             class="course-image">
+                    @else
+                        <img src="https://via.placeholder.com/300x140?text=Course+Image" 
+                             alt="{{ $course->title }}" 
+                             class="course-image">
+                    @endif
+
+                    {{-- Course Content --}}
+                    <div class="course-content">
+                        <h3 class="course-title">{{ $course->title }}</h3>
+
+                        @if($course->category)
+                            <span class="course-category-badge">
+                                {{ $course->category }}
+                            </span>
+                        @endif
+
+                        {{-- Rating --}}
+                        @if($course->ratings->count())
+                            <div class="course-rating">
+                                <span class="stars">
+                                    @for($i = 1; $i <= floor($course->averageRating()); $i++)
+                                        ★
+                                    @endfor
+                                </span>
+                                <span class="rating-number">
+                                    {{ $course->averageRating() }}
+                                </span>
+                                <span class="rating-count">
+                                    ({{ $course->ratings->count() }})
+                                </span>
+                            </div>
+                        @endif
+
+                        {{-- Price --}}
+                        <div class="course-price">
+                            <span class="taka-bold">৳</span>
+                            {{ number_format($course->price ?? 0, 0) }}
+                        </div>
+
+                        {{-- Actions --}}
+                        <div class="course-actions">
+                            <a href="{{ route('courses.details', $course->id) }}" 
+                               class="btn-details">
+                                Details
+                            </a>
+
+                            <div class="action-icons-group">
+                                <form method="POST" action="{{ route('wishlist.add', $course->id) }}">
+                                    @csrf
+                                    <button type="submit" class="btn-icon-action">
+                                        <i class="fa-solid fa-heart"></i>
+                                    </button>
+                                </form>
+
+                                <form method="POST" action="{{ route('cart.add', $course->id) }}">
+                                    @csrf
+                                    <button type="submit" class="btn-icon-action">
+                                        <i class="fa-solid fa-shopping-cart"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+{{-- ================= END RECOMMENDED COURSES ================= --}}
+
     <!-- Courses Section -->
     <section class="courses-section" id="courses">
         <div class="container">
@@ -1139,9 +1231,15 @@
             </div>
             <!-- Show only one row of courses and add a "Load More" button -->
             <div class="courses-grid" id="coursesGrid">
-                @foreach($courses as $index => $course)
-                 @if(!auth()->user()->enrolledCourses->contains($course->id))
-                <div class="course-card" style="{{ $index >= 4 ? 'display:none;' : '' }}">
+        
+
+                @php $visibleCount = 0; @endphp
+                @foreach($courses as $course)
+
+                @if(!auth()->check() || !auth()->user()->enrolledCourses->contains($course->id))
+
+                <div class="course-card" style="{{ $visibleCount >= 4 ? 'display:none;' : '' }}"
+>
                     <!-- Course Image -->
                     @if($course->image)
                         <img src="{{ asset('storage/' . $course->image) }}" alt="{{ $course->title }}" class="course-image">
@@ -1149,15 +1247,36 @@
                         <img src="https://via.placeholder.com/300x140?text=Course+Image" alt="{{ $course->title }}" class="course-image">
                     @endif
                     <!-- Course Content -->
-                    <div class="course-content">
-                        <h3 class="course-title">{{ $course->title }}</h3>
-                        @if(isset($course->category))
-                            <span class="course-category-badge">{{ $course->category }}</span>
-                        @endif
-                      
-                        <div class="course-price">
-                            <span class="taka-bold">৳</span> {{ number_format($course->price ?? 0, 0) }}
-                        </div>
+                   <div class="course-content">
+    <h3 class="course-title">{{ $course->title }}</h3>
+
+    @if(isset($course->category))
+        <span class="course-category-badge">{{ $course->category }}</span>
+    @endif
+
+    {{-- ⭐ STEP 9: Average Rating --}}
+    @if($course->ratings->count())
+        <div class="course-rating">
+            <span class="stars">
+                @for($i = 1; $i <= floor($course->averageRating()); $i++)
+                    ★
+                @endfor
+            </span>
+            <span class="rating-number">
+                {{ $course->averageRating() }}
+            </span>
+            <span class="rating-count">
+                ({{ $course->ratings->count() }})
+            </span>
+            @php $visibleCount++; @endphp
+
+        </div>
+    @endif
+
+    <div class="course-price">
+        <span class="taka-bold">৳</span> {{ number_format($course->price ?? 0, 0) }}
+    </div>
+
                         <div class="course-actions">
                             <a href="{{ route('courses.details', $course->id) }}" class="btn-details">
                                 Details
@@ -1238,6 +1357,32 @@
       window.location.href = "{{ route('wishlist.all') }}";
     }
   @endif
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const cards = document.querySelectorAll('#coursesGrid .course-card');
+
+    let visible = 4;
+    const increment = 4;
+
+    if (!loadMoreBtn || cards.length === 0) return;
+
+    loadMoreBtn.addEventListener('click', function () {
+        let shown = 0;
+
+        for (let i = visible; i < cards.length && shown < increment; i++) {
+            cards[i].style.display = 'flex';
+            shown++;
+        }
+
+        visible += shown;
+
+        if (visible >= cards.length) {
+            loadMoreBtn.style.display = 'none';
+        }
+    });
+});
 </script>
 
 

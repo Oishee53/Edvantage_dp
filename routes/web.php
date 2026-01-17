@@ -40,6 +40,8 @@ Route::post('/logout', function () {
 
 
 
+
+
 // ----------------------------- Forget Password --------------------------//
 Route::controller(ForgotPasswordController::class)->group(function () {
     Route::post('forget-password', 'sendResetLinkEmail')->name('password.email');
@@ -70,20 +72,10 @@ Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.de
 
 Route::middleware(['auth','student'])->group(function () {
 
-Route::get('/homepage', function () {
-    $user = auth()->user();
+Route::get('/homepage', [UserController::class, 'homepage'])
+    ->middleware(['auth','student'])
+    ->name('homepage');
 
-    // Filter courses: quizzes count must match video_count
-    $courses = Courses::withCount('quizzes')
-        ->get()
-        ->filter(function ($course) {
-            return $course->quizzes_count == $course->video_count;
-        });
-
-    $uniqueCategories = $courses->pluck('category')->unique();
-
-    return view('homepage', compact('user', 'courses', 'uniqueCategories'));
-});
 
 Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 
@@ -269,3 +261,13 @@ Route::get('/discussion/forum/{forum}', [DiscussionForumController::class, 'show
 Route::post('/discussion/thread/{thread}/reply', [DiscussionForumController::class, 'storeReply'])
         ->name('discussion.reply.store');
 
+Route::post('/discussion/thread/{thread}/{react}', [DiscussionForumController::class, 'toggleReaction'])
+        ->name('discussion.react.store');
+
+Route::post('/course/rate', [CourseController::class, 'submitRating'])
+    ->name('course.rate')
+    ->middleware('auth');
+
+
+Route::get('/courses/{id}', [CourseController::class, 'show'])
+    ->name('courses.details');

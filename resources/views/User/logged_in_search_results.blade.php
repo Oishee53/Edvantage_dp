@@ -558,10 +558,11 @@
     <main class="main-content">
         <div class="container">
             <!-- Back to Home Link -->
-            <a href="/" class="back-link">
-                <i class="fa-solid fa-arrow-left"></i>
-                Back to Home
-            </a>
+           <a href="{{ auth()->check() ? route('homepage') : url('/') }}" class="back-link">
+    <i class="fa-solid fa-arrow-left"></i>
+    Back to Home
+</a>
+
             
             <!-- Search Results Header -->
             <div class="search-header">

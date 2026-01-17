@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DiscussionForum;
-use App\Models\DiscussionPost;
 use Illuminate\Http\Request;
+use App\Models\DiscussionLike;
+use App\Models\DiscussionPost;
+use App\Models\DiscussionForum;
 
 class DiscussionForumController extends Controller
 {
@@ -55,15 +56,53 @@ class DiscussionForumController extends Controller
     {
         $validated = $request->validate([
             'content' => 'required|string',
+            'parent_id' => 'nullable|exists:discussion_posts,id',
         ]);
 
         DiscussionPost::create([
             'forum_id' => $thread->forum_id,
             'user_id' => auth()->id(),
-            'parent_id' => $thread->id,
+            'parent_id' => $validated['parent_id'] ?? $thread->id,
             'content' => $validated['content'],
         ]);
 
         return back()->with('success', 'Reply posted successfully!');
+    }
+
+   public function toggleReaction(DiscussionPost $post, String $type)
+    {
+        $user = auth()->user();
+        
+        // Find ANY existing reaction (like or dislike)
+        $reaction = DiscussionLike::where('discussion_post_id', $post->id)
+            ->where('user_id', $user->id)
+            ->first();
+        
+        if ($reaction) {
+            if ($reaction->type === $type ) {
+                $reaction->delete();
+                $message = 'Reaction removed';
+            }
+            else if ($reaction->type === 'like' && $type === 'dislike') {
+                // Already liked → remove like
+                $reaction->update(['type' => 'dislike']);
+                $message = 'Changed to dislike';
+            } 
+            else if ($reaction->type === 'dislike' && $type === 'like') {
+                // Already disliked → remove dislike
+                $reaction->update(['type' => 'like']);
+                $message = 'Changed to like';
+            } 
+        } else {
+            // No reaction → create like
+            DiscussionLike::create([
+                'discussion_post_id' => $post->id,
+                'user_id' => $user->id,
+                'type' => $type,
+            ]);
+            $message = 'Post reacted';
+        }
+        
+        return back()->with('success', $message);
     }
 }
