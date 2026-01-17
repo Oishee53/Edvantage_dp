@@ -159,7 +159,7 @@
         <h1>Create Final Exam</h1>
 
         <div class="info-box">
-            <strong>📋 Important:</strong> You can save as draft or publish immediately. Passing mark is automatically set to 70%.
+            <strong>Important:</strong> You can save as draft or publish immediately. Passing mark is automatically set to 70%.
         </div>
 
         @if ($errors->any())
@@ -226,7 +226,7 @@
                 <!-- Questions will be added here dynamically -->
             </div>
 
-            <button type="button" class="add-question-btn" onclick="addQuestion()">
+            <button type="button" class="add-question-btn" onclick="addQuestion()" style="padding: 0.5rem 1rem; margin-bottom: 1rem;">
                 + Add Question
             </button>
 
@@ -246,7 +246,7 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="submit-btn">Create Final Exam</button>
+            <button type="submit" class="submit-btn" style="padding: 0.75rem 1.5rem; font-size: 0.95rem;">Create Final Exam</button>
         </form>
     </div>
 
