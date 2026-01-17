@@ -83,15 +83,10 @@ class DiscussionForumController extends Controller
                 $reaction->delete();
                 $message = 'Reaction removed';
             }
-            else if ($reaction->type === 'like' && $type === 'dislike') {
-                // Already liked → remove like
-                $reaction->update(['type' => 'dislike']);
-                $message = 'Changed to dislike';
-            } 
-            else if ($reaction->type === 'dislike' && $type === 'like') {
+            else{
                 // Already disliked → remove dislike
-                $reaction->update(['type' => 'like']);
-                $message = 'Changed to like';
+                $reaction->update(['type' => $type]);
+                $message = 'Updated reaction';
             } 
         } else {
             // No reaction → create like

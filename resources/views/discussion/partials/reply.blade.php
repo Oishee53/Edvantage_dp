@@ -14,6 +14,32 @@
             </div>
             <p class="text-gray-700 mb-3">{{ $reply->content }}</p>
 
+                        <div class="border-t border-gray-200 p-6 flex items-center space-x-6">
+                {{-- Like Button --}}
+                <form action="{{ route('discussion.react', ['post' => $reply->id, 'type' => 'like']) }}" method="POST" class="inline">
+                    @csrf
+                    <button 
+                        type="submit" 
+                        class="flex items-center space-x-2 hover:text-primary focus:outline-none {{ $reply->isLikedBy(auth()->user()) ? 'text-primary font-semibold' : 'text-gray-600' }}">
+                        <i class="{{ $reply->isLikedBy(auth()->user()) ? 'fas' : 'far' }} fa-thumbs-up"></i>
+                        <span>{{ $reply->like_count }}</span>
+                    </button>
+                </form>
+
+                {{-- Dislike Button --}}
+                <form action="{{ route('discussion.react', ['post' => $reply->id, 'type' => 'dislike']) }}" method="POST" class="inline">
+                    @csrf
+                    <button 
+                        type="submit" 
+                        class="flex items-center space-x-2 hover:text-red-600 focus:outline-none {{ $reply->isDislikedBy(auth()->user()) ? 'text-red-600 font-semibold' : 'text-gray-600' }}">
+                        <i class="{{ $reply->isDislikedBy(auth()->user()) ? 'fas' : 'far' }} fa-thumbs-down"></i>
+                        <span>{{ $reply->dislike_count }}</span>
+                    </button>
+                </form>
+            
+
+            
+
             {{-- Reply Button --}}
             <button 
                 onclick="toggleReplyForm({{ $reply->id }})" 
@@ -21,6 +47,7 @@
                 <i class="fas fa-reply mr-1"></i>
                 Reply
             </button>
+            </div>
 
             {{-- Nested Reply Form --}}
             <div id="reply-form-{{ $reply->id }}" class="hidden mt-4 bg-gray-50 p-4 rounded-lg">
