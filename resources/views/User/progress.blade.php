@@ -8,7 +8,7 @@
  @endif
 
 @section('content')
- <!-- Main Navigation Header --->
+ <!--- Main Navigation Header --->
   <header class="main-header">
     
      <div class="nav-container"> 
