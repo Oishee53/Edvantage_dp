@@ -144,6 +144,19 @@
                 @endif
             </div>
 
+            {{-- Discussion Forum Section --}}
+            @if($forum)
+                <x-discussion-forum :forum="$forum" :course="$course" />
+            @else
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-comments text-gray-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Discussion Forum Not Available</h3>
+                    <p class="text-gray-600">The discussion forum for this lecture is not yet set up.</p>
+                </div>
+            @endif
+
             {{-- Ask Questions Form --}}
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <form action="{{ route('questions.store') }}" method="POST">
