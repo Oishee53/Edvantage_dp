@@ -4,233 +4,255 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Manage Courses</title>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    /* Custom CSS Variables */
     :root {
-      --primary-color: #0E1B33;
-      --primary-light-hover-bg: #E3E6F3;
-      --body-background: #f9fafb;
-      --card-background: #ffffff;
-      --text-default: #333;
-      --text-gray-600: #4b5563;
-      --text-gray-700: #374151;
-      --text-gray-500: #6b7280;
-      --border-color: #e5e7eb;
-      --edit-bg: #EDF2FC;
-      --edit-text: #0E1B33;
-      --delete-bg: #FEF2F2;
-      --delete-icon: #DC2626;
-      --green-600: #059669;
-      --success-color: #059669;
-      --warning-color: #f59e0b;
-      --purple-color: #8b5cf6;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8f9fa;
+      --bg-tertiary: #f1f3f5;
+      --text-primary: #000000;
+      --text-secondary: #495057;
+      --text-tertiary: #6c757d;
+      --border-color: #dee2e6;
+      --border-light: #e9ecef;
+      --accent: #212529;
+      --hover-bg: #f8f9fa;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     body {
-      font-family: 'Montserrat', sans-serif;
-      background-color: var(--body-background);
-      margin: 0;
-      display: flex;
-      min-height: 100vh;
-      overflow-x: hidden;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+      line-height: 1.5;
     }
 
     /* Sidebar */
     .sidebar {
-      width: 17.5rem;
-      background-color: var(--card-background);
+      width: 240px;
+      background-color: var(--bg-primary);
       min-height: 100vh;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border-right: 1px solid var(--border-color);
       position: fixed;
       left: 0;
       top: 0;
     }
 
     .sidebar-header {
-      padding: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--primary-color);
-      font-weight: 700;
-      font-size: 1.25rem;
+      padding: 1.5rem 1rem;
+      border-bottom: 1px solid var(--border-light);
     }
 
     .sidebar-header img {
-      height: 2.5rem;
+      height: 32px;
     }
 
     .sidebar-nav {
-      margin-top: 2.5rem;
-      display: flex;
-      flex-direction: column;
+      padding: 1rem 0;
     }
 
     .sidebar-nav a {
       display: block;
-      padding: 0.75rem 1.5rem;
-      color: var(--primary-color);
+      padding: 0.625rem 1rem;
+      color: var(--text-secondary);
       font-weight: 500;
+      font-size: 0.875rem;
       text-decoration: none;
-      transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+      transition: all 0.15s ease;
+      border-left: 3px solid transparent;
     }
 
     .sidebar-nav a:hover {
-      background-color: var(--primary-light-hover-bg);
-      color: var(--primary-color);
+      background-color: var(--hover-bg);
+      color: var(--text-primary);
     }
 
     .sidebar-nav a.active {
-      background-color: var(--primary-light-hover-bg);
-      color: var(--primary-color);
+      background-color: var(--bg-tertiary);
+      color: var(--text-primary);
+      border-left-color: var(--accent);
     }
 
-    /* Main Content Wrapper */
+    /* Main */
     .main-wrapper {
-      margin-left: 17.5rem;
-      flex: 1;
-      max-width: calc(100vw - 17.5rem);
-      overflow-x: hidden;
+      margin-left: 240px;
+      min-height: 100vh;
     }
 
     .main-content {
-      flex: 1;
-      padding: 2rem;
-      max-width: 100%;
-      box-sizing: border-box;
+      padding: 1.5rem;
+      max-width: 1400px;
     }
 
-    /* Top bar */
-    .top-bar {
+    /* Header */
+    .page-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .top-bar-title {
-      font-size: 1.5rem;
-      font-weight: 400;
-      color: var(--primary-color);
-    }
-
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .user-info span {
-      color: var(--primary-color);
-      font-weight: 500;
-    }
-
-    .logout-button {
-      padding: 0.5rem 0.75rem;
-      border-radius: 0.25rem;
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.2s ease-in-out;
-      background-color: var(--primary-color);
-      color: white;
-    }
-
-    .logout-button:hover {
-      opacity: 0.9;
-    }
-
-    /* Add Course Button */
-    .add-course-button {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background-color: var(--primary-color);
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border-radius: 0.375rem;
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.2s ease-in-out;
-      border: none;
-      cursor: pointer;
-      font-size: 0.875rem;
-      white-space: nowrap;
-      margin-left: auto;
-    }
-
-    .add-course-button:hover {
-      background-color: #1a2645;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(14, 27, 51, 0.2);
-    }
-
-    /* Section Headers */
-    .section-header {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--primary-color);
-      margin: 2rem 0 1rem 0;
-      padding-left: 0.5rem;
-      border-left: 4px solid var(--primary-color);
-    }
-
-    .section-header:first-of-type {
-      margin-top: 1rem;
-    }
-
-    /* Course Card - NEW STYLE */
-    .course-card {
-      background: var(--card-background);
-      border-radius: 0.5rem;
-      padding: 1.5rem;
       margin-bottom: 1.5rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      transition: all 0.3s ease;
-    }
-
-    .course-card:hover {
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-      transform: translateY(-2px);
-    }
-
-    .course-header {
-      display: flex;
-      gap: 1.5rem;
-      margin-bottom: 1rem;
       padding-bottom: 1rem;
       border-bottom: 1px solid var(--border-color);
     }
 
-    .course-image-large {
-      width: 120px;
-      height: 90px;
-      object-fit: cover;
-      border-radius: 0.5rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
     }
 
-    .course-info {
-      flex: 1;
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-name {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.375rem 0.875rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    .btn:hover {
+      background-color: var(--hover-bg);
+      border-color: var(--accent);
+    }
+
+    .btn-primary {
+      background-color: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover {
+      background-color: #000000;
+      border-color: #000000;
+    }
+
+    .btn-sm {
+      padding: 0.25rem 0.625rem;
+      font-size: 0.75rem;
+    }
+
+    .btn-danger {
+      color: #dc3545;
+      border-color: #dc3545;
+    }
+
+    .btn-danger:hover {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    /* Section Container */
+    .section-container {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+
+    .section-header {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      padding: 0.875rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .section-count {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid var(--border-color);
+    }
+
+    .section-body {
+      padding: 0;
+    }
+
+    /* Course Card - Compact */
+    .course-card {
+      border-bottom: 1px solid var(--border-light);
+      transition: background-color 0.15s ease;
+    }
+
+    .course-card:last-child {
+      border-bottom: none;
+    }
+
+    .course-card:hover {
+      background-color: var(--bg-secondary);
+    }
+
+    .course-main {
+      padding: 1rem 1.25rem;
+      display: grid;
+      grid-template-columns: 100px 1fr auto;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .course-image {
+      width: 100px;
+      height: 65px;
+      object-fit: cover;
+      border-radius: 3px;
+      border: 1px solid var(--border-light);
+    }
+
+    .course-details {
+      min-width: 0;
     }
 
     .course-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--primary-color);
-      margin-bottom: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.375rem;
     }
 
     .course-meta {
       display: flex;
-      gap: 1.5rem;
-      font-size: 0.875rem;
-      color: var(--text-gray-600);
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
     }
 
     .course-meta-item {
@@ -239,223 +261,92 @@
       gap: 0.25rem;
     }
 
+    .meta-label {
+      color: var(--text-tertiary);
+    }
+
+    .meta-value {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
     .course-actions {
       display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-top: 0.5rem;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
+      flex-direction: column;
       gap: 0.375rem;
-      padding: 0.5rem 1rem;
-      border-radius: 0.25rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      align-items: flex-end;
     }
 
-    .btn-primary {
-      background-color: var(--primary-color);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background-color: #1a2645;
-      transform: translateY(-1px);
-    }
-
-    .btn-view {
-      background-color: #3b82f6;
-      color: white;
-    }
-
-    .btn-view:hover {
-      background-color: #2563eb;
-    }
-
-    .btn-edit {
-      background-color: #6366f1;
-      color: white;
-    }
-
-    .btn-edit:hover {
-      background-color: #4f46e5;
-    }
-
-    .btn-success {
-      background-color: var(--success-color);
-      color: white;
-    }
-
-    .btn-success:hover {
-      background-color: #047857;
-    }
-
-    .btn-purple {
-      background-color: var(--purple-color);
-      color: white;
-    }
-
-    .btn-purple:hover {
-      background-color: #7c3aed;
-    }
-
-    .btn-warning {
-      background-color: var(--warning-color);
-      color: white;
-    }
-
-    .btn-warning:hover {
-      background-color: #d97706;
-    }
-
-    /* Final Exam Section - NEW */
-    .final-exam-section {
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 2px solid #f3f4f6;
-    }
-
-    .final-exam-header {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.75rem;
-    }
-
-    .final-exam-header h4 {
-      font-size: 1rem;
-      color: var(--primary-color);
-      margin: 0;
-    }
-
-    .exam-status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: 12px;
-      font-size: 0.75rem;
+    .status-badge {
+      display: inline-block;
+      padding: 0.1875rem 0.5rem;
+      border-radius: 3px;
+      font-size: 0.6875rem;
       font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+      margin-left: 0.5rem;
     }
 
-    .exam-status-draft {
-      background-color: #fef3c7;
-      color: #92400e;
+    .status-pending {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
     }
 
-    .exam-status-published {
-      background-color: #d1fae5;
-      color: #065f46;
+    .status-submitted {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
     }
 
-    .exam-info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 0.75rem;
-      margin: 0.75rem 0;
-      padding: 0.75rem;
-      background: #f9fafb;
-      border-radius: 0.375rem;
-    }
-
-    .exam-info-item {
-      font-size: 0.75rem;
-    }
-
-    .exam-info-label {
-      color: var(--text-gray-600);
-      margin-bottom: 0.25rem;
-    }
-
-    .exam-info-value {
-      font-weight: 600;
-      color: var(--primary-color);
-      font-size: 0.875rem;
-    }
-
-    .pending-badge {
-      background-color: #fee2e2;
-      color: #dc2626;
-      padding: 0.125rem 0.5rem;
-      border-radius: 10px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      margin-left: 0.25rem;
-    }
-
-    .no-courses {
+    .empty-state {
+      padding: 2rem;
       text-align: center;
-      color: var(--text-gray-500);
-      font-style: italic;
-      padding: 3rem 2rem;
-      background-color: var(--card-background);
-      border-radius: 0.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      margin-bottom: 2rem;
+      color: var(--text-tertiary);
+      font-size: 0.875rem;
     }
 
-    /* Responsive Design */
-    @media (max-width: 1024px) {
-      .sidebar {
-        width: 16rem;
-      }
-      
-      .main-wrapper {
-        margin-left: 16rem;
-        max-width: calc(100vw - 16rem);
-      }
-
-      .add-course-button {
-        margin-left: 0;
-      }
+    /* Pending Section Styling */
+    .section-container.pending .section-header {
+      background: var(--bg-tertiary);
     }
 
+    /* Responsive */
     @media (max-width: 768px) {
       .sidebar {
         display: none;
       }
-      
+
       .main-wrapper {
         margin-left: 0;
-        max-width: 100vw;
       }
-      
+
       .main-content {
         padding: 1rem;
       }
 
-      .course-header {
-        flex-direction: column;
+      .course-main {
+        grid-template-columns: 1fr;
       }
 
-      .course-image-large {
+      .course-image {
         width: 100%;
-        height: 150px;
+        height: 120px;
       }
 
       .course-actions {
-        justify-content: stretch;
+        align-items: stretch;
       }
 
-      .btn {
-        flex: 1;
-        justify-content: center;
-      }
-
-      .exam-info-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .top-bar {
+      .page-header {
         flex-direction: column;
         align-items: stretch;
+        gap: 1rem;
+      }
+
+      .header-actions {
+        justify-content: space-between;
       }
     }
   </style>
@@ -464,243 +355,179 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <img src="/image/Edvantage.png" alt="Edvantage Logo">
+      <img src="/image/Edvantage.png" alt="Edvantage">
     </div>
     <nav class="sidebar-nav">
       <a href="/instructor_homepage">Dashboard</a>
-      <a href="/instructor/manage_courses" class="active">Manage Course</a>
+      <a href="/instructor/manage_courses" class="active">Manage Courses</a>
     </nav>
   </aside>
 
-  <!-- Main Content Wrapper -->
+  <!-- Main -->
   <div class="main-wrapper">
-    <!-- Main Content -->
     <main class="main-content">
-      <!-- Top bar -->
-      <div class="top-bar">
-        <div class="top-bar-title">Manage Courses</div>
+      <!-- Header -->
+      <div class="page-header">
+        <h1 class="page-title">Manage Courses</h1>
         @auth
-          <div class="user-info">
-            <span>{{ auth()->user()->name }}</span>
-            <form action="/logout" method="POST" style="display: inline;">
+          <div class="header-actions">
+            <span class="user-name">{{ auth()->user()->name }}</span>
+            <form action="/logout" method="POST">
               @csrf
-              <button class="logout-button">Logout</button>
+              <button class="btn btn-sm">Logout</button>
             </form>
           </div>
         @endauth
       </div>
 
       @auth
-      <!-- Add Course Button -->
-      <div style="margin-bottom: 2rem;">
+      <!-- Add Course -->
+      <div style="margin-bottom: 1.5rem;">
         <form action="/manage_courses/add" method="GET">
-          <button type="submit" class="add-course-button">
-            ➕ Add New Course
-          </button>
+          <button type="submit" class="btn btn-primary">Add New Course</button>
         </form>
       </div>
 
       <!-- Approved Courses Section -->
-      <p class="section-header">Approved Courses</p>
-      @if(isset($courses) && $courses->isEmpty())
-          <div class="no-courses">No approved courses available.</div>
-      @else
-          @foreach($courses as $course)
+      <div class="section-container">
+        <div class="section-header">
+          <h2 class="section-title">Approved Courses</h2>
+          @if(isset($courses))
+            <span class="section-count">{{ $courses->count() }}</span>
+          @endif
+        </div>
+        <div class="section-body">
+          @if(isset($courses) && $courses->isEmpty())
+            <div class="empty-state">No approved courses available.</div>
+          @else
+            @foreach($courses as $course)
               <div class="course-card">
-                <div class="course-header">
+                <div class="course-main">
                   @if($course->image)
-                    <img src="{{ asset('storage/' . $course->image) }}" alt="{{ $course->title }}" class="course-image-large">
+                    <img src="{{ asset('storage/' . $course->image) }}" alt="{{ $course->title }}" class="course-image">
                   @endif
                   
-                  <div class="course-info">
+                  <div class="course-details">
                     <h3 class="course-title">{{ $course->title }}</h3>
                     <div class="course-meta">
-                      <span class="course-meta-item">📚 {{ $course->category }}</span>
-                      <span class="course-meta-item">🎥 {{ $course->video_count }} videos</span>
-                      <span class="course-meta-item">⏱️ {{ $course->total_duration }} hrs</span>
-                      <span class="course-meta-item" style="color: var(--success-color); font-weight: 600;">৳{{ $course->price }}</span>
+                      <div class="course-meta-item">
+                        <span class="meta-label">Category:</span>
+                        <span class="meta-value">{{ $course->category }}</span>
+                      </div>
+                      <div class="course-meta-item">
+                        <span class="meta-label">Videos:</span>
+                        <span class="meta-value">{{ $course->video_count }}</span>
+                      </div>
+                      <div class="course-meta-item">
+                        <span class="meta-label">Duration:</span>
+                        <span class="meta-value">{{ $course->total_duration }} hrs</span>
+                      </div>
+                      <div class="course-meta-item">
+                        <span class="meta-label">Price:</span>
+                        <span class="meta-value">৳{{ $course->price }}</span>
+                      </div>
                     </div>
-                    <p style="color: var(--text-gray-600); font-size: 0.875rem; margin-top: 0.5rem;">
-                      {{ Str::limit($course->description, 100) }}
-                    </p>
                   </div>
-                </div>
 
-                <div class="course-actions">
-                  <a href="{{ url("/admin_panel/manage_resources/{$course->id}/modules") }}" class="btn btn-primary">
-                    📂 Manage Modules
-                  </a>
-                </div>
-
-                <!-- 🆕 FINAL EXAM SECTION -->
-                <div class="final-exam-section">
-                  <div class="final-exam-header">
-                    <h4>📝 Final Exam</h4>
+                  <div class="course-actions">
+                    <a href="{{ url("/admin_panel/manage_resources/{$course->id}/modules") }}" class="btn btn-sm">
+                      Manage Modules
+                    </a>
                     @php
-                        $finalExam = \App\Models\FinalExam::where('course_id', $course->id)->first();
+                      $finalExam = \App\Models\FinalExam::where('course_id', $course->id)->first();
                     @endphp
-                    
                     @if($finalExam)
-                        @if($finalExam->status === 'draft')
-                            <span class="exam-status-badge exam-status-draft">📄 Draft</span>
-                        @else
-                            <span class="exam-status-badge exam-status-published">✅ Published</span>
-                        @endif
+                      <a href="{{ route('instructor.final-exams.show', $finalExam->id) }}" class="btn btn-sm">
+                        View Final Exam
+                      </a>
+                    @else
+                      <a href="{{ route('instructor.final-exams.create') }}?course_id={{ $course->id }}" class="btn btn-sm">
+                        Create Final Exam
+                      </a>
                     @endif
                   </div>
-
-                  @if($finalExam)
-                      <!-- Exam exists - show details and actions -->
-                      <div class="exam-info-grid">
-                        <div class="exam-info-item">
-                          <div class="exam-info-label">Questions</div>
-                          <div class="exam-info-value">{{ $finalExam->questions()->count() }}</div>
-                        </div>
-                        <div class="exam-info-item">
-                          <div class="exam-info-label">Total Marks</div>
-                          <div class="exam-info-value">{{ $finalExam->total_marks }}</div>
-                        </div>
-                        <div class="exam-info-item">
-                          <div class="exam-info-label">Duration</div>
-                          <div class="exam-info-value">{{ $finalExam->duration_minutes }} min</div>
-                        </div>
-                        <div class="exam-info-item">
-                          <div class="exam-info-label">Submissions</div>
-                          <div class="exam-info-value">
-                            {{ $finalExam->submissions()->count() }}
-                            @php
-                                $pendingCount = $finalExam->pendingGradingSubmissions()->count();
-                            @endphp
-                            @if($pendingCount > 0)
-                                <span class="pending-badge">{{ $pendingCount }}</span>
-                            @endif
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="course-actions">
-                        <!-- View Exam -->
-                        <a href="{{ route('instructor.final-exams.show', $finalExam->id) }}" class="btn btn-view">
-                          👁️ View Exam
-                        </a>
-
-                        <!-- Edit (only if no submissions) -->
-                        @if(!$finalExam->submissions()->exists())
-                            <a href="{{ route('instructor.final-exams.edit', $finalExam->id) }}" class="btn btn-edit">
-                              ✏️ Edit Exam
-                            </a>
-                        @endif
-
-                        <!-- Publish (if draft) -->
-                        @if($finalExam->status === 'draft')
-                            <form action="{{ route('instructor.final-exams.publish', $finalExam->id) }}" method="POST" style="display: inline;">
-                              @csrf
-                              <button type="submit" class="btn btn-success" onclick="return confirm('Publish this exam? Students will be able to take it.')">
-                                ✅ Publish Exam
-                              </button>
-                            </form>
-                        @endif
-
-                        <!-- Unpublish (if published and no submissions) -->
-                        @if($finalExam->status === 'published' && !$finalExam->submissions()->whereIn('status', ['submitted', 'graded'])->exists())
-                            <form action="{{ route('instructor.final-exams.unpublish', $finalExam->id) }}" method="POST" style="display: inline;">
-                              @csrf
-                              <button type="submit" class="btn btn-warning" onclick="return confirm('Unpublish this exam? Students will not be able to see it.')">
-                                ⏸️ Unpublish
-                              </button>
-                            </form>
-                        @endif
-
-                        <!-- View Submissions -->
-                        <a href="{{ route('instructor.final-exams.submissions', $finalExam->id) }}" class="btn btn-purple">
-                          📊 View Submissions
-                          @if($pendingCount > 0)
-                              <span style="background: white; color: var(--purple-color); padding: 0.125rem 0.5rem; border-radius: 10px; font-size: 0.75rem; font-weight: 700;">
-                                {{ $pendingCount }}
-                              </span>
-                          @endif
-                        </a>
-                      </div>
-                  @else
-                      <!-- No exam yet - show create button -->
-                      <div style="text-align: center; padding: 1rem; background: #f3f4f6; border-radius: 0.375rem;">
-                        <p style="color: var(--text-gray-600); margin-bottom: 1rem; font-size: 0.875rem;">
-                          No final exam created for this course yet.
-                        </p>
-                        <a href="{{ route('instructor.final-exams.create') }}?course_id={{ $course->id }}" class="btn btn-primary">
-                          ➕ Create Final Exam
-                        </a>
-                      </div>
-                  @endif
                 </div>
               </div>
-          @endforeach
-      @endif
+            @endforeach
+          @endif
+        </div>
+      </div>
 
       <!-- Pending Courses Section -->
-      <p class="section-header">Pending Courses (Awaiting Admin Approval)</p>
-      @if(isset($pendingCourses) && $pendingCourses->isEmpty())
-          <div class="no-courses">No pending courses available.</div>
-      @else
-          @foreach($pendingCourses as $course)
-              <div class="course-card" style="border-left: 4px solid var(--warning-color);">
-                <div class="course-header">
+      <div class="section-container pending">
+        <div class="section-header">
+          <h2 class="section-title">Pending Courses (Awaiting Approval)</h2>
+          @if(isset($pendingCourses))
+            <span class="section-count">{{ $pendingCourses->count() }}</span>
+          @endif
+        </div>
+        <div class="section-body">
+          @if(isset($pendingCourses) && $pendingCourses->isEmpty())
+            <div class="empty-state">No pending courses.</div>
+          @else
+            @foreach($pendingCourses as $course)
+              <div class="course-card">
+                <div class="course-main">
                   @if($course->image)
-                    <img src="{{ asset('storage/' . $course->image) }}" alt="{{ $course->title }}" class="course-image-large">
+                    <img src="{{ asset('storage/' . $course->image) }}" alt="{{ $course->title }}" class="course-image">
                   @endif
                   
-                  <div class="course-info">
+                  <div class="course-details">
                     <h3 class="course-title">{{ $course->title }}</h3>
                     <div class="course-meta">
-                      <span class="course-meta-item">📚 {{ $course->category }}</span>
-                      <span class="course-meta-item">🎥 {{ $course->video_count }} videos</span>
-                      <span class="course-meta-item">⏱️ {{ $course->total_duration }} hrs</span>
-                      <span class="course-meta-item" style="color: var(--success-color); font-weight: 600;">৳{{ $course->price }}</span>
-                    </div>
-                    <div style="margin-top: 0.5rem;">
-                      @if(\App\Models\CourseNotification::where('pending_course_id', $course->id)->exists())
-                        <span style="display: inline-block; background: #d1fae5; color: #065f46; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">
-                          ✅ Submitted for Approval
-                        </span>
-                      @else
-                        <span style="display: inline-block; background: #fef3c7; color: #92400e; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">
-                          ⚠️ Not Yet Submitted
-                        </span>
-                      @endif
+                      <div class="course-meta-item">
+                        <span class="meta-label">Category:</span>
+                        <span class="meta-value">{{ $course->category }}</span>
+                      </div>
+                      <div class="course-meta-item">
+                        <span class="meta-label">Videos:</span>
+                        <span class="meta-value">{{ $course->video_count }}</span>
+                      </div>
+                      <div class="course-meta-item">
+                        <span class="meta-label">Duration:</span>
+                        <span class="meta-value">{{ $course->total_duration }} hrs</span>
+                      </div>
+                      <div class="course-meta-item">
+                        <span class="meta-label">Price:</span>
+                        <span class="meta-value">৳{{ $course->price }}</span>
+                      </div>
+                      <div class="course-meta-item">
+                        @if(\App\Models\CourseNotification::where('pending_course_id', $course->id)->exists())
+                          <span class="status-badge status-submitted">Submitted</span>
+                        @else
+                          <span class="status-badge status-pending">Not Submitted</span>
+                        @endif
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="course-actions">
-                  <a href="{{ url("/instructor/manage_resources/{$course->id}/modules") }}" class="btn btn-primary">
-                    📂 Manage Modules
-                  </a>
-                  
-                  <form action="/admin/manage_courses/courses/{{ $course->id }}/edit" method="GET" style="display: inline;">
-                    <button type="submit" class="btn btn-edit">
-                      ✏️ Edit Course
-                    </button>
-                  </form>
-                  
-                  <form action="/admin_panel/manage_courses/delete-course/{{ $course->id }}" method="POST" style="display: inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn" style="background-color: var(--delete-bg); color: var(--delete-icon);" onclick="return confirm('Are you sure you want to delete this course?');">
-                      🗑️ Delete
-                    </button>
-                  </form>
-                </div>
-
-                <div style="margin-top: 1rem; padding: 0.75rem; background: #fef3c7; border-radius: 0.375rem; font-size: 0.875rem; color: #92400e;">
-                  <strong>Note:</strong> You can only create final exams for approved courses. This course is awaiting admin approval.
+                  <div class="course-actions">
+                    <a href="{{ url("/instructor/manage_resources/{$course->id}/modules") }}" class="btn btn-sm">
+                      Manage Modules
+                    </a>
+                    <form action="/admin/manage_courses/courses/{{ $course->id }}/edit" method="GET">
+                      <button type="submit" class="btn btn-sm">Edit Course</button>
+                    </form>
+                    <form action="/admin_panel/manage_courses/delete-course/{{ $course->id }}" method="POST">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this course?');">
+                        Delete
+                      </button>
+                    </form>
+                  </div>
                 </div>
               </div>
-          @endforeach
-      @endif
+            @endforeach
+          @endif
+        </div>
+      </div>
 
       @else
-      <div style="text-align: center; padding: 3rem;">
-        <p>You are not logged in. <a href="/" style="color: var(--primary-color); text-decoration: underline;">Go to Login</a></p>
+      <div class="section-container">
+        <div class="empty-state" style="padding: 3rem;">
+          <p>You are not logged in. <a href="/" style="color: var(--accent); text-decoration: underline;">Go to Login</a></p>
+        </div>
       </div>
       @endauth
     </main>
