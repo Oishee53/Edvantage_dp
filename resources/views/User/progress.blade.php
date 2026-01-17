@@ -8,8 +8,9 @@
  @endif
 
 @section('content')
- <!-- Main Navigation Header -->
+ <!-- Main Navigation Header --->
   <header class="main-header">
+    
      <div class="nav-container"> 
         <a href="/" class="logo"> 
             <img src="/image/Edvantage.png" alt="EDVANTAGE Logo" style="height:40px; vertical-align:middle;">
