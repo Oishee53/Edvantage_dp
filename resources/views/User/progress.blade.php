@@ -8,8 +8,9 @@
  @endif
 
 @section('content')
- <!-- Main Navigation Header -->
+ <!--- Main Navigation Header --->
   <header class="main-header">
+    
      <div class="nav-container"> 
         <a href="/" class="logo"> 
             <img src="/image/Edvantage.png" alt="EDVANTAGE Logo" style="height:40px; vertical-align:middle;">
@@ -150,33 +151,17 @@
                                                                                                                                                                                                  <div class="course-actions"> <button class="btn-primary" onclick="toggleDetails('{{ $progress['course_id'] }}')">
                                                                                                                                                                                                      <i class="fas fa-eye"></i> View Details </button>
                                                                                                                                                                                                       @if($progress['completion_percentage'] == 100 && $progress['average_percentage'] >= 70) 
-                                                                                                                                                                                                      <button class="btn-secondary" onclick="confirmCertificate({{ $progress['course_id'] }})">
-                                                                                                                                                                                                         Certificate
-                                                                                                                                                                                                         </button>
-                                                                                                                                                                                                       <div id="rating-{{ $progress['course_id'] }}" style="display:none; border:1px solid #ccc; padding:15px; margin-top:10px; background:#fff;"> 
-                                                                                                                                                                                                        <form method="POST" action="{{ route('course.rate') }}"> 
-                                                                                                                                                                                                            @csrf
-                                                                                                                                                                                                             <input type="hidden" name="course_id" value="{{ $progress['course_id'] }}">
-                                                                                                                                                                                                              <!-- VERY IMPORTANT --> 
-                                                                                                                                                                                                              <input type="hidden" name="certificate_url" value="{{ route('certificate.generate', [ 'userId' => auth()->id(), 'courseId' => $progress['course_id'] ]) }}">
-                                                                                                                                                                                                               <label>Rate this course</label><br>
-                                                                                                                                                                                                                <select name="rating" required>
-                                                                                                                                                                                                                     <option value="">Select rating</option> 
-                                                                                                                                                                                                                     <option value="5">★★★★★</option> 
-                                                                                                                                                                                                                     <option value="4">★★★★</option> 
-                                                                                                                                                                                                                     <option value="3">★★★</option> 
-                                                                                                                                                                                                                     <option value="2">★★</option>
-                                                                                                                                                                                                                      <option value="1">★</option> 
-                                                                                                                                                                                                                    </select>
-                                                                                                                                                                                                                     <br><br>
-                                                                                                                                                                                                                      <textarea name="review" placeholder="Write a review (optional)"></textarea>
-                                                                                                                                                                                                                       <br><br>
-                                                                                                                                                                                                                        <button type="submit" class="btn-primary"> Submit & Download Certificate </button>
-                                                                                                                                                                                                                         <a href="{{ route('certificate.generate', [ 'userId' => auth()->id(), 'courseId' => $progress['course_id'] ]) }}" class="btn-secondary"> Skip </a> </form>
-                                                                                                                                                                                                                         </div>
-                                                                                                                                                                                                                          @endif 
-                                                                                                                                                                                                                        </div> 
-                                                                                                                                                                                                                    </div> 
+                                                                                                                                                                                                    <button class="btn-secondary"
+    onclick="openRatingModal(
+        {{ $progress['course_id'] }},
+        '{{ route('certificate.generate', ['userId' => auth()->id(), 'courseId' => $progress['course_id']]) }}'
+    )">
+    Certificate
+</button>
+ @endif  
+ 
+
+                                                                                                                                                                                                      
                                                                                                                                                                                                                     <div class="course-details" id="details-{{ $progress['course_id'] }}" style="display: none;">
                                                                                                                                                                                                                          <div class="details-header">
                                                                                                                                                                                                                              <h4><i class="fas fa-chart-bar"></i> Quiz Performance</h4>
@@ -207,10 +192,72 @@
                                                                                                                                                                                                                                          <p>Start your learning journey by enrolling in your first course</p>
                                                                                                                                                                                                                                           <a href="/courses" class="btn-primary">
                                                                                                                                                                                                                                              <i class="fas fa-search"></i> Browse Courses </a>
-                                                                                                                                                                                                                                             </div> 
+                                                                                                                                                                                                                                           </div> 
                                                                                                                                                                                                                                              @endforelse                                                                                                                                                                                                                                    </div>                                                                                                                                                                                                                                          </section> 
-     </div>                                                                                                                                                                                                                                            </div>
+     </div>   
+     <!-- ⭐ RATING POPUP -->
+<div id="ratingModal"
+     style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999;">
+
+    <div style="background:#fff; width:420px; margin:10% auto; padding:20px; border-radius:12px; text-align:center;">
+
+        <h3>Would you like to rate this course?</h3>
+
+        <form method="POST" action="{{ route('course.rate') }}">
+            @csrf
+
+            <input type="hidden" name="course_id" id="rating_course_id">
+            <input type="hidden" name="rating" id="rating_value">
+            <input type="hidden" name="certificate_url" id="certificate_url">
+
+            <!-- ⭐ STAR RATING -->
+            <div id="stars" style="font-size:32px; cursor:pointer; margin:12px 0;">
+                @for($i = 1; $i <= 5; $i++)
+                    <span data-value="{{ $i }}">☆</span>
+                @endfor
+            </div>
+
+            <!-- 💬 COMMENT -->
+            <textarea name="review"
+                placeholder="Write a review (optional)"
+                style="width:100%; padding:8px; margin-bottom:10px;"></textarea>
+
+            <div style="display:flex; justify-content:space-between; gap:10px;">
+                <button type="button" class="btn-secondary" onclick="skipRating()">Skip</button>
+                <button type="submit" class="btn-primary">Submit & Download</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+                                                                                                                                                                                                                                             </div>
 <script>
+    let selectedRating = 0;
+
+function openRatingModal(courseId, certificateUrl) {
+    document.getElementById('ratingModal').style.display = 'block';
+    document.getElementById('rating_course_id').value = courseId;
+    document.getElementById('certificate_url').value = certificateUrl;
+}
+
+// Star click logic
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('#stars span').forEach(star => {
+        star.addEventListener('click', function () {
+            selectedRating = this.dataset.value;
+            document.getElementById('rating_value').value = selectedRating;
+
+            document.querySelectorAll('#stars span').forEach(s => {
+                s.innerText = s.dataset.value <= selectedRating ? '★' : '☆';
+            });
+        });
+    });
+});
+
+function skipRating() {
+    window.location.href = document.getElementById('certificate_url').value;
+}
+
     function toggleDetails(courseId) {
         const details = document.getElementById('details-' + courseId);
         if (!details) return;
@@ -221,19 +268,7 @@
                 : 'none';
     }
 
-    function confirmCertificate(courseId) {
-        if (confirm("Do you want to rate this course?")) {
-            // YES → show rating popup
-            const box = document.getElementById('rating-' + courseId);
-            if (box) {
-                box.style.display = 'block';
-                box.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        } else {
-            // NO → directly download certificate
-            window.location.href = "/certificate/{{ auth()->id() }}/" + courseId;
-        }
-    }
+
 
     // Close alert
     document.addEventListener('DOMContentLoaded', function () {
