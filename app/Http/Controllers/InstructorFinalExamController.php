@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\FinalExam;
-use App\Models\FinalExamQuestion;
-use App\Models\FinalExamSubmission;
-use App\Models\FinalExamAnswer;
 use App\Models\Courses;
+use App\Models\FinalExam;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\FinalExamAnswer;
+use App\Models\FinalExamQuestion;
 use Illuminate\Support\Facades\DB;
+use App\Models\FinalExamSubmission;
+use Illuminate\Support\Facades\Auth;
+use App\Notifications\FinalExamGradedNotification;
 
 class InstructorFinalExamController extends Controller
 {
@@ -512,6 +513,11 @@ class InstructorFinalExamController extends Controller
         
         DB::commit();
 
+        $student = $submission->user;
+        if($student){
+            $student->notify(new FinalExamGradedNotification($submission));
+        }
+
         return redirect()->route('instructor.final-exams.submissions', $submission->exam->id)
             ->with('success', 'Exam graded successfully! Student has been notified.');
             
@@ -528,60 +534,6 @@ class InstructorFinalExamController extends Controller
             ->withInput();
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
