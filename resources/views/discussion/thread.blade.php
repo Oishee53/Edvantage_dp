@@ -18,144 +18,148 @@
         }
     </script>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <div class="container mx-auto px-6 py-8 max-w-4xl">
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-6 max-w-4xl">
         {{-- Back Button --}}
-        <div class="mb-6">
+        <div class="mb-4">
             <a href="{{ route('inside.module', ['courseId' => $forum->course_id, 'moduleNumber' => $forum->module->moduleId]) }}" 
-               class="inline-flex items-center text-gray-600 hover:text-gray-900">
-                <i class="fas fa-arrow-left mr-2"></i>
-                Back to Course
+               class="inline-flex items-center text-gray-600 hover:text-primary transition-colors">
+                <i class="fas fa-arrow-left mr-2 text-sm"></i>
+                <span class="text-sm font-medium">Back to Course</span>
             </a>
         </div>
 
         {{-- Flash Messages --}}
         @if(session('success'))
-            <div class="bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl mb-6 flex items-center">
-                <i class="fas fa-check-circle mr-3 text-green-500"></i>
-                {{ session('success') }}
+            <div class="bg-green-50 border-l-4 border-green-500 text-green-800 px-4 py-3 rounded mb-4">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <span class="text-sm">{{ session('success') }}</span>
+                </div>
             </div>
         @endif
 
-        {{-- Thread Header --}}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6">
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center space-x-2">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
-                        {{ $forum->title }}
-                    </span>
-                    @if($thread->is_pinned)
-                        <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full flex items-center">
-                            <i class="fas fa-thumbtack mr-1"></i>
-                            Pinned
+        {{-- Combined Thread & Replies Card --}}
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-4">
+            {{-- Thread Header --}}
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center space-x-2">
+                        <span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
+                            {{ $forum->title }}
                         </span>
-                    @endif
+                        @if($thread->is_pinned)
+                            <span class="px-3 py-1 bg-yellow-50 text-yellow-700 text-xs font-medium rounded-full flex items-center">
+                                <i class="fas fa-thumbtack mr-1 text-xs"></i>
+                                Pinned
+                            </span>
+                        @endif
+                    </div>
+                    <span class="text-xs text-gray-500">{{ $thread->created_at->format('M d, Y') }}</span>
                 </div>
-                <span class="text-sm text-gray-500">
-                    {{ $thread->created_at->format('M d, Y') }}
-                </span>
-            </div>
 
-            <h1 class="text-2xl font-bold text-gray-900 mb-4">{{ $thread->title }}</h1>
+                <h1 class="text-xl font-bold text-gray-900 mb-4">{{ $thread->title }}</h1>
 
-            <div class="flex items-center space-x-4 mb-6">
-                <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-semibold text-lg">
-                    {{ strtoupper(substr($thread->user->name ?? 'U', 0, 1)) }}
+                {{-- Author Info --}}
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-semibold">
+                        {{ strtoupper(substr($thread->user->name ?? 'U', 0, 1)) }}
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-900 text-sm">{{ $thread->user->name ?? 'Anonymous' }}</div>
+                        <div class="text-xs text-gray-500">{{ $thread->created_at->diffForHumans() }}</div>
+                    </div>
                 </div>
-                <div>
-                    <div class="font-semibold text-gray-900">{{ $thread->user->name ?? 'Anonymous' }}</div>
-                    <div class="text-sm text-gray-500">{{ $thread->created_at->diffForHumans() }}</div>
+
+                {{-- Thread Content --}}
+                <div class="text-gray-700 text-sm leading-relaxed mb-4">
+                    {{ $thread->content }}
                 </div>
-            </div>
 
-            <div class="prose max-w-none text-gray-700">
-                {{ $thread->content }}
-            </div>
+                {{-- Action Buttons --}}
+                <div class="flex items-center space-x-2 pt-2 border-t border-gray-100">
+                    {{-- Like --}}
+                    <form action="{{ route('discussion.react', ['post' => $thread->id, 'type' => 'like']) }}" method="POST" class="inline">
+                        @csrf
+                        <button 
+                            type="submit" 
+                            class="flex items-center space-x-1 px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors {{ $thread->isLikedBy(auth()->user()) ? 'text-primary bg-blue-50 font-medium' : 'text-gray-600' }}">
+                            <i class="{{ $thread->isLikedBy(auth()->user()) ? 'fas' : 'far' }} fa-thumbs-up text-sm"></i>
+                            <span class="text-sm">{{ $thread->like_count }}</span>
+                        </button>
+                    </form>
 
-                        {{-- Like/Dislike Buttons --}}
-            <div class="border-t border-gray-200 p-6 flex items-center space-x-6">
-                {{-- Like Button --}}
-                <form action="{{ route('discussion.react', ['post' => $thread->id, 'type' => 'like']) }}" method="POST" class="inline">
-                    @csrf
+                    {{-- Dislike --}}
+                    <form action="{{ route('discussion.react', ['post' => $thread->id, 'type' => 'dislike']) }}" method="POST" class="inline">
+                        @csrf
+                        <button 
+                            type="submit" 
+                            class="flex items-center space-x-1 px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors {{ $thread->isDislikedBy(auth()->user()) ? 'text-red-600 bg-red-50 font-medium' : 'text-gray-600' }}">
+                            <i class="{{ $thread->isDislikedBy(auth()->user()) ? 'fas' : 'far' }} fa-thumbs-down text-sm"></i>
+                            <span class="text-sm">{{ $thread->dislike_count }}</span>
+                        </button>
+                    </form>
+
+                    {{-- Respond Button --}}
                     <button 
-                        type="submit" 
-                        class="flex items-center space-x-2 hover:text-primary focus:outline-none {{ $thread->isLikedBy(auth()->user()) ? 'text-primary font-semibold' : 'text-gray-600' }}">
-                        <i class="{{ $thread->isLikedBy(auth()->user()) ? 'fas' : 'far' }} fa-thumbs-up"></i>
-                        <span>{{ $thread->like_count }}</span>
+                        onclick="toggleMainReplyForm()" 
+                        class="flex items-center space-x-1 px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors text-gray-600 font-medium text-sm">
+                        <i class="fas fa-comment text-sm"></i>
+                        <span>Respond</span>
                     </button>
-                </form>
+                </div>
 
-                {{-- Dislike Button --}}
-                <form action="{{ route('discussion.react', ['post' => $thread->id, 'type' => 'dislike']) }}" method="POST" class="inline">
-                    @csrf
-                    <button 
-                        type="submit" 
-                        class="flex items-center space-x-2 hover:text-red-600 focus:outline-none {{ $thread->isDislikedBy(auth()->user()) ? 'text-red-600 font-semibold' : 'text-gray-600' }}">
-                        <i class="{{ $thread->isDislikedBy(auth()->user()) ? 'fas' : 'far' }} fa-thumbs-down"></i>
-                        <span>{{ $thread->dislike_count }}</span>
-                    </button>
-                </form>
+                {{-- Inline Reply Form --}}
+                <div id="main-reply-form" class="hidden mt-4">
+                    <form action="{{ route('discussion.reply.store', $thread->id) }}" method="POST">
+                        @csrf
+                        <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                            <textarea 
+                                name="content"
+                                required
+                                rows="3"
+                                placeholder="Write your response..."
+                                class="w-full border-0 bg-transparent text-sm focus:ring-0 focus:outline-none resize-none placeholder-gray-500 mb-2"></textarea>
+                            @error('content')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                            <div class="flex items-center justify-end space-x-2">
+                                <button 
+                                    type="button" 
+                                    onclick="toggleMainReplyForm()"
+                                    class="text-gray-600 hover:text-gray-900 px-3 py-1.5 text-xs font-medium transition-colors">
+                                    Cancel
+                                </button>
+                                <button 
+                                    type="submit" 
+                                    class="bg-primary hover:bg-opacity-90 text-white px-4 py-1.5 rounded text-xs font-medium transition-colors">
+                                    Post Response
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
 
-        {{-- Replies Section --}}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-            <div class="border-b border-gray-200 p-6">
-                <h2 class="text-lg font-semibold text-gray-900">
-                    {{ $thread->replies()->count() }} {{ Str::plural('Reply', $thread->replies()->count()) }}
+            {{-- Responses Divider --}}
+            <div class="px-6 py-3 bg-gray-50 border-y border-gray-100">
+                <h2 class="text-sm font-semibold text-gray-700">
+                    {{ $thread->replies()->count() }} {{ Str::plural('Response', $thread->replies()->count()) }}
                 </h2>
             </div>
 
             {{-- Replies List --}}
-            <div class="divide-y divide-gray-200">
+            <div class="divide-y divide-gray-100">
                 @forelse($thread->allReplies as $reply)
                     @include('discussion.partials.reply', ['reply' => $reply, 'thread' => $thread, 'depth' => 0])
                 @empty
-                    <div class="p-12 text-center text-gray-500">
-                        <i class="far fa-comments text-4xl text-gray-300 mb-4"></i>
-                        <p class="text-lg font-medium text-gray-900 mb-2">No replies yet</p>
-                        <p class="text-sm">Be the first to respond!</p>
+                    <div class="p-12 text-center">
+                        <i class="far fa-comments text-5xl text-gray-300 mb-3"></i>
+                        <p class="text-base font-medium text-gray-900 mb-1">No responses yet</p>
+                        <p class="text-sm text-gray-500">Be the first to respond!</p>
                     </div>
                 @endforelse
             </div>
-        </div>
-
-        {{-- Main Reply Form --}}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Post a Reply</h3>
-            <form action="{{ route('discussion.reply.store', $thread->id) }}" method="POST">
-                @csrf
-                <div class="mb-4">
-                    <label for="reply_content" class="block text-sm font-medium text-gray-700 mb-2">
-                        Your Reply
-                    </label>
-                    <textarea 
-                        id="reply_content" 
-                        name="content"
-                        required
-                        rows="4"
-                        placeholder="Write your response..."
-                        class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent focus:outline-none resize-none"></textarea>
-                    @error('content')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-                
-                <div class="flex items-center justify-between">
-                    <p class="text-sm text-gray-500">
-                        <i class="fas fa-info-circle mr-1"></i>
-                        Be respectful and constructive
-                    </p>
-                    <button 
-                        type="submit" 
-                        class="bg-primary hover:bg-opacity-90 text-white px-6 py-2 rounded-lg transition-colors">
-                        Post Reply
-                    </button>
-                </div>
-            </form>
-        </div>
-
-
         </div>
     </div>
 
@@ -165,6 +169,29 @@
             form.classList.toggle('hidden');
             if (!form.classList.contains('hidden')) {
                 form.querySelector('textarea').focus();
+            }
+        }
+
+        function toggleMainReplyForm() {
+            const form = document.getElementById('main-reply-form');
+            form.classList.toggle('hidden');
+            if (!form.classList.contains('hidden')) {
+                form.querySelector('textarea').focus();
+            }
+        }
+
+        function toggleNestedReplies(replyId) {
+            const repliesDiv = document.getElementById('nested-replies-' + replyId);
+            const toggleBtn = document.getElementById('toggle-btn-' + replyId);
+            
+            repliesDiv.classList.toggle('hidden');
+            
+            // Change button text
+            if (repliesDiv.classList.contains('hidden')) {
+                const count = repliesDiv.querySelectorAll(':scope > div').length;
+                toggleBtn.innerHTML = `<span>${count} ${count === 1 ? 'reply' : 'replies'}</span>`;
+            } else {
+                toggleBtn.innerHTML = `<i class="fas fa-chevron-up text-xs"></i><span>Hide replies</span>`;
             }
         }
     </script>
