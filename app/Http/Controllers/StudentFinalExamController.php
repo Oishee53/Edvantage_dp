@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\FinalExam;
-use App\Models\FinalExamSubmission;
-use App\Models\FinalExamAnswer;
-use App\Models\Enrollment;
 use App\Models\Courses;
+use App\Models\FinalExam;
+use App\Models\Enrollment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\FinalExamAnswer;
 use Illuminate\Support\Facades\DB;
+use App\Models\FinalExamSubmission;
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Facades\Auth;
+use App\Notifications\FinalExamSubmittedNotification;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 
@@ -359,6 +361,11 @@ class StudentFinalExamController extends Controller
             'status' => 'submitted',
             'submitted_at' => now()
         ]);
+
+        $instructor = User::find($submission->exam->instructor);
+        if ($instructor) {
+            $instructor->notify(new FinalExamSubmittedNotification($submission));
+        }
 
         return redirect()->route('student.final-exam.show', $submission->exam->course_id)
             ->with('success', 'Exam submitted successfully! Your instructor will grade it soon.');
