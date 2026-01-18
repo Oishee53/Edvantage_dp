@@ -1,57 +1,282 @@
 <!-- Navigation Header Component -->
-<nav class="navbar navbar-expand-lg navbar-light fixed-top" style="background-color: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
-    <div class="container-fluid" style="max-width: 1400px; padding: 0.5rem 2rem;">
-        <a class="navbar-brand d-flex align-items-center" href="/" style="margin-right: 2rem;">
-            <img src="/image/Edvantage.png" alt="EDVANTAGE" style="height: 40px;">
-        </a>
-        
-        <form class="d-none d-md-flex mx-3" action="{{ route('courses.search') }}" method="GET" style="flex: 1; max-width: 500px;">
-            <input class="form-control" type="search" name="search" placeholder="What do you want to learn?" value="{{ request('search') }}" autocomplete="off" style="border-radius: 24px; padding: 0.5rem 1.25rem; border: 2px solid #e5e7eb;">
-        </form>
-        
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto d-lg-none mb-2">
-                <li class="nav-item"><a class="nav-link fw-medium" href="#about">About Us</a></li>
-                <li class="nav-item"><a class="nav-link fw-medium" href="#contact">Contact Us</a></li>
-            </ul>
-        </div>
-        
-        <div class="d-flex align-items-center gap-3 ms-auto">
-            <a href="#about" class="text-decoration-none text-dark d-none d-lg-inline fw-medium" style="font-size: 0.9rem; transition: color 0.3s;">About Us</a>
-            <a href="#contact" class="text-decoration-none text-dark d-none d-lg-inline fw-medium" style="font-size: 0.9rem; transition: color 0.3s;">Contact Us</a>
-            
-            <a href="/wishlist" class="btn btn-light d-flex align-items-center justify-content-center" title="Wishlist" style="width: 44px; height: 44px; border-radius: 50%; border: 1px solid #e5e7eb; transition: all 0.3s ease;">
-                <i class="fa-solid fa-heart"></i>
+<header class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm" x-data="{ mobileMenuOpen: false, userMenuOpen: false }">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <!-- Logo -->
+            <a href="/" class="flex-shrink-0">
+                <img src="/image/Edvantage.png" alt="EDVANTAGE Logo" class="h-10">
             </a>
-            
-            <a href="/cart" class="btn btn-light d-flex align-items-center justify-content-center" title="Shopping Cart" style="width: 44px; height: 44px; border-radius: 50%; border: 1px solid #e5e7eb; transition: all 0.3s ease;">
-                <i class="fa-solid fa-shopping-bag"></i>
-            </a>
-            
-            <div class="dropdown">
-                <button class="btn btn-dark d-flex align-items-center justify-content-center dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 44px; height: 44px; border-radius: 50%; background: #0E1B33; border: none; transition: all 0.3s ease;">
-                    <i class="fa-solid fa-user-circle" style="font-size: 1.1rem;"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 220px; border-radius: 12px; margin-top: 0.5rem;">
-                    <li><a class="dropdown-item py-2 px-3" href="/profile" style="transition: all 0.2s; border-radius: 8px; margin: 0.25rem;"><i class="fa-solid fa-user me-2" style="width: 20px; color: #0E1B33;"></i> My Profile</a></li>
-                    <li><a class="dropdown-item py-2 px-3" href="{{ route('courses.enrolled') }}" style="transition: all 0.2s; border-radius: 8px; margin: 0.25rem;"><i class="fa-solid fa-graduation-cap me-2" style="width: 20px; color: #0E1B33;"></i> My Courses</a></li>
-                    <li><a class="dropdown-item py-2 px-3" href="{{ route('user.progress') }}" style="transition: all 0.2s; border-radius: 8px; margin: 0.25rem;"><i class="fa-solid fa-chart-line me-2" style="width: 20px; color: #0E1B33;"></i> My Progress</a></li>
-                    <li><a class="dropdown-item py-2 px-3" href="/homepage" style="transition: all 0.2s; border-radius: 8px; margin: 0.25rem;"><i class="fa-solid fa-book-open me-2" style="width: 20px; color: #0E1B33;"></i> Course Catalog</a></li>
-                    <li><a class="dropdown-item py-2 px-3" href="{{ route('purchase.history') }}" style="transition: all 0.2s; border-radius: 8px; margin: 0.25rem;"><i class="fa-solid fa-receipt me-2" style="width: 20px; color: #0E1B33;"></i> Purchase History</a></li>
-                    <li><hr class="dropdown-divider my-2"></li>
-                    <li><a class="dropdown-item py-2 px-3 text-danger" href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="transition: all 0.2s; border-radius: 8px; margin: 0.25rem;"><i class="fa-solid fa-right-from-bracket me-2" style="width: 20px;"></i> Logout</a></li>
-                </ul>
+
+            <!-- Search Bar - Desktop -->
+            @auth
+            <form action="{{ route('courses.search') }}" method="GET" class="hidden md:flex flex-1 max-w-xl mx-8">
+                <div class="relative w-full">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        value="{{ request('search') }}"
+                        placeholder="What do you want to learn?" 
+                        class="w-full px-4 py-2.5 pl-11 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                        autocomplete="off"
+                    />
+                    <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+            </form>
+            @else
+            <form action="{{ route('guest.courses.search') }}" method="GET" class="hidden md:flex flex-1 max-w-xl mx-8">
+                <div class="relative w-full">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        value="{{ request('search') }}"
+                        placeholder="What do you want to learn?" 
+                        class="w-full px-4 py-2.5 pl-11 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                        autocomplete="off"
+                    />
+                    <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+            </form>
+            @endauth
+
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center space-x-6">
+                <!-- Navigation Links -->
+                <a href="#about" class="text-gray-700 hover:text-teal-600 transition-colors font-medium">About Us</a>
+                <a href="#contact" class="text-gray-700 hover:text-teal-600 transition-colors font-medium">Contact Us</a>
+                
+                @guest
+                    <!-- Guest Buttons -->
+                    <a href="/login" class="px-4 py-2 border-2 border-teal-600 text-teal-600 rounded-md hover:bg-teal-50 transition-colors font-medium">
+                        Login
+                    </a>
+                    <a href="/register" class="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors font-medium shadow-md">
+                        Sign Up
+                    </a>
+                @else
+                    <!-- Logged In User Actions -->
+                    <a href="/wishlist" class="w-11 h-11 flex items-center justify-center rounded-full border border-gray-300 hover:border-teal-500 hover:bg-teal-50 transition-all" title="Wishlist">
+                        <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                    </a>
+                    
+                    <a href="/cart" class="w-11 h-11 flex items-center justify-center rounded-full border border-gray-300 hover:border-teal-500 hover:bg-teal-50 transition-all" title="Shopping Cart">
+                        <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        </svg>
+                    </a>
+                    
+                    <!-- User Dropdown -->
+                    <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                        <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
+                            <div class="w-11 h-11 flex items-center justify-center rounded-full bg-teal-600 text-white hover:bg-teal-700 transition-colors">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="font-semibold text-gray-900">{{ explode(' ', auth()->user()->name)[0] }}</span>
+                            <svg class="w-4 h-4 text-gray-500 transition-transform" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div x-show="open" 
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2"
+                             style="display: none;">
+                            
+                            <a href="/profile" class="flex items-center px-4 py-2.5 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                                My Profile
+                            </a>
+                            
+                            <a href="{{ route('courses.enrolled') }}" class="flex items-center px-4 py-2.5 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                                My Courses
+                            </a>
+                            
+                            <a href="{{ route('user.progress') }}" class="flex items-center px-4 py-2.5 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                My Progress
+                            </a>
+                            
+                            <a href="/homepage" class="flex items-center px-4 py-2.5 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                                Course Catalog
+                            </a>
+                            
+                            <a href="{{ route('purchase.history') }}" class="flex items-center px-4 py-2.5 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Purchase History
+                            </a>
+                            
+                            <hr class="my-2 border-gray-200">
+                            
+                            <a href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" 
+                               class="flex items-center px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
+                                Logout
+                            </a>
+                            
+                            <form id="logout-form" action="/logout" method="POST" class="hidden">
+                                @csrf
+                            </form>
+                        </div>
+                    </div>
+                @endguest
             </div>
-            
-            <span class="fw-semibold d-none d-lg-inline text-dark" style="font-size: 0.95rem; margin-left: 0.5rem;">{{ explode(' ', $user->name)[0] }}</span>
+
+            <!-- Mobile Menu Button -->
+            <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 rounded-md hover:bg-gray-100">
+                <svg x-show="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+                <svg x-show="mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
         </div>
-        
-        <form id="logout-form" action="/logout" method="POST" class="d-none">
-            @csrf
-        </form>
+
+        <!-- Mobile Search -->
+        <div class="md:hidden pb-3">
+            @auth
+            <form action="{{ route('courses.search') }}" method="GET">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        value="{{ request('search') }}"
+                        placeholder="What do you want to learn?" 
+                        class="w-full px-4 py-2.5 pl-11 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        autocomplete="off"
+                    />
+                    <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+            </form>
+            @else
+            <form action="{{ route('guest.courses.search') }}" method="GET">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        value="{{ request('search') }}"
+                        placeholder="What do you want to learn?" 
+                        class="w-full px-4 py-2.5 pl-11 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        autocomplete="off"
+                    />
+                    <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+            </form>
+            @endauth
+        </div>
+
+        <!-- Mobile Menu -->
+        <div x-show="mobileMenuOpen" x-transition class="md:hidden border-t border-gray-200 py-4 space-y-3">
+            <a href="#about" class="block py-2 text-gray-700 hover:text-teal-600 font-medium">About Us</a>
+            <a href="#contact" class="block py-2 text-gray-700 hover:text-teal-600 font-medium">Contact Us</a>
+            
+            @guest
+                <a href="/login" class="block py-2 px-4 border-2 border-teal-600 text-teal-600 rounded-md text-center font-medium">Login</a>
+                <a href="/register" class="block py-2 px-4 bg-teal-600 text-white rounded-md text-center font-medium">Sign Up</a>
+            @else
+                <div class="space-y-2 border-t border-gray-200 pt-3">
+                    <div class="flex items-center gap-3 px-2 mb-3">
+                        <div class="w-10 h-10 flex items-center justify-center rounded-full bg-teal-600 text-white">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <span class="font-semibold text-gray-900">{{ auth()->user()->name }}</span>
+                    </div>
+                    
+                    <a href="/wishlist" class="flex items-center py-2 px-2 text-gray-700 hover:bg-teal-50 rounded-md">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                        Wishlist
+                    </a>
+                    
+                    <a href="/cart" class="flex items-center py-2 px-2 text-gray-700 hover:bg-teal-50 rounded-md">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        </svg>
+                        Shopping Cart
+                    </a>
+                    
+                    <a href="/profile" class="flex items-center py-2 px-2 text-gray-700 hover:bg-teal-50 rounded-md">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        My Profile
+                    </a>
+                    
+                    <a href="{{ route('courses.enrolled') }}" class="flex items-center py-2 px-2 text-gray-700 hover:bg-teal-50 rounded-md">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        My Courses
+                    </a>
+                    
+                    <a href="{{ route('user.progress') }}" class="flex items-center py-2 px-2 text-gray-700 hover:bg-teal-50 rounded-md">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        My Progress
+                    </a>
+                    
+                    <a href="/homepage" class="flex items-center py-2 px-2 text-gray-700 hover:bg-teal-50 rounded-md">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        Course Catalog
+                    </a>
+                    
+                    <a href="{{ route('purchase.history') }}" class="flex items-center py-2 px-2 text-gray-700 hover:bg-teal-50 rounded-md">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Purchase History
+                    </a>
+                    
+                    <a href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();" 
+                       class="flex items-center py-2 px-2 text-red-600 hover:bg-red-50 rounded-md">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        Logout
+                    </a>
+                    
+                    <form id="logout-form-mobile" action="/logout" method="POST" class="hidden">
+                        @csrf
+                    </form>
+                </div>
+            @endguest
+        </div>
     </div>
-</nav>
+</header>
