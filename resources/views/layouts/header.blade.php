@@ -48,6 +48,11 @@
                 <a href="#about" class="text-gray-700 hover:text-teal-600 transition-colors font-medium">About Us</a>
                 <a href="#contact" class="text-gray-700 hover:text-teal-600 transition-colors font-medium">Contact Us</a>
                 
+                <!-- Instructor Mode Link -->
+                @if(auth()->check() && auth()->user()->role == 3)
+                    <a href="/instructor_homepage" class="text-gray-700 hover:text-teal-600 transition-colors font-medium">Instructor</a>
+                @endif
+                
                 @guest
                     <!-- Guest Buttons -->
                     <a href="/login" class="px-4 py-2 border-2 border-teal-600 text-teal-600 rounded-md hover:bg-teal-50 transition-colors font-medium">
@@ -58,6 +63,7 @@
                     </a>
                 @else
                     <!-- Logged In User Actions -->
+                    
                     <a href="/wishlist" class="w-11 h-11 flex items-center justify-center rounded-full border border-gray-300 hover:border-teal-500 hover:bg-teal-50 transition-all" title="Wishlist">
                         <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
@@ -69,6 +75,84 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                         </svg>
                     </a>
+                    
+                    <!-- Notification Button -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @mouseenter="open = true" @mouseleave="open = false" class="w-11 h-11 flex items-center justify-center rounded-full border border-gray-300 hover:border-teal-500 hover:bg-teal-50 transition-all relative" title="Notifications">
+                            <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            </svg>
+                            
+                            @php
+                                // Filter notifications to only count question-related ones
+                                $relevantNotifications = auth()->user()->unreadNotifications->filter(function ($notification) {
+                                    return $notification->type === \App\Notifications\QuestionRejectedNotification::class || 
+                                           $notification->type === \App\Notifications\QuestionAnsweredNotification::class;
+                                });
+                                $relevantCount = $relevantNotifications->count();
+                            @endphp
+                            
+                            @if($relevantCount > 0)
+                                <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white animate-pulse">
+                                    {{ $relevantCount }}
+                                </span>
+                            @endif
+                        </button>
+                        
+                        <!-- Notification Dropdown -->
+                        <div x-show="open" 
+                             @mouseenter="open = true" 
+                             @mouseleave="open = false"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden"
+                             style="display: none;">
+                            
+                            <div class="px-5 py-4 bg-gray-50 border-b border-gray-200">
+                                <h4 class="font-semibold text-gray-900">Notifications</h4>
+                            </div>
+                            
+                            <div class="max-h-96 overflow-y-auto">
+                                @if($relevantCount > 0)
+                                    @foreach($relevantNotifications as $notification)
+                                        @if($notification->type === \App\Notifications\QuestionRejectedNotification::class)
+                                            <div class="px-5 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors border-l-4 border-l-red-600">
+                                                <div class="font-semibold text-gray-900 text-sm mb-1">Question Rejected</div>
+                                                <div class="text-gray-600 text-sm mb-2 leading-relaxed">{{ $notification->data['content'] }}</div>
+                                                <div class="text-gray-500 text-xs italic mb-2">Instructor: {{ $notification->data['instructor_name'] }}</div>
+                                                <a href="{{ url('/student/questions/' . $notification->data['question_id']) }}" class="inline-block px-3 py-1 bg-teal-600 text-white text-xs font-medium rounded hover:bg-teal-700 transition-colors">
+                                                    View Question
+                                                </a>
+                                            </div>
+                                        @endif
+                                        
+                                        @if($notification->type === \App\Notifications\QuestionAnsweredNotification::class)
+                                            <div class="px-5 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors border-l-4 border-l-green-600">
+                                                <div class="font-semibold text-gray-900 text-sm mb-1">Question Answered</div>
+                                                <div class="text-gray-600 text-sm mb-2 leading-relaxed">{{ $notification->data['content'] }}</div>
+                                                <div class="text-gray-500 text-xs italic mb-2">Instructor: {{ $notification->data['instructor_name'] }}</div>
+                                                <a href="{{ url('/student/questions/' . $notification->data['question_id']) }}" class="inline-block px-3 py-1 bg-teal-600 text-white text-xs font-medium rounded hover:bg-teal-700 transition-colors">
+                                                    View Answer
+                                                </a>
+                                            </div>
+                                        @endif
+                                    @endforeach
+                                @else
+                                    <div class="py-10 text-center text-gray-400">
+                                        <svg class="w-8 h-8 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13.5v-8A2.5 2.5 0 0017.5 3h-11A2.5 2.5 0 004 5.5v8A2.5 2.5 0 006.5 16h11a2.5 2.5 0 002.5-2.5z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 8l6 5 6-5"></path>
+                                        </svg>
+                                        <div class="text-sm">No new notifications</div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
                     
                     <!-- User Dropdown -->
                     <div class="relative" x-data="{ open: false }" @click.away="open = false">
@@ -129,6 +213,15 @@
                                 </svg>
                                 Purchase History
                             </a>
+                            
+                            @if(auth()->user()->role != 3)
+                                <a href="{{ route('ins.signup') }}" class="flex items-center px-4 py-2.5 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors">
+                                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                    </svg>
+                                    Register as Instructor
+                                </a>
+                            @endif
                             
                             <hr class="my-2 border-gray-200">
                             
@@ -201,6 +294,11 @@
             <a href="#about" class="block py-2 text-gray-700 hover:text-teal-600 font-medium">About Us</a>
             <a href="#contact" class="block py-2 text-gray-700 hover:text-teal-600 font-medium">Contact Us</a>
             
+            <!-- Instructor Mode Link - Mobile -->
+            @if(auth()->check() && auth()->user()->role == 3)
+                <a href="/instructor_homepage" class="block py-2 text-gray-700 hover:text-teal-600 font-medium">Instructor</a>
+            @endif
+            
             @guest
                 <a href="/login" class="block py-2 px-4 border-2 border-teal-600 text-teal-600 rounded-md text-center font-medium">Login</a>
                 <a href="/register" class="block py-2 px-4 bg-teal-600 text-white rounded-md text-center font-medium">Sign Up</a>
@@ -214,6 +312,26 @@
                         </div>
                         <span class="font-semibold text-gray-900">{{ auth()->user()->name }}</span>
                     </div>
+                    
+                    <!-- Notifications - Mobile -->
+                    <a href="/notifications" class="flex items-center py-2 px-2 text-gray-700 hover:bg-teal-50 rounded-md">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                        </svg>
+                        Notifications
+                        @php
+                            $relevantNotifications = auth()->user()->unreadNotifications->filter(function ($notification) {
+                                return $notification->type === \App\Notifications\QuestionRejectedNotification::class || 
+                                       $notification->type === \App\Notifications\QuestionAnsweredNotification::class;
+                            });
+                            $relevantCount = $relevantNotifications->count();
+                        @endphp
+                        @if($relevantCount > 0)
+                            <span class="ml-auto bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                                {{ $relevantCount }}
+                            </span>
+                        @endif
+                    </a>
                     
                     <a href="/wishlist" class="flex items-center py-2 px-2 text-gray-700 hover:bg-teal-50 rounded-md">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -263,6 +381,15 @@
                         </svg>
                         Purchase History
                     </a>
+                    
+                    @if(auth()->user()->role != 3)
+                        <a href="{{ route('ins.signup') }}" class="flex items-center py-2 px-2 text-gray-700 hover:bg-teal-50 rounded-md">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            Register as Instructor
+                        </a>
+                    @endif
                     
                     <a href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();" 
                        class="flex items-center py-2 px-2 text-red-600 hover:bg-red-50 rounded-md">
