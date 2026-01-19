@@ -274,7 +274,7 @@
                 </div>
             @else
                 <!-- Table Header -->
-                <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                <div class="bg-white px-6 py-4 border-b border-gray-200">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div class="md:col-span-2">
                             <span class="text-sm font-medium text-gray-700">Course Details</span>
@@ -312,7 +312,7 @@
 
                                 <!-- Price -->
                                 <div class="text-center">
-                                    <span class="inline-flex items-center bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                                    <span class="inline-flex items-center bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-sm font-medium">
                                         ৳{{ number_format($enrollment->course->price, 2) }}
                                     </span>
                                 </div>
@@ -332,13 +332,13 @@
                 </div>
 
                 <!-- Footer -->
-                <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                <div class="bg-white px-6 py-4 border-t border-gray-200">
                     <div class="flex items-center justify-between">
                         <div class="text-sm text-gray-600">
                             Total Purchases: <span class="font-medium text-gray-900">{{ $enrollments->count() }}</span>
                         </div>
                         <div class="text-sm text-gray-600">
-                            Total Spent: <span class="font-medium text-green-600">৳{{ number_format($enrollments->sum(function($enrollment) { return $enrollment->course->price; }), 2) }}</span>
+                            Total Spent: <span class="font-medium text-teal-600">৳{{ number_format($enrollments->sum(function($enrollment) { return $enrollment->course->price; }), 2) }}</span>
                         </div>
                     </div>
                 </div>

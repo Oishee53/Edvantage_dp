@@ -9,541 +9,145 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
-       * {
-            font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * {
+            font-family: 'Montserrat', sans-serif;
         }
         i[class^="fa-"], i[class*=" fa-"] {
             font-family: "Font Awesome 6 Free" !important;
             font-style: normal;
             font-weight: 900 !important;
         }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f9f9f9;
-        }
-        /* Header Styles - Updated to match homepage exactly */
-        .header {
-            background: #fff;
-            backdrop-filter: blur(10px);
-            padding: 0.5rem 0;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            box-shadow: none;
-        }
-        .logo {
-            margin-left: -2rem;
-            margin-right:0.75rem;
-        }
-        .nav-container {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            flex-shrink: 0;
-        }
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 0.5rem;
-            margin-left: 1rem;
-            margin-right: -1rem;
-        }
-        .nav-menu a:hover{
-            color: #0E1B33;
-        }
-        .nav-menu a {
-            font-family: 'Montserrat', sans-serif;
-            text-decoration: none;
-            color: #374151;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
-            margin-right:1rem;
-        }
-        .btn {
-            padding: 0.2rem 0.75rem;
-            border: none;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: 400;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .btn-outline {
-            background: transparent;
-            color: #0E1B33;
-            border: 2px solid #0E1B33;
-        }
-        .btn-outline:hover {
-            background: #dcdcdd;
-            color: #0E1B33;
-        }
-        .btn-primary {
-            background: #0E1B33;
-            color: white;
-            border: 2px solid #0E1B33;
-        }
-        .btn-primary:hover {
-            background: #475569;
-        }
-        .top-icons {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-left: 2rem;
-            margin-right: -2rem;
-        }
-        .icon-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 44px;
-            height: 44px;
-            font-size: 1.1rem;
-            color: #0E1B33;
-            background: rgba(14, 27, 51, 0.08);
-            border: 1px solid rgba(14, 27, 51, 0.2);
-            border-radius: 10px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        .icon-button:hover {
-            background: rgba(14, 27, 51, 0.15);
-            border-color: rgba(14, 27, 51, 0.3);
-            box-shadow: 0 4px 12px rgba(14, 27, 51, 0.2);
-        }
-        .icon-button:active {
-            transform: translateY(0);
-        }
-        .user-menu-button {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, #0E1B33 0%, #475569 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(14, 27, 51, 0.3);
-        }
-        .user-menu-button:hover {
-            background: linear-gradient(135deg, #475569 0%, #334155 100%);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 16px rgba(14, 27, 51, 0.4);
-        }
-        .user-menu-button:active {
-            transform: translateY(0);
-        }
-        .user-menu-button i {
-            font-size: 1rem;
-        }
-        .user-menu {
-            position: relative;
-        }
-        .user-dropdown {
-            position: absolute;
-            top: 60px;
-            right: 0;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            border: 1px solid #e2e8f0;
-            min-width: 220px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-            z-index: 1001;
-        }
-        .user-menu:hover .user-dropdown {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-        .user-dropdown a {
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            text-decoration: none;
-            color: #374151;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: background-color 0.2s ease;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        .user-dropdown a:last-child {
-            border-bottom: none;
-        }
-        .user-dropdown a:hover {
-            background: #f8fafc;
-            color: #0E1B33;
-        }
-        .user-dropdown .icon {
-            margin-right: 12px;
-            font-size: 0.9rem;
-            width: 16px;
-            text-align: center;
-            color: #0E1B33;
-        }
-        .user-dropdown .separator {
-            height: 1px;
-            background: #e5e7eb;
-            margin: 8px 0;
-        }
-        .search-form {
-            flex: 0 0 auto;
-            display: flex;
-            align-items: center;
-            margin-right: 1rem;
-        }
-        .search-input {
-            width: 400px;
-            padding: 0.5rem 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 24px;
-            font-size: 1rem;
-        }
-        /* Username styling */
-        .username {
-            margin-left: 1.5rem;
-            font-weight: 500;
-            color: #374151;
-        }
-
-    /* Main Content */
-    .main-content {
-      padding: 3rem 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-   
-    /* Courses Container - Updated colors */
-    .courses-container {
-      background: white;
-      padding: 2.5rem;
-      border-radius: 8px;
-      border: 1px solid #dadce0;
-    }
-    .courses-title {
-      font-size: 1.875rem;
-      font-weight: 400;
-      color: #202124;
-      margin-bottom: 2rem;
-      text-align: center;
-    }
-    .course-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 2rem;
-      padding: 0;
-      list-style-type: none;
-    }
-    .course-card {
-      background: white;
-      padding: 0;
-      border-radius: 8px;
-      border: 1px solid #dadce0;
-      transition: all 0.3s ease;
-      overflow: hidden;
-    }
-    .course-card:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      transform: translateY(-2px);
-      border-color: #0E1B33;
-    }
-    .course-image {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      transition: transform 0.3s ease;
-    }
-    .course-card:hover .course-image {
-      transform: scale(1.02);
-    }
-    .course-content {
-      padding: 1.5rem;
-    }
-    .course-title {
-      font-size: 1.25rem;
-      font-weight: 500;
-      color: #202124;
-      text-decoration: none;
-      margin-bottom: 0.75rem;
-      display: block;
-      transition: color 0.3s ease;
-      line-height: 1.4;
-    }
-    .course-title:hover {
-      color: #0E1B33;
-      text-decoration: none;
-    }
-    .course-description {
-      font-size: 0.9rem;
-      color: #5f6368;
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    /* Progress Bar - Updated colors */
-    .progress-container {
-      margin-bottom: 1rem;
-    }
-    .progress-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.5rem;
-    }
-    .progress-label {
-      font-size: 0.8rem;
-      color: #5f6368;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .progress-percentage {
-      font-size: 0.8rem;
-      color: #0E1B33;
-      font-weight: 500;
-    }
-    .progress-bar {
-      width: 100%;
-      height: 4px;
-      background: #f1f3f4;
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      background: #0E1B33;
-      border-radius: 2px;
-      transition: width 0.8s ease;
-    }
-    /* Course Stats */
-    .course-stats {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      font-size: 0.8rem;
-      color: #5f6368;
-    }
-    .continue-btn {
-      width: 100%;
-      padding: 0.75rem;
-      background: #0E1B33;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-weight: 500;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: block;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .continue-btn:hover {
-      background: #475569;
-      box-shadow: 0 2px 8px rgba(14, 27, 51, 0.3);
-      text-decoration: none;
-      color: white;
-    }
-    /* Empty State - Updated colors */
-    .empty-state {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 3rem;
-    }
-    .empty-state h3 {
-      color: #202124;
-      font-size: 1.5rem;
-      font-weight: 400;
-      margin-bottom: 1rem;
-    }
-    .empty-state p {
-      color: #5f6368;
-      margin-bottom: 2rem;
-    }
-    .browse-btn {
-      display: inline-block;
-      padding: 0.75rem 2rem;
-      background: white;
-      color: #0E1B33;
-      text-decoration: none;
-      border: 1px solid #0E1B33;
-      border-radius: 4px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .browse-btn:hover {
-      background: #0E1B33;
-      color: white;
-      box-shadow: 0 2px 8px rgba(14, 27, 51, 0.3);
-    }
-
-.course-instructor {
-  font-size: 0.85rem;
-  color: #0E1B33;
-  font-weight: 500;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.course-instructor i {
-  font-size: 0.8rem;
-  color: #5f6368;
-}
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-      .nav-menu {
-        display: none;
-      }
-      .main-content {
-        padding: 2rem 1rem;
-      }
-      .page-title {
-        font-size: 2rem;
-      }
-      .courses-container {
-        padding: 1.5rem;
-      }
-      .course-list {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-      }
-      .stats-container {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      }
-    }
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    .course-card {
-      animation: fadeInUp 0.6s ease forwards;
-    }
-    .course-card:nth-child(1) { animation-delay: 0.1s; }
-    .course-card:nth-child(2) { animation-delay: 0.2s; }
-    .course-card:nth-child(3) { animation-delay: 0.3s; }
-    .course-card:nth-child(4) { animation-delay: 0.4s; }
-  </style>
+    </style>
 </head>
-<body>
+<body class="bg-gray-50 px-20 pt-5">
+    @include('layouts.header')
 
-  <!-- Header -->
-  @include('layouts.header')
-
-  <!-- Main Content -->
-  <main class="main-content">
-  
-    <!-- Courses Container -->
-    <div class="courses-container">
-      <h2 class="courses-title">My Courses</h2>
-      <div class="course-list">
-        @forelse ($enrolledCourses as $course)
-
-          @php
-            $progress = $courseProgress[$course->id] ?? ['completed_videos' => 0, 'total_videos' => 0, 'completion_percentage' => 0];
-          @endphp
-          <div class="course-card">
-            <img src="{{ asset('storage/' . $course->image) }}" alt="{{ $course->title }}" class="course-image">
-                        
-            <div class="course-content">
-              <a href="{{ route('user.course.modules', $course->id) }}" class="course-title">
-                {{ $course->title }}
-              </a>
-               
-  <div class="course-instructor">
-    <span>{{ $course->instructor->name ?? 'Instructor not assigned' }}</span>
-  </div>
-                            
-              <p class="course-description">{{ $course->description }}</p>
-                            
-            <!-- Progress Bar -->
-          <div class="progress-container">
-        <div class="progress-header">
-        <span class="progress-label">
-            Completed {{ $progress['completed_videos'] ?? 0 }} / {{ $progress['total_videos'] ?? 0 }} videos
-        </span>
-        <span class="progress-percentage">{{ $progress['completion_percentage'] ?? 0 }}%</span>
-        </div>
-        <div class="progress-bar">
-        <div class="progress-fill" style="width: {{ $progress['completion_percentage'] ?? 0 }}%"></div>
-        </div>
-        </div>
-
-                            
-              <!-- Course Stats -->
-              <div class="course-stats">
-                <span><span class="icon-book"></span> {{ $course->video_count ?? 10 }} lectures</span>
-                <span><span class="icon-clock"></span> {{ $course->total_duration ?? '2h' }} h</span>
-              </div>
-                            
-              <a href="{{ route('user.course.modules', $course->id) }}" class="continue-btn">
-                Continue Learning
-              </a>
+    <main class="pt-24 pb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Page Header -->
+            <div class="mb-12">
+                <h1 class="text-4xl md:text-4xl font-bold text-gray-900 mb-3">My Courses</h1>
+                <p class="text-lg text-gray-600">Continue your learning journey</p>
             </div>
-          </div>
-        @empty
-          <div class="empty-state">
-            <h3>Begin Your Learning Journey</h3>
-            <p>Explore our comprehensive course catalog to advance your skills</p>
-            <a href="/login" class="browse-btn">Browse Courses</a>
-          </div>
-        @endforelse
-      </div>
-    </div>
-  </main>
 
-  <script>
-    // Smooth progress bar animation
-    window.addEventListener('load', function() {
-      const progressBars = document.querySelectorAll('.progress-fill');
-      progressBars.forEach(bar => {
-        const width = bar.style.width;
-        bar.style.width = '0%';
-        setTimeout(() => {
-          bar.style.width = width;
-        }, 500);
-      });
-    });
-  </script>
+            <!-- Courses Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-15">
+                @forelse ($enrolledCourses as $course)
+                    @php
+                        $progress = $courseProgress[$course->id] ?? ['completed_videos' => 0, 'total_videos' => 0, 'completion_percentage' => 0];
+                    @endphp
+
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg hover:border-teal-500 transition-all group">
+                        <!-- Course Image -->
+                        <div class="relative overflow-hidden h-48">
+                            <img src="{{ asset('storage/' . $course->image) }}" 
+                                 alt="{{ $course->title }}" 
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            
+                            <!-- Progress Badge -->
+                            @if($progress['completion_percentage'] == 100)
+                            <div class="absolute top-3 right-3">
+                                <div class="w-10 h-10 rounded-full bg-green-500 border-2 border-white flex items-center justify-center shadow-lg">
+                                    <i class="fas fa-check text-white text-sm"></i>
+                                </div>
+                            </div>
+                            @else
+                            <div class="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full shadow-md">
+                                <span class="text-sm font-bold text-teal-600">{{ $progress['completion_percentage'] }}%</span>
+                            </div>
+                            @endif
+                        </div>
+
+                        <!-- Course Content -->
+                        <div class="p-6 space-y-4">
+                            <!-- Course Title -->
+                            <a href="{{ route('user.course.modules', $course->id) }}" 
+                               class="block text-xl font-bold text-gray-900 hover:text-teal-600 transition-colors line-clamp-2 min-h-[2rem]">
+                                {{ $course->title }}
+                            </a>
+
+                            <!-- Instructor -->
+                            <div class="flex items-center gap-2 text-sm text-gray-600">
+                                <i class="fas fa-chalkboard-teacher text-teal-600"></i>
+                                <span class="font-medium">{{ $course->instructor->name ?? 'Instructor' }}</span>
+                            </div>
+
+                            <!-- Description -->
+                            <p class="text-sm text-gray-600 line-clamp-2">{{ $course->description }}</p>
+
+                            <!-- Progress Bar -->
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-gray-600 font-medium">
+                                        {{ $progress['completed_videos'] ?? 0 }} / {{ $progress['total_videos'] ?? 0 }} videos
+                                    </span>
+                                    <span class="font-bold text-teal-600">{{ $progress['completion_percentage'] ?? 0 }}%</span>
+                                </div>
+                                <div class="h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-teal-600 rounded-full transition-all duration-1000" 
+                                         style="width: {{ $progress['completion_percentage'] ?? 0 }}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Course Stats -->
+                            <div class="flex items-center justify-between text-sm text-gray-600 pt-2 border-t border-gray-200">
+                                <div class="flex items-center gap-1.5">
+                                    <i class="fas fa-play-circle text-teal-600"></i>
+                                    <span>{{ $course->video_count ?? 0 }} lectures</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <i class="fas fa-clock text-teal-600"></i>
+                                    <span>{{ $course->total_duration ?? '0' }}h</span>
+                                </div>
+                            </div>
+
+                            <!-- Continue Button -->
+                            <a href="{{ route('user.course.modules', $course->id) }}" 
+                               class="block w-full py-3 bg-teal-600 hover:bg-teal-700 text-white text-center font-semibold rounded-lg transition-colors shadow-md mt-4">
+                                <i class="fas fa-play mr-2"></i>
+                                Continue Learning
+                            </a>
+                        </div>
+                    </div>
+
+                @empty
+                    <!-- Empty State -->
+                    <div class="col-span-full bg-white rounded-xl shadow-md border border-gray-200 p-12">
+                        <div class="text-center max-w-md mx-auto">
+                            <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-teal-100 flex items-center justify-center">
+                                <i class="fas fa-book-open text-5xl text-teal-600"></i>
+                            </div>
+                            
+                            <h3 class="text-2xl font-bold text-gray-900 mb-3">Begin Your Learning Journey</h3>
+                            <p class="text-gray-600 mb-8 leading-relaxed">
+                                Explore our comprehensive course catalog to advance your skills
+                            </p>
+                            
+                            <a href="/homepage" 
+                               class="inline-block px-8 py-3 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 transition-colors shadow-md">
+                                Browse Courses
+                            </a>
+                        </div>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Smooth progress bar animation on load
+        window.addEventListener('load', function() {
+            const progressBars = document.querySelectorAll('.bg-teal-600.rounded-full');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        });
+    </script>
 </body>
 </html>
