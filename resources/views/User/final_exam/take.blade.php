@@ -1,3 +1,17 @@
+@if($submission->status !== 'in_progress')
+<script>
+    window.location.replace(
+        "{{ route('student.final-exam.show', $exam->course_id) }}"
+    );
+</script>
+@endif
+
+
+
+<script>
+    const uploadAnswerUrlTemplate =
+        "{{ route('student.final-exam.upload-answer', ['submissionId' => '__SUB__', 'questionId' => '__Q__']) }}";
+</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -384,6 +398,28 @@
                 </div>
             </div>
         </div>
+        <!-- Webcam Proctoring Preview -->
+<div id="proctoring-box" style="
+    position: fixed;
+    top: 90px;
+    right: 20px;
+    width: 220px;
+    background: black;
+    border: 3px solid red;
+    border-radius: 8px;
+    z-index: 9999;
+">
+    <video id="webcam"
+           autoplay
+           muted
+           playsinline
+           style="width:100%; border-radius:6px;">
+    </video>
+    <div style="color:white; font-size:12px; text-align:center; padding:4px;">
+        🔴 Recording
+    </div>
+</div>
+
 
         <!-- Questions -->
         @foreach($exam->questions as $question)
@@ -461,15 +497,19 @@
             Answered: <strong><span id="answered-count">0</span>/{{ $exam->questions()->count() }}</strong>
         </div>
 
-        <form action="{{ route('student.final-exam.submit', $submission->id) }}" 
-              method="POST" 
-              id="submit-form"
-              onsubmit="return confirmSubmit()">
-            @csrf
-            <button type="submit" class="submit-button" id="submit-btn" disabled>
-                Submit Exam
-            </button>
-        </form>
+       <form action="{{ route('student.final-exam.submit', $submission->id) }}" 
+      method="POST" 
+      id="submit-form">
+    @csrf
+    <button type="button"
+            class="submit-button"
+            id="submit-btn"
+            onclick="submitExam()"
+            disabled>
+        Submit Exam
+    </button>
+</form>
+
     </div>
 
     <script>
@@ -507,6 +547,7 @@
             const minutes = Math.floor(duration / 60);
             const seconds = duration % 60;
             timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
             
             if (duration <= 300) timerDisplay.classList.add('danger');
             else if (duration <= 600) timerDisplay.classList.add('warning');
@@ -519,10 +560,15 @@
             }
         }
 
-        setInterval(updateTimer, 1000);
+       @if($submission->status === 'in_progress')
+    updateTimer();
+    window.examTimer = setInterval(updateTimer, 1000);
+@endif
+
 
         function showError(questionId, message) {
-            const errorDiv = document.getElementById(`error-${questionId}`);
+          const errorDiv = document.getElementById(`error-${questionId}`);
+
             errorDiv.textContent = message;
             errorDiv.style.display = 'block';
             setTimeout(() => {
@@ -554,25 +600,34 @@
                 formData.append('image', file);
 
                 try {
-                    const response = await fetch(
-                        `{{ url('/') }}/final-exam-submissions/${submissionId}/questions/${questionId}/upload-answer`,
-                        {
-                            method: 'POST',
-                            headers: { 'X-CSRF-TOKEN': csrfToken },
-                            body: formData
-                        }
-                    );
+                    const uploadUrl = uploadAnswerUrlTemplate
+    .replace('__SUB__', submissionId)
+    .replace('__Q__', questionId);
+
+console.log('UPLOAD URL:', uploadUrl);
+
+const response = await fetch(uploadUrl, {
+    method: 'POST',
+    headers: {
+        'X-CSRF-TOKEN': csrfToken
+    },
+    body: formData
+});
+
 
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
+                    window.location.href = "{{ route('student.final-exam.show', $exam->course_id) }}";
+
 
                     const data = await response.json();
 
                     if (data.success) {
                         uploadedImages[questionId] = data.images;
                         displayImages(questionId, data.images);
-                        answeredQuestions.add(questionId);
+                        answeredQuestions.add(parseInt(questionId));
+
                         updateStatus(questionId, 'uploaded');
                     } else {
                         showError(questionId, data.error || 'Upload failed');
@@ -672,13 +727,7 @@
             document.getElementById('submit-btn').disabled = (answeredQuestions.size < totalQuestions);
         }
 
-        function confirmSubmit() {
-            if (answeredQuestions.size < totalQuestions) {
-                alert(`Please answer all questions (${answeredQuestions.size}/${totalQuestions})`);
-                return false;
-            }
-            return confirm('⚠️ Submit exam? You cannot change answers after submission.');
-        }
+       
 
         // Drag & drop
         document.querySelectorAll('.upload-area').forEach(area => {
@@ -695,9 +744,134 @@
         window.addEventListener('beforeunload', (e) => { e.preventDefault(); e.returnValue = ''; });
 
         updateProgress();
+       @if($submission->status === 'in_progress')
+window.addEventListener('load', () => {
+    startWebcam();
+});
+@endif
+
+
+        /*********************************
+ * STEP 6: TAB SWITCH / VISIBILITY DETECTION
+ *********************************/
+document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+        alert("⚠️ Do not switch tabs during the exam!");
+
+        // OPTIONAL: log attempt to backend
+        fetch(`{{ url('/') }}/student/exam-log/${submissionId}`, {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": csrfToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                type: "tab_switch",
+                time: new Date().toISOString()
+            })
+        });
+    }
+});
+
+
 
         // Debug: Log the upload URL
         console.log('Upload URL will be:', `{{ url('/') }}/final-exam-submissions/${submissionId}/questions/[QUESTION_ID]/upload-answer`);
+        /*********************************
+ * WEBCAM PROCTORING
+ *********************************/
+let mediaRecorder;
+let recordedChunks = [];
+let webcamStream = null;
+
+async function startWebcam() {
+    try {
+        webcamStream = await navigator.mediaDevices.getUserMedia({
+    video: {
+        facingMode: "user",
+        width: { ideal: 640 },
+        height: { ideal: 480 }
+    },
+    audio: true
+});
+
+
+        document.getElementById('webcam').srcObject = webcamStream;
+
+        mediaRecorder = new MediaRecorder(webcamStream);
+
+        mediaRecorder.ondataavailable = e => {
+            if (e.data.size > 0) recordedChunks.push(e.data);
+        };
+
+        mediaRecorder.start();
+        console.log('Webcam recording started');
+    } catch (error) {
+        alert('Webcam permission is required to take this exam.');
+        console.error(error);
+    }
+}
+
+function stopWebcam() {
+    return new Promise(resolve => {
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            resolve(blob);
+        };
+
+        mediaRecorder.stop();
+        webcamStream.getTracks().forEach(track => track.stop());
+    });
+}
+/*********************************
+ * STEP 3: FINAL SUBMIT WITH WEBCAM
+ *********************************/
+async function submitExam() {
+
+    if (answeredQuestions.size < totalQuestions) {
+        alert(`Please answer all questions (${answeredQuestions.size}/${totalQuestions})`);
+        return;
+    }
+
+    if (!confirm('⚠️ Submit exam? You cannot change answers after submission.')) {
+        return;
+    }
+
+    document.getElementById('submit-btn').disabled = true;
+
+    try {
+        // STOP CAMERA
+        const videoBlob = await stopWebcam();
+
+        // FORM DATA
+        const form = document.getElementById('submit-form');
+        const formData = new FormData(form);
+
+        // ATTACH VIDEO
+        formData.append('proctoring_video', videoBlob, 'proctoring.webm');
+
+        const response = await fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error('Submission failed');
+        }
+
+      
+
+    } catch (error) {
+        console.error(error);
+        alert('Submission failed. Please refresh and try again.');
+        document.getElementById('submit-btn').disabled = false;
+    }
+}
+
+
     </script>
 </body>
 </html>
