@@ -231,7 +231,7 @@
                     <p class="text-xl text-gray-600">Discover our most popular courses designed to help you achieve your learning goals</p>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-8 px-8" x-data="{ visibleCourses: 8 }">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 pb-8 px-8" x-data="{ visibleCourses: 8 }">
                     @foreach($courses as $index => $course)
                     <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-2xl border border-gray-200 hover:border-teal-500 transition-all cursor-pointer group transform hover:-translate-y-2 duration-300"
                          x-show="{{ $index }} < visibleCourses"
@@ -292,7 +292,7 @@
                             <!-- Actions -->
                             <div class="flex gap-2 pt-2">
                                 <a href="{{ route('courses.details', $course->id) }}" 
-                                   class="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-center text-sm font-semibold rounded-md transition-colors">
+                                   class="flex-1 px-2 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-center text-sm font-semibold rounded-md transition-colors">
                                     Details
                                 </a>
                                 @guest
@@ -300,7 +300,7 @@
                                     @csrf
                                     <input type="hidden" name="course_id" value="{{ $course->id }}">
                                     <button type="submit" 
-                                            class="w-full px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-md transition-colors flex items-center justify-center gap-2 shadow-md">
+                                            class="w-full px-2 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-md transition-colors flex items-center justify-center gap-2 shadow-md">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                                         </svg>

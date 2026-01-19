@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Your Cart - EDVANTAGE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
@@ -437,24 +439,24 @@
             color: #202124;
             font-weight: 500;
         }
-      .checkout-btn {
-  font-size: 17px;
-  padding: 10px 27px;
-  display: block;
-  margin: 20px auto;
-  text-align: center;
-  background-color: #0E1B33; /* Bootstrap primary color */
-  color: white;
-  border: none;
-  border-radius: 0.375rem; /* same as Bootstrap .btn rounded */
-  text-decoration: none;
-  cursor: pointer;
-}
+        .checkout-btn {
+            font-size: 17px;
+            padding: 10px 27px;
+            display: block;
+            margin: 20px auto;
+            text-align: center;
+            background-color: #0E1B33; /* Bootstrap primary color */
+            color: white;
+            border: none;
+            border-radius: 0.375rem; /* same as Bootstrap .btn rounded */
+            text-decoration: none;
+            cursor: pointer;
+        }
 
-.checkout-btn:hover {
-  background-color: #0b5ed7; /* Bootstrap primary hover color */
-  color: white;
-}
+        .checkout-btn:hover {
+        background-color: #0b5ed7; /* Bootstrap primary hover color */
+        color: white;
+        }
 
         .checkout-btn:hover {
             background: #475569; /* Updated hover color */
@@ -564,65 +566,7 @@
 </head>
 <body>
     <!-- Main Navigation Bar -->
-    <header class="header">
-        <div class="nav-container">
-            <a href="/" class="logo">
-                <img src="/image/Edvantage.png" alt="EDVANTAGE Logo" style="height:40px; vertical-align:middle;">
-            </a>
-           <form class="search-form" action="{{ route('courses.search') }}" method="GET">
-    <input type="text" 
-           name="search" 
-           placeholder="What do you want to learn?" 
-           class="search-input"
-           value="{{ request('search') }}"
-           autocomplete="off">
-          </form>
-            <nav>
-                <ul class="nav-menu">
-                    <li><a href="#about">About Us</a></li>
-                    <li><a href="#contact">Contact Us</a></li>
-                </ul>
-            </nav>
-            @auth
-            <div class="top-icons">
-                <a href="/wishlist" class="icon-button" title="Wishlist">
-                    <i class="fa-solid fa-heart"></i>
-                </a>
-                <a href="/cart" class="icon-button" title="Shopping Cart">
-                    <i class="fa-solid fa-shopping-bag"></i>
-                </a>
-                <div class="user-menu">
-                    <button class="user-menu-button" title="User Menu">
-                        <i class="fa-solid fa-user-circle"></i>
-                    </button>
-                    <div class="user-dropdown">
-                        <a href="/profile"><i class="fa-solid fa-user icon"></i> My Profile</a>
-                        <a href="{{ route('courses.enrolled') }}"><i class="fa-solid fa-graduation-cap icon"></i> My Courses</a>
-                       <a href="{{ route('user.progress') }}"><i class="fa-solid fa-chart-line icon"></i> My Progress</a>
-                        <a href="{{ route('login') }}"><i class="fa-solid fa-book-open icon"></i> Course Catalog</a>
-                        <a href="/purchase_history"><i class="fa-solid fa-receipt icon"></i> Purchase History</a>
-                        <div class="separator"></div>
-                        <a href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            <i class="fa-solid fa-right-from-bracket icon"></i> Logout
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            @else
-            <div class="auth-buttons">
-                <a href="/login" class="btn btn-login" >Login</a>
-                <a href="/register" class="btn btn-signup">SignUp</a>
-            </div>
-            @endauth
-            @auth
-            <!-- Hidden logout form -->
-            <form id="logout-form" action="/logout" method="POST" style="display: none;">
-                @csrf
-            </form>
-            @endauth
-        </div>
-    </header>
+    @include('layouts.header')
     <!-- Main Content -->
     <main class="main-content">
         <!-- Breadcrumb -->
