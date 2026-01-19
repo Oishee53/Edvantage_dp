@@ -3,7 +3,11 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <!-- Logo -->
+            @guest
             <a href="/" class="flex-shrink-0">
+            @else
+            <a href="/homepage" class="flex-shrink-0">
+            @endguest
                 <img src="/image/Edvantage.png" alt="EDVANTAGE Logo" class="h-10">
             </a>
 
@@ -45,8 +49,10 @@
             <!-- Desktop Navigation -->
             <div class="hidden md:flex items-center space-x-6">
                 <!-- Navigation Links -->
+                @guest
                 <a href="#about" class="text-gray-700 hover:text-teal-600 transition-colors font-medium">About Us</a>
                 <a href="#contact" class="text-gray-700 hover:text-teal-600 transition-colors font-medium">Contact Us</a>
+                @endguest
                 
                 <!-- Instructor Mode Link -->
                 @if(auth()->check() && auth()->user()->role == 3)
@@ -291,9 +297,10 @@
 
         <!-- Mobile Menu -->
         <div x-show="mobileMenuOpen" x-transition class="md:hidden border-t border-gray-200 py-4 space-y-3">
+            @guest    
             <a href="#about" class="block py-2 text-gray-700 hover:text-teal-600 font-medium">About Us</a>
             <a href="#contact" class="block py-2 text-gray-700 hover:text-teal-600 font-medium">Contact Us</a>
-            
+            @endguest
             <!-- Instructor Mode Link - Mobile -->
             @if(auth()->check() && auth()->user()->role == 3)
                 <a href="/instructor_homepage" class="block py-2 text-gray-700 hover:text-teal-600 font-medium">Instructor</a>
