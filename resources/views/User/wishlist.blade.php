@@ -10,651 +10,233 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
         * {
-            font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Montserrat', sans-serif;
         }
         i[class^="fa-"], i[class*=" fa-"] {
             font-family: "Font Awesome 6 Free" !important;
             font-style: normal;
             font-weight: 900 !important;
         }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f8f9fa;
-            color: #202124;
-            min-height: 100vh;
-        }
-        /* Header Styles - Updated to match homepage exactly */
-        .header {
-            background: #fff;
-            backdrop-filter: blur(10px);
-            padding: 0.5rem 0;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            box-shadow: none;
-        }
-        .logo {
-            margin-left: -2rem;
-            margin-right:0.75rem;
-        }
-        .nav-container {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            flex-shrink: 0;
-        }
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 0.5rem;
-            margin-left: 1rem;
-            margin-right: -1rem;
-        }
-        .nav-menu a:hover{
-            color: #0E1B33;
-        }
-        .nav-menu a {
-            font-family: 'Montserrat', sans-serif;
-            text-decoration: none;
-            color: #374151;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
-            margin-right:1rem;
-        }
-        .btn {
-            padding: 0.2rem 0.75rem;
-            border: none;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: 400;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .btn-outline {
-            background: transparent;
-            color: #0E1B33;
-            border: 2px solid #0E1B33;
-        }
-        .btn-outline:hover {
-            background: #dcdcdd;
-            color: #0E1B33;
-        }
-        .btn-primary {
-            background: #0E1B33;
-            color: white;
-            border: 2px solid #0E1B33;
-        }
-        .btn-primary:hover {
-            background: #475569;
-        }
-        .top-icons {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-left: 2rem;
-            margin-right: -2rem;
-        }
-        .icon-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 44px;
-            height: 44px;
-            font-size: 1.1rem;
-            color: #0E1B33;
-            background: rgba(14, 27, 51, 0.08);
-            border: 1px solid rgba(14, 27, 51, 0.2);
-            border-radius: 10px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        .icon-button:hover {
-            background: rgba(14, 27, 51, 0.15);
-            border-color: rgba(14, 27, 51, 0.3);
-            box-shadow: 0 4px 12px rgba(14, 27, 51, 0.2);
-        }
-        .icon-button:active {
-            transform: translateY(0);
-        }
-        .user-menu-button {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, #0E1B33 0%, #475569 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(14, 27, 51, 0.3);
-        }
-        .user-menu-button:hover {
-            background: linear-gradient(135deg, #475569 0%, #334155 100%);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 16px rgba(14, 27, 51, 0.4);
-        }
-        .user-menu-button:active {
-            transform: translateY(0);
-        }
-        .user-menu-button i {
-            font-size: 1rem;
-        }
-        .user-menu {
-            position: relative;
-        }
-        .user-dropdown {
-            position: absolute;
-            top: 60px;
-            right: 0;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            border: 1px solid #e2e8f0;
-            min-width: 220px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-            z-index: 1001;
-        }
-        .user-menu:hover .user-dropdown {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-        .user-dropdown a {
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            text-decoration: none;
-            color: #374151;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: background-color 0.2s ease;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        .user-dropdown a:last-child {
-            border-bottom: none;
-        }
-        .user-dropdown a:hover {
-            background: #f8fafc;
-            color: #0E1B33;
-        }
-        .user-dropdown .icon {
-            margin-right: 12px;
-            font-size: 0.9rem;
-            width: 16px;
-            text-align: center;
-            color: #0E1B33;
-        }
-        .user-dropdown .separator {
-            height: 1px;
-            background: #e5e7eb;
-            margin: 8px 0;
-        }
-        .search-form {
-            flex: 0 0 auto;
-            display: flex;
-            align-items: center;
-            margin-right: 1rem;
-        }
-        .search-input {
-            width: 400px;
-            padding: 0.5rem 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 24px;
-            font-size: 1rem;
-        }
-        /* Username styling */
-        .username {
-            margin-left: 1.5rem;
-            font-weight: 500;
-            color: #374151;
-        }
-
-        /* Main Content */
-        .main-content {
-            padding: 3rem 2rem;
-            max-width: 1200px;
-            margin: 80px auto 0 auto; /* Adjusted top margin for fixed header */
-        }
-        .page-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        .page-title {
-            font-size: 2.5rem;
-            font-weight: 400;
-            color: #202124;
-            margin-bottom: 1rem;
-        }
-        .page-subtitle {
-            font-size: 1.1rem;
-            color: #5f6368;
-            margin-bottom: 2rem;
-        }
-        /* Breadcrumb */
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            color: #5f6368;
-        }
-        .breadcrumb a {
-            color: #0E1B33; /* Updated color */
-            text-decoration: none;
-        }
-        .breadcrumb a:hover {
-            text-decoration: underline;
-        }
-        /* Wishlist Container */
-        .wishlist-container {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 8px;
-            border: 1px solid #dadce0;
-        }
-        .wishlist-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e8eaed;
-        }
-        .wishlist-title {
-            font-size: 1.5rem;
-            font-weight: 500;
-            color: #202124;
-        }
-        .wishlist-count {
-            color: #5f6368;
-            font-size: 0.9rem;
-        }
-        .wishlist-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Adjusted to match homepage card width */
-            gap: 2.5rem 0.5rem; /* Adjusted gap to match homepage */
-            padding: 0;
-            list-style-type: none;
-        }
-        /* Course Card Styles - Matching Homepage */
-        .wishlist-item { /* Renamed from .course-card in homepage for clarity, but applies same styles */
-            background: #fff;
-            border-radius: 5px;
-            overflow: hidden;
-            border: 1px solid #c4c6ca;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            height: 340px; /* Fixed height from homepage */
-            width: 280px; /* Fixed width from homepage */
-            transition: box-shadow 0.2s;
-            position: relative;
-            margin: 0 auto; /* Center card in grid cell */
-            box-sizing: border-box;
-            text-align: left;
-        }
-        .wishlist-item:hover {
-            box-shadow: 0 6px 24px rgba(0,0,0,0.10);
-            border: #0E1B33 1.3px solid;
-        }
-        .course-image {
-            width: 100%;
-            height: 160px; /* Adjusted height to match homepage */
-            object-fit: cover;
-            border-bottom: 1px solid #f1f1f1;
-            transition: transform 0.3s ease; /* Keep hover effect */
-        }
-        .wishlist-item:hover .course-image {
-            transform: scale(1.02);
-        }
-        .course-content {
-            padding: 10px 12px 8px 12px; /* Adjusted padding to match homepage */
-            display: flex;
-            flex-direction: column;
-            flex: 1 1 auto;
-            min-height: 0;
-        }
-        .course-title {
-            font-size: 1.1rem; /* Adjusted font size */
-            font-weight: 700; /* Adjusted font weight */
-            color: #1a1a1a; /* Adjusted color */
-            line-height: 1.3; /* Adjusted line height */
-            min-height: 2.4em; /* Ensure consistent height for titles */
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap; /* Truncate long titles */
-            margin-bottom: 0.75rem; /* Keep some margin */
-        }
-        .course-category-badge { /* New style from homepage */
-            display: inline-block;
-            background: #dcdcdd;
-            color: #0E1B33;
-            font-size: 0.85rem;
-            font-weight: 500;
-            border-radius: 16px;
-            padding: 3px 14px;
-            margin-bottom: 4px; /* Adjusted margin */
-            border: none;
-            cursor: default;
-        }
-        .course-rating { /* New style from homepage */
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 2px;
-        }
-        .stars { /* New style from homepage */
-            color: #f59e0b;
-            font-size: 1rem;
-            letter-spacing: 1px;
-        }
-        .rating-number { /* New style from homepage */
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #f59e0b;
-        }
-        .rating-count { /* New style from homepage */
-            font-size: 0.85rem;
-            color: #9ca3af;
-        }
-        .course-price {
-            font-family: 'Montserrat', sans-serif; /* Ensure Montserrat */
-            font-size: 1.1rem; /* Adjusted font size */
-            font-weight: 700; /* Adjusted font weight */
-            color: #1a1a1a; /* Adjusted color */
-            margin-top: 0; /* Adjusted margin */
-            margin-bottom: 2px; /* Adjusted margin */
-        }
-        .taka-bold { /* New style from homepage, adapted for dollar sign */
-            font-weight: 790;
-            font-size: 1.3rem;
-            letter-spacing: 0.5px;
-        }
-        .course-actions {
-            display: flex;
-            gap: 6px; /* Adjusted gap to match homepage */
-            margin-top: auto; /* Push actions to bottom */
-        }
-        .btn-details { /* New style for 'View Course' button */
-            flex: 1;
-            background: #f3f4f6;
-            color: #374151;
-            text-align: center;
-            padding: 6px 4px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 11px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: #bebfc0 1px solid;
-        }
-        .btn-details:hover {
-            background: #ffffff;
-            border: #bebfc0 1px solid;
-        }
-        /* Existing btn-primary and btn-secondary styles are fine for 'Add to Cart' */
-        .btn-primary {
-            background: #0E1B33;
-            color: white;
-            border: 2px solid #0E1B33; /* Keep existing primary button style */
-            padding: 0.2rem 0.75rem; /* Keep existing primary button padding */
-            font-weight: 400; /* Keep existing primary button font weight */
-        }
-        .btn-primary:hover {
-            background: #475569;
-            border: 2px solid #475569; /* Match hover border */
-        }
-        .btn-secondary {
-            background: white;
-            color: #5f6368;
-            border: 1px solid #dadce0;
-            padding: 0.75rem 1rem; /* Keep existing secondary button padding */
-        }
-        .btn-secondary:hover {
-            background: #f8f9fa;
-            border-color: #0E1B33;
-            color: #0E1B33;
-        }
-
-        .remove-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: rgba(234, 67, 53, 0.1);
-            color: #ea4335;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            z-index: 10; /* Ensure it's above other content */
-        }
-        .remove-btn:hover {
-            background: #ea4335;
-            color: white;
-            transform: scale(1.1);
-        }
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-        }
-        .empty-icon {
-            font-size: 4rem;
-            color: #dadce0;
-            margin-bottom: 1rem;
-        }
-        .empty-state h3 {
-            color: #202124;
-            font-size: 1.5rem;
-            font-weight: 400;
-            margin-bottom: 1rem;
-        }
-        .empty-state p {
-            color: #5f6368;
-            margin-bottom: 2rem;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .browse-btn {
-            display: inline-block;
-            padding: 0.75rem 2rem;
-            background: #0E1B33; /* Updated color */
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        .browse-btn:hover {
-            background: #475569; /* Updated hover color */
-            box-shadow: 0 2px 8px rgba(14, 27, 51, 0.3); /* Updated shadow color */
-            text-decoration: none;
-            color: white;
-        }
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .nav-menu {
-                display: none;
-            }
-            .main-content {
-                padding: 2rem 1rem;
-            }
-            .page-title {
-                font-size: 2rem;
-            }
-            .wishlist-container {
-                padding: 1.5rem;
-            }
-            .wishlist-grid {
-                grid-template-columns: 1fr; /* Single column on small screens */
-                gap: 1.5rem;
-            }
-            .wishlist-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-            .course-actions {
-                flex-direction: column;
-            }
-        }
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .wishlist-item {
-            animation: fadeInUp 0.6s ease forwards;
-        }
-        .wishlist-item:nth-child(1) { animation-delay: 0.1s; }
-        .wishlist-item:nth-child(2) { animation-delay: 0.2s; }
-        .wishlist-item:nth-child(3) { animation-delay: 0.3s; }
-        .wishlist-item:nth-child(4) { animation-delay: 0.4s; }
     </style>
 </head>
-<body>
-    <!-- Main Navigation Bar -->
+<body class="bg-gray-50">
     @include('layouts.header')
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Breadcrumb -->
-        <div class="breadcrumb">
-            <a href="/login">Home</a>
-            <span>›</span>
-            <span>Wishlist</span>
-        </div>
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title">My Wishlist</h1>
-            <p class="page-subtitle">Save courses for later and never miss out on learning opportunities</p>
-        </div>
-        <!-- Wishlist Container -->
-        <div class="wishlist-container">
+    <main class="pt-24 pb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Breadcrumb -->
+            <nav class="flex items-center gap-2 text-sm mb-6 text-gray-600">
+                <a href="/homepage" class="hover:text-teal-600 transition-colors ml-7">Home</a>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+                <span class="text-gray-900 font-medium">Wishlist</span>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-gray-900 mb-3">My Wishlist</h1>
+                <p class="text-lg text-gray-600">Save courses for later and never miss out on learning opportunities</p>
+            </div>
+
             @if($wishlistItems->count())
-                <div class="wishlist-header">
-                    <h2 class="wishlist-title">Saved Courses</h2>
-                    <span class="wishlist-count">{{ $wishlistItems->count() }} {{ Str::plural('course', $wishlistItems->count()) }}</span>
-                </div>
-                <div class="wishlist-grid">
-                    @foreach ($wishlistItems as $item)
-                        <div class="wishlist-item">
-                            <!-- Remove Button -->
-                            <form action="{{ route('wishlist.remove', $item->id) }}" method="POST" style="display: inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="remove-btn" title="Remove from wishlist">
-                                    <i class="fa-solid fa-times"></i>
-                                </button>
-                            </form>
-                            @if($item->course->image)
-                                <img src="{{ asset('storage/' . $item->course->image) }}" alt="{{ $item->course->title }}" class="course-image">
-                            @else
-                                <img src="/placeholder.svg?height=160&width=280" alt="{{ $item->course->title }}" class="course-image">
-                            @endif
+                <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-md border border-gray-200 p-6 md:p-8">
+                    <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
+                        <h2 class="text-2xl font-bold text-gray-900">Saved Courses</h2>
+                        <span class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                            {{ $wishlistItems->count() }} {{ Str::plural('course', $wishlistItems->count()) }}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        @foreach ($wishlistItems as $item)
+                            <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-2xl border border-gray-200 hover:border-teal-500 transition-all group transform hover:-translate-y-2 duration-300 relative">
+                                <!-- Remove Button -->
+                                <form action="{{ route('wishlist.remove', $item->id) }}" method="POST" class="absolute top-3 right-3 z-10">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" 
+                                            onclick="return confirm('Remove this course from wishlist?')"
+                                            class="w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-red-600 hover:bg-red-600 hover:text-white transition-all"
+                                            title="Remove from wishlist">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+
+                                <!-- Course Image -->
+                                <div class="relative overflow-hidden h-40">
+                                    @if($item->course->image)
+                                        <img src="{{ asset('storage/' . $item->course->image) }}" 
+                                             alt="{{ $item->course->title }}" 
+                                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                    @else
+                                        <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                                            <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                        </div>
+                                    @endif
+                                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                </div>
+
+                                <!-- Course Content -->
+                                <div class="p-4 space-y-1">
+                                    <!-- Category Badge -->
+                                    @if(isset($item->course->category))
+                                        <span class="inline-block bg-teal-100 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full">
+                                            {{ $item->course->category }}
+                                        </span>
+                                    @else
+                                        <span class="inline-block bg-teal-100 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full">
+                                            General
+                                        </span>
+                                    @endif
+
+                                    <!-- Title -->
+                                    <h3 class="font-bold text-lg text-gray-900 line-clamp-2 min-h-[3rem]">
+                                        {{ $item->course->title }}
+                                    </h3>
+
+                                    <!-- Rating -->
+                                    @if($item->course->ratings && $item->course->ratings->count())
+                                        <div class="flex items-center gap-2">
+                                            <div class="flex items-center">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    @if($i <= floor($item->course->ratings->avg('rating')))
+                                                        <svg class="w-4 h-4 text-yellow-400 fill-yellow-400" viewBox="0 0 20 20">
+                                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                                        </svg>
+                                                    @else
+                                                        <svg class="w-4 h-4 text-gray-300" viewBox="0 0 20 20">
+                                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                                        </svg>
+                                                    @endif
+                                                @endfor
+                                            </div>
+                                            <span class="font-semibold text-sm text-yellow-600">{{ number_format($item->course->ratings->avg('rating'), 1) }}</span>
+                                            <span class="text-xs text-gray-500">({{ $item->course->ratings->count() }})</span>
+                                        </div>
+                                    @endif
+
+                                    <!-- Price -->
+                                    <div class="pt-2">
+                                        <div class="flex items-baseline gap-1">
+                                            <span class="text-2xl font-bold text-gray-900">৳</span>
+                                            <span class="text-2xl font-bold text-gray-900">{{ number_format($item->course->price, 0) }}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="flex gap-2 pt-2">
+                                        <a href="{{ route('courses.details', $item->course->id) }}" 
+                                           class="flex-1 px-2 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-center text-sm font-semibold rounded-md transition-colors">
+                                            Details
+                                        </a>
                                         
-                            <div class="course-content">
-                                <h3 class="course-title">{{ $item->course->title }}</h3>
-                                @if(isset($item->course->category))
-                                    <span class="course-category-badge">{{ $item->course->category }}</span>
-                                @else
-                                    <span class="course-category-badge">General</span>
-                                @endif
-                                <div class="course-rating">
-                                    <span class="stars">★★★★★</span>
-                                    <span class="rating-number">4.8</span>
-                                    <span class="rating-count">(120)</span>
-                                </div>
-                                <div class="course-price">
-                                    <span class="taka-bold">$</span> {{ number_format($item->course->price, 0) }}
-                                </div>
-                                            
-                                <div class="course-actions">
-                                    <a href="{{ route('courses.details', $item->course->id) }}" class="btn-details">
-                                        Details
-                                    </a>
-                                    <form action="{{ route('cart.add', $item->course->id) }}" method="POST" style="flex: 1;">
-                                        @csrf
-                                        <button type="submit" class="btn btn-primary" style="width: 100%;">
-                                            Add to Cart
-                                        </button>
-                                    </form>
+                                        <form action="{{ route('cart.add', $item->course->id) }}" method="POST" class="flex-1">
+                                            @csrf
+                                            <button type="submit" 
+                                                    class="w-full px-2 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-md transition-colors flex items-center justify-center gap-2 shadow-md">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                                </svg>
+                                                Cart
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
             @else
-                <div class="empty-state">
-                    <div class="empty-icon"><i class="fa-solid fa-heart"></i></div>
-                    <h3>Your wishlist is empty</h3>
-                    <p>Start building your learning journey by adding courses to your wishlist. You can save courses for later and get notified about price changes.</p>
-                    <a href="{{ route('login') }}" class="browse-btn">Browse Courses</a>
+                <div class="bg-white rounded-xl shadow-md border border-gray-200 p-12">
+                    <div class="text-center max-w-md mx-auto">
+                        <div class="w-24 h-24 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-12 h-12 text-pink-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3">Your wishlist is empty</h3>
+                        <p class="text-gray-600 mb-8 leading-relaxed">
+                            Start building your learning journey by adding courses to your wishlist. You can save courses for later and get notified about price changes.
+                        </p>
+                        
+                        <a href="/homepage" 
+                           class="inline-block px-8 py-3 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 transition-colors shadow-md">
+                            Browse Courses
+                        </a>
+                    </div>
                 </div>
             @endif
         </div>
     </main>
+
+    <!-- Success Modal for Cart Added -->
+    @if(session('cart_added'))
+    <div id="cartModal"
+        class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+        x-data="{ show: true }"
+        x-show="show"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0">
+
+        <div class="bg-white rounded-lg shadow-2xl max-w-sm w-full mx-4 p-6 text-center"
+             x-show="show"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="transform scale-95 opacity-0"
+             x-transition:enter-end="transform scale-100 opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="transform scale-100 opacity-100"
+             x-transition:leave-end="transform scale-95 opacity-0">
+            
+            <!-- Success Icon -->
+            <div class="mb-4">
+                <div class="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center mx-auto">
+                    <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Message -->
+            <h3 class="text-lg font-bold text-gray-900 mb-1">Added to Cart!</h3>
+            <p class="text-sm text-gray-600 mb-5">
+                {{ session('cart_added') }}
+            </p>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-2">
+                <a href="{{ route('cart.all') }}"
+                   class="flex-1 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-semibold">
+                    Go to Cart
+                </a>
+
+                <button @click="show = false; setTimeout(() => document.getElementById('cartModal')?.remove(), 200)"
+                        class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-semibold">
+                    Continue
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <script>
-        // Smooth animations
-        window.addEventListener('load', function() {
-            const items = document.querySelectorAll('.wishlist-item');
-            items.forEach((item, index) => {
-                setTimeout(() => {
-                    item.style.opacity = '1';
-                    item.style.transform = 'translateY(0)';
-                }, index * 100);
-            });
-        });
-        // Confirm removal
-        document.querySelectorAll('.remove-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                if (!confirm('Are you sure you want to remove this course from your wishlist?')) {
-                    e.preventDefault();
-                }
-            });
-        });
+        // Auto close modal after 10 seconds
         @if(session('cart_added'))
-            if (confirm("{{ session('cart_added') }} Go to cart?")) {
-                window.location.href = "{{ route('cart.all') }}";
+        setTimeout(() => {
+            const modal = document.getElementById('cartModal');
+            if (modal) {
+                modal.remove();
             }
+        }, 10000);
         @endif
     </script>
 </body>

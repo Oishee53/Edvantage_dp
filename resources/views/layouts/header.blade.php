@@ -70,16 +70,34 @@
                 @else
                     <!-- Logged In User Actions -->
                     
-                    <a href="/wishlist" class="w-11 h-11 flex items-center justify-center rounded-full border border-gray-300 hover:border-teal-500 hover:bg-teal-50 transition-all" title="Wishlist">
+                    <!-- Wishlist Button with Count -->
+                    <a href="/wishlist" class="w-11 h-11 flex items-center justify-center rounded-full border border-gray-300 hover:border-teal-500 hover:bg-teal-50 transition-all relative" title="Wishlist">
                         <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                         </svg>
+                        @php
+                            $wishlistCount = auth()->user()->wishlist()->count();
+                        @endphp
+                        @if($wishlistCount > 0)
+                            <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1 border-2 border-white">
+                                {{ $wishlistCount > 99 ? '99+' : $wishlistCount }}
+                            </span>
+                        @endif
                     </a>
                     
-                    <a href="/cart" class="w-11 h-11 flex items-center justify-center rounded-full border border-gray-300 hover:border-teal-500 hover:bg-teal-50 transition-all" title="Shopping Cart">
+                    <!-- Cart Button with Count -->
+                    <a href="/cart" class="w-11 h-11 flex items-center justify-center rounded-full border border-gray-300 hover:border-teal-500 hover:bg-teal-50 transition-all relative" title="Shopping Cart">
                         <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                         </svg>
+                        @php
+                            $cartCount = auth()->user()->cart()->count();
+                        @endphp
+                        @if($cartCount > 0)
+                            <span class="absolute -top-1 -right-1 bg-teal-600 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1 border-2 border-white">
+                                {{ $cartCount > 99 ? '99+' : $cartCount }}
+                            </span>
+                        @endif
                     </a>
                     
                     <!-- Notification Button -->
@@ -93,7 +111,8 @@
                                 // Filter notifications to only count question-related ones
                                 $relevantNotifications = auth()->user()->unreadNotifications->filter(function ($notification) {
                                     return $notification->type === \App\Notifications\QuestionRejectedNotification::class || 
-                                           $notification->type === \App\Notifications\QuestionAnsweredNotification::class;
+                                           $notification->type === \App\Notifications\QuestionAnsweredNotification::class||
+                                           $notification->type === \App\Notifications\FinalExamGradedNotification::class;
                                 });
                                 $relevantCount = $relevantNotifications->count();
                             @endphp
@@ -327,31 +346,49 @@
                         </svg>
                         Notifications
                         @php
-                            $relevantNotifications = auth()->user()->unreadNotifications->filter(function ($notification) {
+                            $mobileRelevantNotifications = auth()->user()->unreadNotifications->filter(function ($notification) {
                                 return $notification->type === \App\Notifications\QuestionRejectedNotification::class || 
                                        $notification->type === \App\Notifications\QuestionAnsweredNotification::class;
                             });
-                            $relevantCount = $relevantNotifications->count();
+                            $mobileRelevantCount = $mobileRelevantNotifications->count();
                         @endphp
-                        @if($relevantCount > 0)
+                        @if($mobileRelevantCount > 0)
                             <span class="ml-auto bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                                {{ $relevantCount }}
+                                {{ $mobileRelevantCount }}
                             </span>
                         @endif
                     </a>
                     
+                    <!-- Wishlist - Mobile -->
                     <a href="/wishlist" class="flex items-center py-2 px-2 text-gray-700 hover:bg-teal-50 rounded-md">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                         </svg>
                         Wishlist
+                        @php
+                            $mobileWishlistCount = auth()->user()->wishlist()->count();
+                        @endphp
+                        @if($mobileWishlistCount > 0)
+                            <span class="ml-auto bg-red-600 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
+                                {{ $mobileWishlistCount > 99 ? '99+' : $mobileWishlistCount }}
+                            </span>
+                        @endif
                     </a>
                     
+                    <!-- Cart - Mobile -->
                     <a href="/cart" class="flex items-center py-2 px-2 text-gray-700 hover:bg-teal-50 rounded-md">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                         </svg>
                         Shopping Cart
+                        @php
+                            $mobileCartCount = auth()->user()->cart()->count();
+                        @endphp
+                        @if($mobileCartCount > 0)
+                            <span class="ml-auto bg-teal-600 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
+                                {{ $mobileCartCount > 99 ? '99+' : $mobileCartCount }}
+                            </span>
+                        @endif
                     </a>
                     
                     <a href="/profile" class="flex items-center py-2 px-2 text-gray-700 hover:bg-teal-50 rounded-md">
@@ -414,3 +451,4 @@
         </div>
     </div>
 </header>
+                        
