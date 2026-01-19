@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EDVANTAGE - Your Virtual Classroom Redefined</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
@@ -1003,120 +1005,7 @@
         @endforeach
     </div>
    <!-- Main Navigation Bar -->
-    <header class="header">
-        <div class="nav-container">
-            <a href="/" class="logo">
-                <img src="/image/Edvantage.png" alt="EDVANTAGE Logo" style="height:40px; vertical-align:middle;">
-            </a>
-            <form class="search-form" action="{{ route('courses.search') }}" method="GET">
-    <input type="text" 
-           name="search" 
-           placeholder="What do you want to learn?" 
-           class="search-input"
-           value="{{ request('search') }}"
-           autocomplete="off">
-          </form>
-            <nav>
-                <ul class="nav-menu">
-                    <li><a href="#about">About Us</a></li>
-                    <li><a href="#contact">Contact Us</a></li>
-                    @if(auth()->user() && auth()->user()->role == 3)
-                        <li><a href="/instructor_homepage">Instructor</a></li>
-                    @endif
-                </ul>
-            </nav>
-            <div class="top-icons">
-                <a href="/wishlist" class="icon-button" title="Wishlist">
-                    <i class="fa-solid fa-heart"></i>
-                </a>
-                <a href="/cart" class="icon-button" title="Shopping Cart">
-                    <i class="fa-solid fa-shopping-bag"></i>
-                </a>
-                <!-- Notification Button -->
-                @auth
-<div class="notification-button icon-button" title="Notifications">
-    <i class="fa-solid fa-bell"></i>
-    @php
-        // Filter notifications to only count question-related ones
-        $relevantNotifications = auth()->user()->unreadNotifications->filter(function ($notification) {
-            return $notification->type === \App\Notifications\QuestionRejectedNotification::class || 
-                   $notification->type === \App\Notifications\QuestionAnsweredNotification::class;
-        });
-        $relevantCount = $relevantNotifications->count();
-    @endphp
-    
-    @if($relevantCount > 0)
-        <span class="notification-badge">{{ $relevantCount }}</span>
-    @endif
-    
-    <div class="notification-dropdown">
-        <div class="notification-header">
-            <h4>Notifications</h4>
-        </div>
-        @if($relevantCount > 0)
-            @foreach ($relevantNotifications as $notification)
-                @if ($notification->type === \App\Notifications\QuestionRejectedNotification::class)
-                    <div class="notification-item notification-rejected">
-                        <div class="notification-content">
-                            <div class="notification-title">Question Rejected</div>
-                            <div class="notification-text">{{ $notification->data['content'] }}</div>
-                            <div class="notification-instructor">Instructor: {{ $notification->data['instructor_name'] }}</div>
-                        </div>
-                        <a href="{{ url('/student/questions/' . $notification->data['question_id']) }}" class="notification-action">
-                            View Question
-                        </a>
-                    </div>
-                @endif
-                @if ($notification->type === \App\Notifications\QuestionAnsweredNotification::class)
-                    <div class="notification-item notification-answered">
-                        <div class="notification-content">
-                            <div class="notification-title">Question Answered</div>
-                            <div class="notification-text">{{ $notification->data['content'] }}</div>
-                            <div class="notification-instructor">Instructor: {{ $notification->data['instructor_name'] }}</div>
-                        </div>
-                        <a href="{{ url('/student/questions/' . $notification->data['question_id']) }}" class="notification-action">
-                            View Answer
-                        </a>
-                    </div>
-                @endif
-            @endforeach
-        @else
-            <div class="no-notifications">
-                <i class="fa-solid fa-bell-slash"></i>
-                <div>No new notifications</div>
-            </div>
-        @endif
-    </div>
-</div>
-@endauth
-                <div class="user-menu">
-                    <button class="user-menu-button" title="User Menu">
-                        <i class="fa-solid fa-user-circle"></i>
-                    </button>
-                    <div class="user-dropdown">
-                        <a href="/profile"><i class="fa-solid fa-user icon"></i> My Profile</a>
-                        <a href="{{ route('courses.enrolled') }}"><i class="fa-solid fa-graduation-cap icon"></i> My Courses</a>
-                        <a href="{{ route('user.progress') }}"><i class="fa-solid fa-chart-line icon"></i> My Progress</a>
-
-                        <a href="{{ route('login') }}"><i class="fa-solid fa-book-open icon"></i> Course Catalog</a>
-                        <a href="{{ route('purchase.history') }}"><i class="fa-solid fa-receipt icon"></i> Purchase History</a>
-                        @if(auth()->user() && auth()->user()->role!=3)
-                        <a href="{{ route('ins.signup') }}">Register as instructor</a>
-                        @endif
-                        <div class="separator"></div>
-                        <a href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            <i class="fa-solid fa-right-from-bracket icon"></i> Logout
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <!-- Hidden logout form -->
-            <form id="logout-form" action="/logout" method="POST" style="display: none;">
-                @csrf
-            </form>
-            <p class="username">{{ explode(' ', $user->name)[0] }}</p>
-        </div>
-    </header>
+   @include('layouts.header')
 
    <section class="hero">
         <div class="hero-content">

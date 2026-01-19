@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - EDVANTAGE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
@@ -727,63 +729,7 @@
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="nav-container">
-            <div class="nav-left">
-                <a href="/" class="logo">
-                    <img src="/image/Edvantage.png" alt="EDVANTAGE Logo">
-                </a>
-                <form class="search-form" action="" method="GET">
-                    <input type="text" name="q" placeholder="What do you want to learn?" class="search-input">
-                </form>
-                <nav>
-                    <ul class="nav-menu">
-                        <li><a href="#about">About Us</a></li>
-                        <li><a href="#contact">Contact Us</a></li>
-                    </ul>
-                </nav>
-            </div>
-            
-            <div class="nav-right">
-                @auth
-                <div class="top-icons">
-                    <a href="/wishlist" class="icon-button" title="Wishlist">
-                        <i class="fa-solid fa-heart"></i>
-                    </a>
-                    <a href="/cart" class="icon-button" title="Shopping Cart">
-                        <i class="fa-solid fa-shopping-bag"></i>
-                    </a>
-                    <div class="user-menu">
-                        <button class="user-menu-button" title="User Menu">
-                            <i class="fa-solid fa-user"></i>
-                        </button>
-                        <div class="user-dropdown">
-                            <a href="/profile"><i class="fa-solid fa-user icon"></i> My Profile</a>
-                            <a href="{{ route('courses.enrolled') }}"><i class="fa-solid fa-graduation-cap icon"></i> My Courses</a>
-                            <a href="{{ route('user.progress') }}"><i class="fa-solid fa-chart-line icon"></i> My Progress</a>
-                            <a href="{{ route('courses.all') }}"><i class="fa-solid fa-book-open icon"></i> Course Catalog</a>
-                            <a href="/purchase_history"><i class="fa-solid fa-receipt icon"></i> Purchase History</a>
-                            <a href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="fa-solid fa-right-from-bracket icon"></i> Logout
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <span class="username">{{ explode(' ', $user->name)[0] }}</span>
-                
-                <!-- Hidden logout form -->
-                <form id="logout-form" action="/logout" method="POST" style="display: none;">
-                    @csrf
-                </form>
-                @else
-                <div class="auth-buttons">
-                    <a href="/login" class="btn btn-login">Login</a>
-                    <a href="/register" class="btn btn-signup">Sign Up</a>
-                </div>
-                @endauth
-            </div>
-        </div>
-    </header>
+    @include('layouts.header')
 
     <main class="main-content">
         <!-- Hero Section with Course Info and Sidebar -->

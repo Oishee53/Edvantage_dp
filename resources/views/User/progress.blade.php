@@ -1,3 +1,5 @@
+<script src="https://cdn.tailwindcss.com"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 @extends('layouts.app')
  @if(session('error'))
   <div class="alert alert-danger clean-alert"> 
@@ -9,61 +11,28 @@
 
 @section('content')
  <!--- Main Navigation Header --->
-  <header class="main-header">
+<header class="main-header">
     
      <div class="nav-container"> 
-        <a href="/" class="logo"> 
-            <img src="/image/Edvantage.png" alt="EDVANTAGE Logo" style="height:40px; vertical-align:middle;">
-         </a> <form class="search-form" action="{{ route('courses.search') }}" method="GET">
-             <input type="text" name="search" placeholder="What do you want to learn?" class="search-input" value="{{ request('search') }}" autocomplete="off"> 
-            </form> 
-             <nav>
-                 <ul class="nav-menu">
-                     <li><a href="#about">About Us</a></li>
-                     
-                     <li><a href="#contact">Contact Us</a></li>
-                     </ul> </nav> <div class="top-icons">
-                         <a href="/wishlist" class="icon-button" title="Wishlist"> 
-                            <i class="fa-solid fa-heart"></i> </a>
-                             <a href="/cart" class="icon-button" title="Shopping Cart">
-                                 <i class="fa-solid fa-shopping-bag"></i> </a> <div class="user-menu">
-                                     <button class="user-menu-button" title="User Menu">
-                                         <i class="fa-solid fa-user-circle"></i> </button>
-                                         
-                                         
-                                         <div class="user-dropdown"> <a href="/profile">
-                                            <i class="fa-solid fa-user icon">
-                                                </i> My Profile</a> 
-                                                <a href="{{ route('courses.enrolled') }}">
-                                                    <i class="fa-solid fa-graduation-cap icon">
-                                                        </i> My Courses</a> <a href="{{ route('user.progress') }}">
-                                                            <i class="fa-solid fa-chart-line icon">
-                                                                </i> My Progress</a> <a href="{{ route('login') }}">
-                                                                    <i class="fa-solid fa-book-open icon">
-                                                                        </i> Course Catalog</a> <a href="{{ route('purchase.history') }}">
-                                                                            <i class="fa-solid fa-receipt icon"></i> Purchase History</a> 
-                                                                            <div class="separator"></div> <a href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                                                                 <i class="fa-solid fa-right-from-bracket icon"></i> Logout </a> </div> 
-                                                                                </div>
-                                                                             </div>
-                                                                              <!-- Hidden logout form -->
-                                                                               <form id="logout-form" action="/logout" method="POST" style="display: none;">
-                                                                                 @csrf </form>
-                                                                                  <p class="username">{{ explode(' ', auth()->user()->name)[0] }}</p> 
-                                                                                </div> </header> <div class="clean-dashboard">
-                                                                                     {{-- Welcome Header Section --}} 
-                                                                                     <header class="clean-header">
-                                                                                         <div class="header-container">
-                                                                                             <div class="header-content"> 
-                                                                                                <div class="greeting-section">
-                                                                                                     <h1 class="main-title">
-                                                                                                         <span class="welcome-text">Welcome back,</span>
-                                                                                                          <span class="user-name">{{ explode(' ', auth()->user()->name)[0] }}</span> 
-                                                                                                        </h1> <p class="subtitle">Track your learning journey</p>
-                                                                                                     </div>
-                                                                                                     </div> 
-                                                                                                    </div>
-                                                                                                 </header> 
+        @include('layouts.header')                                                                                                    
+    </div>
+
+    </div> 
+</header> 
+    <div class="clean-dashboard">
+        {{-- Welcome Header Section --}} 
+        <header class="clean-header">
+            <div class="header-container">
+                <div class="header-content"> 
+                    <div class="greeting-section">
+                        <h1 class="main-title">
+                            <span class="welcome-text">Welcome back,</span>
+                            <span class="user-name">{{ explode(' ', auth()->user()->name)[0] }}</span> 
+                        </h1> <p class="subtitle">Track your learning journey</p>
+                    </div>
+                </div> 
+            </div>
+        </header> 
                                                                                                  <div class="main-content">
                                                                                                      {{-- Stats Overview --}}
                                                                                                       <section class="stats-section">
