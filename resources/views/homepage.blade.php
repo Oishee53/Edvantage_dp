@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EDVANTAGE - Your Virtual Classroom Redefined</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
@@ -992,324 +994,130 @@
     </style>
 </head>
 <body>
-    <!-- Place the category bar immediately after the header -->
-    <div class="category-bar" style="top:56px; font-weight: 50;">
-      @foreach($uniqueCategories as $category)
-    <a href="{{ route('courses.search', ['search' => $category]) }}"
-   class="category-link">
-    {{ $category }}
-</a>
-
-        @endforeach
-    </div>
    <!-- Main Navigation Bar -->
-    <header class="header">
-        <div class="nav-container">
-            <a href="/" class="logo">
-                <img src="/image/Edvantage.png" alt="EDVANTAGE Logo" style="height:40px; vertical-align:middle;">
-            </a>
-            <form class="search-form" action="{{ route('courses.search') }}" method="GET">
-    <input type="text" 
-           name="search" 
-           placeholder="What do you want to learn?" 
-           class="search-input"
-           value="{{ request('search') }}"
-           autocomplete="off">
-          </form>
-            <nav>
-                <ul class="nav-menu">
-                    <li><a href="#about">About Us</a></li>
-                    <li><a href="#contact">Contact Us</a></li>
-                    @if(auth()->user() && auth()->user()->role == 3)
-                        <li><a href="/instructor_homepage">Instructor</a></li>
-                    @endif
-                </ul>
-            </nav>
-            <div class="top-icons">
-                <a href="/wishlist" class="icon-button" title="Wishlist">
-                    <i class="fa-solid fa-heart"></i>
-                </a>
-                <a href="/cart" class="icon-button" title="Shopping Cart">
-                    <i class="fa-solid fa-shopping-bag"></i>
-                </a>
-                <!-- Notification Button -->
-                @auth
-<div class="notification-button icon-button" title="Notifications">
-    <i class="fa-solid fa-bell"></i>
-    @php
-        // Filter notifications to only count question-related ones
-        $relevantNotifications = auth()->user()->unreadNotifications->filter(function ($notification) {
-            return $notification->type === \App\Notifications\QuestionRejectedNotification::class || 
-                   $notification->type === \App\Notifications\QuestionAnsweredNotification::class;
-        });
-        $relevantCount = $relevantNotifications->count();
-    @endphp
-    
-    @if($relevantCount > 0)
-        <span class="notification-badge">{{ $relevantCount }}</span>
-    @endif
-    
-    <div class="notification-dropdown">
-        <div class="notification-header">
-            <h4>Notifications</h4>
-        </div>
-        @if($relevantCount > 0)
-            @foreach ($relevantNotifications as $notification)
-                @if ($notification->type === \App\Notifications\QuestionRejectedNotification::class)
-                    <div class="notification-item notification-rejected">
-                        <div class="notification-content">
-                            <div class="notification-title">Question Rejected</div>
-                            <div class="notification-text">{{ $notification->data['content'] }}</div>
-                            <div class="notification-instructor">Instructor: {{ $notification->data['instructor_name'] }}</div>
-                        </div>
-                        <a href="{{ url('/student/questions/' . $notification->data['question_id']) }}" class="notification-action">
-                            View Question
-                        </a>
-                    </div>
-                @endif
-                @if ($notification->type === \App\Notifications\QuestionAnsweredNotification::class)
-                    <div class="notification-item notification-answered">
-                        <div class="notification-content">
-                            <div class="notification-title">Question Answered</div>
-                            <div class="notification-text">{{ $notification->data['content'] }}</div>
-                            <div class="notification-instructor">Instructor: {{ $notification->data['instructor_name'] }}</div>
-                        </div>
-                        <a href="{{ url('/student/questions/' . $notification->data['question_id']) }}" class="notification-action">
-                            View Answer
-                        </a>
-                    </div>
-                @endif
-            @endforeach
-        @else
-            <div class="no-notifications">
-                <i class="fa-solid fa-bell-slash"></i>
-                <div>No new notifications</div>
-            </div>
-        @endif
-    </div>
-</div>
-@endauth
-                <div class="user-menu">
-                    <button class="user-menu-button" title="User Menu">
-                        <i class="fa-solid fa-user-circle"></i>
-                    </button>
-                    <div class="user-dropdown">
-                        <a href="/profile"><i class="fa-solid fa-user icon"></i> My Profile</a>
-                        <a href="{{ route('courses.enrolled') }}"><i class="fa-solid fa-graduation-cap icon"></i> My Courses</a>
-                        <a href="{{ route('user.progress') }}"><i class="fa-solid fa-chart-line icon"></i> My Progress</a>
+   @include('layouts.header')
 
-                        <a href="{{ route('login') }}"><i class="fa-solid fa-book-open icon"></i> Course Catalog</a>
-                        <a href="{{ route('purchase.history') }}"><i class="fa-solid fa-receipt icon"></i> Purchase History</a>
-                        @if(auth()->user() && auth()->user()->role!=3)
-                        <a href="{{ route('ins.signup') }}">Register as instructor</a>
-                        @endif
-                        <div class="separator"></div>
-                        <a href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            <i class="fa-solid fa-right-from-bracket icon"></i> Logout
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <!-- Hidden logout form -->
-            <form id="logout-form" action="/logout" method="POST" style="display: none;">
-                @csrf
-            </form>
-            <p class="username">{{ explode(' ', $user->name)[0] }}</p>
-        </div>
-    </header>
+   @include('layouts.category-bar')
 
-   <section class="hero">
-        <div class="hero-content">
-            <h1>Welcome to Edvantage</h1>
-            <p>Your virtual classroom redefined. Learn from the best instructors, explore trending courses, and unlock your potential.</p>
-            <div class="hero-buttons">
-                <a href="/register" class="btn btn-primary btn-hero">Get Started for FREE</a>
-                <a href="#courses" class="btn btn-secondary btn-hero">Learn More</a>
-            </div>
-        </div>
-    </section>
+   @include('layouts.hero')
     
-    <!-- Section Header -->
-      <div class="section-header">
-        <h2 class="section-title"></h2>
-      </div>
 
       {{-- ================= RECOMMENDED COURSES ================= --}}
+{{-- ================= RECOMMENDED COURSES ================= --}}
 @if(auth()->check() && isset($recommendedCourses) && count($recommendedCourses))
-<section class="courses-section" style="padding-top: 2rem;">
-    <div class="container">
-        <div class="section-title">
-            <h2>Recommended For You</h2>
-            <p>Courses based on your searches and learning activity</p>
-        </div>
+<section id="recommended" class="py-16 bg-gray-50"> 
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="relative overflow-hidden bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="text-center mb-12 pt-5">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Recommended For You</h2>
+                <p class="text-xl text-gray-600">Courses based on your searches and learning activity</p>
+            </div>
 
-        <div class="courses-grid">
-            @foreach($recommendedCourses as $course)
-                <div class="course-card">
-                    {{-- Course Image --}}
-                    @if($course->image)
-                        <img src="{{ asset('storage/' . $course->image) }}" 
-                             alt="{{ $course->title }}" 
-                             class="course-image">
-                    @else
-                        <img src="https://via.placeholder.com/300x140?text=Course+Image" 
-                             alt="{{ $course->title }}" 
-                             class="course-image">
-                    @endif
-
-                    {{-- Course Content --}}
-                    <div class="course-content">
-                        <h3 class="course-title">{{ $course->title }}</h3>
-
-                        @if($course->category)
-                            <span class="course-category-badge">
-                                {{ $course->category }}
-                            </span>
-                        @endif
-
-                        {{-- Rating --}}
-                        @if($course->ratings->count())
-                            <div class="course-rating">
-                                <span class="stars">
-                                    @for($i = 1; $i <= floor($course->averageRating()); $i++)
-                                        ★
-                                    @endfor
-                                </span>
-                                <span class="rating-number">
-                                    {{ $course->averageRating() }}
-                                </span>
-                                <span class="rating-count">
-                                    ({{ $course->ratings->count() }})
-                                </span>
-                            </div>
-                        @endif
-
-                        {{-- Price --}}
-                        <div class="course-price">
-                            <span class="taka-bold">৳</span>
-                            {{ number_format($course->price ?? 0, 0) }}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 pb-8 px-8">
+                @foreach($recommendedCourses as $course)
+                    <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-2xl border border-gray-200 hover:border-teal-500 transition-all cursor-pointer group transform hover:-translate-y-2 duration-300">
+                        <!-- Image -->
+                        <div class="relative overflow-hidden h-48">
+                            @if($course->image)
+                                <img src="{{ asset('storage/' . $course->image) }}" alt="{{ $course->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            @else
+                                <img src="https://via.placeholder.com/300x140?text=Course+Image" alt="{{ $course->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            @endif
+                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         </div>
 
-                        {{-- Actions --}}
-                        <div class="course-actions">
-                            <a href="{{ route('courses.details', $course->id) }}" 
-                               class="btn-details">
-                                Details
-                            </a>
+                        <!-- Content -->
+                        <div class="p-4 space-y-3">
+                            <!-- Category Badge -->
+                            @if($course->category)
+                                <span class="inline-block bg-teal-100 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full">
+                                    {{ $course->category }}
+                                </span>
+                            @endif
 
-                            <div class="action-icons-group">
-                                <form method="POST" action="{{ route('wishlist.add', $course->id) }}">
-                                    @csrf
-                                    <button type="submit" class="btn-icon-action">
-                                        <i class="fa-solid fa-heart"></i>
-                                    </button>
-                                </form>
+                            <!-- Title -->
+                            <h3 class="font-bold text-lg text-gray-900 line-clamp-2 min-h-[3.5rem]">
+                                {{ $course->title }}
+                            </h3>
 
-                                <form method="POST" action="{{ route('cart.add', $course->id) }}">
-                                    @csrf
-                                    <button type="submit" class="btn-icon-action">
-                                        <i class="fa-solid fa-shopping-cart"></i>
-                                    </button>
-                                </form>
+                            <!-- Rating -->
+                            @if($course->ratings->count())
+                            <div class="flex items-center gap-2">
+                                <div class="flex items-center">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= floor($course->averageRating()))
+                                            <svg class="w-4 h-4 text-yellow-500 fill-yellow-500" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                            </svg>
+                                        @else
+                                            <svg class="w-4 h-4 text-gray-300" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                            </svg>
+                                        @endif
+                                    @endfor
+                                </div>
+                                <span class="font-semibold text-sm text-yellow-600">{{ $course->averageRating() }}</span>
+                                <span class="text-xs text-gray-500">({{ $course->ratings->count() }})</span>
+                            </div>
+                            @endif
+
+                            <!-- Price -->
+                            <div class="pt-2">
+                                <div class="flex items-baseline gap-1">
+                                    <span class="text-2xl font-bold text-gray-900">৳</span>
+                                    <span class="text-2xl font-bold text-gray-900">{{ number_format($course->price ?? 0, 0) }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex gap-2 pt-2">
+                                <!-- Details Button -->
+                                <a href="{{ route('courses.details', $course->id) }}" 
+                                   class="flex-1 px-2 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-center text-sm font-semibold rounded-md transition-colors">
+                                    Details
+                                </a>
+                                
+                                <!-- Action Buttons Row -->
+                                <div class="flex gap-2">
+                                    <!-- Wishlist Button -->
+                                    <form method="POST" action="{{ route('wishlist.add', $course->id) }}" class="flex-1">
+                                        @csrf
+                                        <input type="hidden" name="course_id" value="{{ $course->id }}">
+                                        <button type="submit" 
+                                                class="w-full px-2 py-2 bg-pink-50 hover:bg-pink-100 text-pink-600 text-sm font-semibold rounded-md transition-colors flex items-center justify-center gap-2"
+                                                title="Add to Wishlist">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                    
+                                    <!-- Cart Button -->
+                                    <form method="POST" action="{{ route('cart.add', $course->id) }}" class="flex-1">
+                                        @csrf
+                                        <input type="hidden" name="course_id" value="{{ $course->id }}">
+                                        <button type="submit" 
+                                                class="w-full px-2 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-md transition-colors flex items-center justify-center gap-2 shadow-md"
+                                                title="Add to Cart">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
     </div>
 </section>
 @endif
 {{-- ================= END RECOMMENDED COURSES ================= --}}
 
-    <!-- Courses Section -->
-    <section class="courses-section" id="courses">
-        <div class="container">
-            <div class="section-title">
-                <h2>Featured Courses</h2>
-                <p>Discover our most popular courses designed to help you achieve your learning goals</p>
-            </div>
-            <!-- Show only one row of courses and add a "Load More" button -->
-            <div class="courses-grid" id="coursesGrid">
-        
 
-                @php $visibleCount = 0; @endphp
-                @foreach($courses as $course)
-
-                @if(!auth()->check() || !auth()->user()->enrolledCourses->contains($course->id))
-
-                <div class="course-card" style="{{ $visibleCount >= 4 ? 'display:none;' : '' }}"
->
-                    <!-- Course Image -->
-                    @if($course->image)
-                        <img src="{{ asset('storage/' . $course->image) }}" alt="{{ $course->title }}" class="course-image">
-                    @else
-                        <img src="https://via.placeholder.com/300x140?text=Course+Image" alt="{{ $course->title }}" class="course-image">
-                    @endif
-                    <!-- Course Content -->
-                   <div class="course-content">
-    <h3 class="course-title">{{ $course->title }}</h3>
-
-    @if(isset($course->category))
-        <span class="course-category-badge">{{ $course->category }}</span>
-    @endif
-
-    {{-- ⭐ STEP 9: Average Rating --}}
-    @if($course->ratings->count())
-        <div class="course-rating">
-            <span class="stars">
-                @for($i = 1; $i <= floor($course->averageRating()); $i++)
-                    ★
-                @endfor
-            </span>
-            <span class="rating-number">
-                {{ $course->averageRating() }}
-            </span>
-            <span class="rating-count">
-                ({{ $course->ratings->count() }})
-            </span>
-            @php $visibleCount++; @endphp
-
-        </div>
-    @endif
-
-    <div class="course-price">
-        <span class="taka-bold">৳</span> {{ number_format($course->price ?? 0, 0) }}
-    </div>
-
-                        <div class="course-actions">
-                            <a href="{{ route('courses.details', $course->id) }}" class="btn-details">
-                                Details
-                            </a>
-                            <div class="action-icons-group">
-                                <form method="POST" action="{{ route('wishlist.add', $course->id) }}">
-                                    @csrf
-                                    <input type="hidden" name="course_id" value="{{ $course->id }}">
-                                    <button type="submit" class="btn-icon-action" title="Add to Wishlist">
-                                        <i class="fa-solid fa-heart"></i>
-                                    </button>
-                                </form>
-                                <form method="POST" action="{{ route('cart.add', $course->id) }}">
-                                    @csrf
-                                    <input type="hidden" name="course_id" value="{{ $course->id }}">
-                                    <button type="submit" class="btn-icon-action" title="Add to Cart">
-                                        <i class="fa-solid fa-shopping-cart"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endif
-                @endforeach
-            </div>
-            @if($courses->count() > 4)
-                <div style="text-align:center; margin-top:2rem;">
-                    <button id="loadMoreBtn" class="btn btn-primary">Load More</button>
-                </div>
-            @endif
-        </div>
-    </section>
+@include('layouts.featured-course')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.querySelector('.search-input');

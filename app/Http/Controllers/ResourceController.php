@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Models\Quiz;
 use App\Models\Courses;
 use App\Models\Resource;
+use App\Models\DiscussionForum;
 use Illuminate\Http\Request;
 use App\Models\PendingCourses;
 use Illuminate\Routing\Controller;
@@ -126,6 +127,10 @@ public function addModule(Request $request){
                 ->where('module_number', $moduleNumber)
                 ->first();
     $questions = $quiz ? $quiz->questions : collect();
+    $forum = DiscussionForum::where('course_id', $courseId)
+        ->where('module_id', $resource->id) 
+        ->first(); 
+                
 
     return view('Admin.inside_module', [
         'course' => $course,
@@ -133,6 +138,7 @@ public function addModule(Request $request){
         'questions' => $questions,
         'moduleNumber' => $moduleNumber,
         'resource' => $resource,
+        'forum' => $forum,
     ]);
 }
 

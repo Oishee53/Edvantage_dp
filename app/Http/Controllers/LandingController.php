@@ -20,12 +20,12 @@ class LandingController extends Controller
     $uniqueCategories = $courses->pluck('category')->unique();
 
     // 🔥 STEP 6: GET RECOMMENDED COURSES
-    $recommendedCourses = [];
+    $recommendedCourses = collect();
 
-    if (auth()->check()) {
-        $recommendedCourses = $recommendationService
-            ->getRecommendedCourses(auth()->id());
-    }
+if (auth()->check()) {
+    $recommendedCourses = $recommendationService
+        ->getRecommendedCourses(auth()->id());
+}
 
     return response()
         ->view('landing', compact(

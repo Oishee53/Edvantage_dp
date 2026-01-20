@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Lecture Resources</title>
     <!-- Google Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
     <style>
         /* Custom CSS Variables */
@@ -414,7 +416,6 @@
                 @elseif(auth()->user()->role === 3)
                     <a href="/instructor_homepage">Dashboard</a>
                     <a href="/instructor/manage_courses" class="active">Manage Courses</a>
-                    <a href="/instructor/manage_user">Manage Users</a>
                 @endif
             </nav>
         </aside>
@@ -568,6 +569,24 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- Discussion Forum Section --}}
+            <div class="resource-section">
+                
+            @if($forum)
+                <x-discussion-forum :forum="$forum" :course="$course" />
+            @else
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-comments text-gray-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Discussion Forum Not Available</h3>
+                    <p class="text-gray-600">The discussion forum for this lecture is not yet set up.</p>
+                </div>
+            @endif
+            </div>
+
+                
 
                 <!-- Back Link -->
                 <a href="javascript:history.back()" class="back-link">

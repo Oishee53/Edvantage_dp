@@ -4,145 +4,507 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $exam->title }} - Exam Details</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <style>
-        .accent { color: #0E1B33; }
-        .bg-accent { background-color: #0E1B33; }
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #f1f3f5;
+            --text-primary: #000000;
+            --text-secondary: #495057;
+            --text-tertiary: #6c757d;
+            --border-color: #dee2e6;
+            --border-light: #e9ecef;
+            --accent: #212529;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .breadcrumb {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+            margin-top: 0.25rem;
+        }
+
+        .breadcrumb a {
+            color: var(--text-tertiary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Action Bar */
+        .action-bar {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background-color: var(--bg-tertiary);
+            border-color: var(--accent);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn-primary:hover {
+            background-color: #000000;
+        }
+
+        .pending-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 0.375rem;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 10px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+        }
+
+        /* Main Grid Layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1rem 1.25rem;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            font-size: 0.9375rem;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        /* Exam Info */
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+        }
+
+        .info-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .status-draft {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status-published {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .stat-box {
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            margin-top: 0.25rem;
+        }
+
+        .stat-detail {
+            font-size: 0.75rem;
+            color: #dc3545;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        /* Description */
+        .description-box {
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-left: 3px solid var(--accent);
+            border-radius: 3px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Questions */
+        .question-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .question-item {
+            padding: 1rem;
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            transition: border-color 0.15s ease;
+        }
+
+        .question-item:hover {
+            border-color: var(--border-color);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .question-number {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .marks-badge {
+            padding: 0.1875rem 0.625rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .question-text {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+        }
+
+        .criteria-box {
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            margin-top: 0.75rem;
+        }
+
+        .criteria-label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            letter-spacing: 0.025em;
+            margin-bottom: 0.375rem;
+        }
+
+        .criteria-text {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+
+        /* Sidebar Actions */
+        .action-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 968px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-bar {
+                flex-wrap: wrap;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .action-bar {
+                width: 100%;
+            }
+        }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <div class="container mx-auto px-4 py-8 max-w-6xl">
-        <!-- Header Card -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">{{ $exam->title }}</h1>
-                    <p class="text-gray-600 mt-1">{{ $exam->course->title }}</p>
-                </div>
-                <div>
-                    @if($exam->status === 'draft')
-                        <span class="px-4 py-2 bg-yellow-100 text-yellow-800 font-semibold rounded-full">
-                            📄 Draft
-                        </span>
-                    @else
-                        <span class="px-4 py-2 bg-green-100 text-green-800 font-semibold rounded-full">
-                            ✅ Published
-                        </span>
-                    @endif
+<body>
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">{{ $exam->title }}</h1>
+                <div class="breadcrumb">
+                    <a href="/instructor/manage_courses">Manage Courses</a> / 
+                    <a href="/instructor/manage_courses">{{ $exam->course->title }}</a> / 
+                    <span>Exam Details</span>
                 </div>
             </div>
-
-            <!-- Description -->
-            @if($exam->description)
-                <div class="bg-gray-50 p-4 rounded-lg mb-4">
-                    <p class="text-gray-700">{{ $exam->description }}</p>
-                </div>
-            @endif
-
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <div class="bg-blue-50 p-4 rounded-lg text-center">
-                    <div class="text-xs text-blue-700 uppercase mb-1">Questions</div>
-                    <div class="text-2xl font-bold text-blue-900">{{ $exam->questions()->count() }}</div>
-                </div>
-                <div class="bg-purple-50 p-4 rounded-lg text-center">
-                    <div class="text-xs text-purple-700 uppercase mb-1">Total Marks</div>
-                    <div class="text-2xl font-bold text-purple-900">{{ $exam->total_marks }}</div>
-                </div>
-                <div class="bg-green-50 p-4 rounded-lg text-center">
-                    <div class="text-xs text-green-700 uppercase mb-1">Passing Marks</div>
-                    <div class="text-2xl font-bold text-green-900">{{ $exam->passing_marks }}</div>
-                </div>
-                <div class="bg-orange-50 p-4 rounded-lg text-center">
-                    <div class="text-xs text-orange-700 uppercase mb-1">Duration</div>
-                    <div class="text-2xl font-bold text-orange-900">{{ $exam->duration_minutes }} min</div>
-                </div>
-                <div class="bg-indigo-50 p-4 rounded-lg text-center">
-                    <div class="text-xs text-indigo-700 uppercase mb-1">Submissions</div>
-                    <div class="text-2xl font-bold text-indigo-900">{{ $totalSubmissions }}</div>
-                    @if($pendingGrading > 0)
-                        <div class="text-xs text-red-600 font-semibold mt-1">{{ $pendingGrading }} pending</div>
-                    @endif
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex gap-3 mt-6">
-                <a href="{{ route('instructor.final-exams.submissions', $exam->id) }}" 
-                   class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-center transition">
-                    📊 View Submissions
-                    @if($pendingGrading > 0)
-                        <span class="ml-2 bg-red-500 px-2 py-1 rounded-full text-xs">{{ $pendingGrading }}</span>
-                    @endif
-                </a>
-
+            <div class="action-bar">
                 @if($totalSubmissions == 0)
-                    <a href="{{ route('instructor.final-exams.edit', $exam->id) }}" 
-                       class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition">
-                        ✏️ Edit Exam
+                    <a href="{{ route('instructor.final-exams.edit', $exam->id) }}" class="btn">
+                        Edit Exam
                     </a>
                 @endif
-
-                <a href="/instructor/manage_courses" 
-                   class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold transition">
-                    ← Back
+                <a href="/instructor/manage_courses" class="btn">
+                    Back
                 </a>
             </div>
         </div>
 
-        <!-- Questions List -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">📝 Exam Questions</h2>
-
-            @foreach($exam->questions as $question)
-                <div class="border-b border-gray-200 pb-4 mb-4 last:border-0">
-                    <div class="flex items-start justify-between mb-2">
-                        <h3 class="text-lg font-semibold text-gray-900">
-                            Question {{ $question->question_number }}
-                        </h3>
-                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
-                            {{ $question->marks }} marks
-                        </span>
-                    </div>
-
-                    <p class="text-gray-700 mb-2">{{ $question->question_text }}</p>
-
-                    @if($question->marking_criteria)
-                        <div class="bg-green-50 border-l-4 border-green-500 p-3 mt-2">
-                            <div class="text-xs text-green-700 font-semibold uppercase mb-1">Marking Criteria</div>
-                            <p class="text-sm text-green-800">{{ $question->marking_criteria }}</p>
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Left Column: Questions -->
+            <div>
+                <div class="card">
+                    <div class="card-header">Exam Questions ({{ $exam->questions()->count() }})</div>
+                    <div class="card-body">
+                        <div class="question-list">
+                            @foreach($exam->questions as $question)
+                                <div class="question-item">
+                                    <div class="question-header">
+                                        <span class="question-number">Question {{ $question->question_number }}</span>
+                                        <span class="marks-badge">{{ $question->marks }} marks</span>
+                                    </div>
+                                    <div class="question-text">{{ $question->question_text }}</div>
+                                    @if($question->marking_criteria)
+                                        <div class="criteria-box">
+                                            <div class="criteria-label">Marking Criteria</div>
+                                            <div class="criteria-text">{{ $question->marking_criteria }}</div>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endforeach
                         </div>
-                    @endif
-                </div>
-            @endforeach
-        </div>
-
-        <!-- Submissions Stats (if any) -->
-        @if($totalSubmissions > 0)
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-4">📈 Submission Statistics</h2>
-
-                <div class="grid grid-cols-3 gap-4">
-                    <div class="text-center p-4 bg-yellow-50 rounded-lg">
-                        <div class="text-3xl font-bold text-yellow-900">{{ $pendingGrading }}</div>
-                        <div class="text-sm text-yellow-700 mt-1">Pending Grading</div>
-                    </div>
-                    <div class="text-center p-4 bg-green-50 rounded-lg">
-                        <div class="text-3xl font-bold text-green-900">{{ $graded }}</div>
-                        <div class="text-sm text-green-700 mt-1">Graded</div>
-                    </div>
-                    <div class="text-center p-4 bg-blue-50 rounded-lg">
-                        <div class="text-3xl font-bold text-blue-900">{{ $passed }}</div>
-                        <div class="text-sm text-blue-700 mt-1">Passed (70%+)</div>
-                        @if($graded > 0)
-                            <div class="text-xs text-gray-600 mt-1">
-                                {{ round(($passed / $graded) * 100) }}% pass rate
-                            </div>
-                        @endif
                     </div>
                 </div>
             </div>
-        @endif
+
+            <!-- Right Column: Info & Actions -->
+            <div>
+                <!-- Status & Info -->
+                <div class="card">
+                    <div class="card-header">Exam Information</div>
+                    <div class="card-body">
+                        <div class="info-row">
+                            <span class="info-label">Status</span>
+                            @if($exam->status === 'draft')
+                                <span class="status-badge status-draft">Draft</span>
+                            @else
+                                <span class="status-badge status-published">Published</span>
+                            @endif
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Total Marks</span>
+                            <span class="info-value">{{ $exam->total_marks }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Passing Marks</span>
+                            <span class="info-value">{{ $exam->passing_marks }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Duration</span>
+                            <span class="info-value">{{ $exam->duration_minutes }} minutes</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Total Questions</span>
+                            <span class="info-value">{{ $exam->questions()->count() }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                @if($exam->description)
+                    <div class="card" style="margin-top: 1rem;">
+                        <div class="card-header">Description</div>
+                        <div class="card-body">
+                            <div class="description-box">
+                                {{ $exam->description }}
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Submissions Stats -->
+                <div class="card" style="margin-top: 1rem;">
+                    <div class="card-header">Submissions</div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <div class="stat-value">{{ $totalSubmissions }}</div>
+                                <div class="stat-label">Total</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">{{ $pendingGrading }}</div>
+                                <div class="stat-label">Pending</div>
+                                @if($pendingGrading > 0)
+                                    <div class="stat-detail">Needs grading</div>
+                                @endif
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">{{ $graded }}</div>
+                                <div class="stat-label">Graded</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">{{ $passed }}</div>
+                                <div class="stat-label">Passed</div>
+                                @if($graded > 0)
+                                    <div class="stat-detail">{{ round(($passed / $graded) * 100) }}% pass rate</div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="card" style="margin-top: 1rem;">
+                    <div class="card-header">Actions</div>
+                    <div class="card-body">
+                        <div class="action-list">
+                            <a href="{{ route('instructor.final-exams.submissions', $exam->id) }}" class="btn btn-primary">
+                                View All Submissions
+                                @if($pendingGrading > 0)
+                                    <span class="pending-badge">{{ $pendingGrading }}</span>
+                                @endif
+                            </a>
+                            @if($totalSubmissions == 0)
+                                <a href="{{ route('instructor.final-exams.edit', $exam->id) }}" class="btn">
+                                    Edit Exam
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

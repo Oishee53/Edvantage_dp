@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Purchase History - Edvantage</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
@@ -242,56 +243,7 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Main Navigation Bar -->
-    <header class="header">
-        <div class="nav-container">
-            <a href="/" class="logo">
-                <img src="/image/Edvantage.png" alt="EDVANTAGE Logo" style="height:40px; vertical-align:middle;">
-            </a>
-           <form class="search-form" action="{{ route('courses.search') }}" method="GET">
-    <input type="text" 
-           name="search" 
-           placeholder="What do you want to learn?" 
-           class="search-input"
-           value="{{ request('search') }}"
-           autocomplete="off">
-          </form>
-            <nav>
-                <ul class="nav-menu">
-                    <li><a href="#about">About Us</a></li>
-                    <li><a href="#contact">Contact Us</a></li>
-                </ul>
-            </nav>
-            <div class="top-icons">
-                <a href="/wishlist" class="icon-button" title="Wishlist">
-                    <i class="fa-solid fa-heart"></i>
-                </a>
-                <a href="/cart" class="icon-button" title="Shopping Cart">
-                    <i class="fa-solid fa-shopping-bag"></i>
-                </a>
-                <div class="user-menu">
-                    <button class="user-menu-button" title="User Menu">
-                        <i class="fa-solid fa-user-circle"></i>
-                    </button>
-                    <div class="user-dropdown">
-                        <a href="/profile"><i class="fa-solid fa-user icon"></i> My Profile</a>
-                        <a href="{{ route('courses.enrolled') }}"><i class="fa-solid fa-graduation-cap icon"></i> My Courses</a>
-                        <a href="{{ route('user.progress') }}"><i class="fa-solid fa-chart-line icon"></i> My Progress</a>
-                        <a href="{{ route('login') }}"><i class="fa-solid fa-book-open icon"></i> Course Catalog</a>
-                        <a href="{{ route('purchase.history') }}"><i class="fa-solid fa-receipt icon"></i> Purchase History</a>
-                        <div class="separator"></div>
-                        <a href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            <i class="fa-solid fa-right-from-bracket icon"></i> Logout
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <!-- Hidden logout form -->
-            <form id="logout-form" action="/logout" method="POST" style="display: none;">
-                @csrf
-            </form>
-            <p class="username">{{ explode(' ', auth()->user()->name)[0] }}</p>
-        </div>
-    </header>
+    @include('layouts.header')
 
     <div class="max-w-6xl mx-auto px-4 py-8">
         <!-- Header Section -->
@@ -322,7 +274,7 @@
                 </div>
             @else
                 <!-- Table Header -->
-                <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                <div class="bg-white px-6 py-4 border-b border-gray-200">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div class="md:col-span-2">
                             <span class="text-sm font-medium text-gray-700">Course Details</span>
@@ -360,7 +312,7 @@
 
                                 <!-- Price -->
                                 <div class="text-center">
-                                    <span class="inline-flex items-center bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                                    <span class="inline-flex items-center bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-sm font-medium">
                                         ৳{{ number_format($enrollment->course->price, 2) }}
                                     </span>
                                 </div>
@@ -380,13 +332,13 @@
                 </div>
 
                 <!-- Footer -->
-                <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                <div class="bg-white px-6 py-4 border-t border-gray-200">
                     <div class="flex items-center justify-between">
                         <div class="text-sm text-gray-600">
                             Total Purchases: <span class="font-medium text-gray-900">{{ $enrollments->count() }}</span>
                         </div>
                         <div class="text-sm text-gray-600">
-                            Total Spent: <span class="font-medium text-green-600">৳{{ number_format($enrollments->sum(function($enrollment) { return $enrollment->course->price; }), 2) }}</span>
+                            Total Spent: <span class="font-medium text-teal-600">৳{{ number_format($enrollments->sum(function($enrollment) { return $enrollment->course->price; }), 2) }}</span>
                         </div>
                     </div>
                 </div>

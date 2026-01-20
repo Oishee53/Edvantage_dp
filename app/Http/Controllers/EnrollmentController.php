@@ -6,6 +6,7 @@ use App\Models\Quiz;
 use App\Models\Courses;
 use App\Models\Resource;
 use App\Models\Enrollment;
+use App\Models\DiscussionForum;
 use Illuminate\Http\Request;
 use App\Models\VideoProgress;
 use App\Models\PendingResources;
@@ -93,6 +94,9 @@ public function showInsideModule($courseId, $moduleNumber)
                 ->where('module_number', $moduleNumber)
                 ->first();
     $questions = $quiz ? $quiz->questions : collect();
+    $forum = DiscussionForum::where('course_id', $courseId)
+        ->where('module_id', $resource->id) 
+        ->first(); 
 
     return view('Resources.inside_module', [
         'course' => $course,
@@ -100,6 +104,7 @@ public function showInsideModule($courseId, $moduleNumber)
         'questions' => $questions,
         'moduleNumber' => $moduleNumber,
         'resource' => $resource,
+        'forum' => $forum,
     ]);
 }
 

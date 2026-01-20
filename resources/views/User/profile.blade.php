@@ -10,396 +10,216 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <style>
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
             font-family: 'Montserrat', sans-serif;
-        }
-        
-        body {
-            background-color: #f9f9f9;
-            padding-top: 70px;
-            min-height: 100vh;
-        }
-        
-        /* Header hover effects */
-        .navbar a:hover,
-        .navbar button:hover {
-            transform: translateY(-2px);
-        }
-        
-        .dropdown-item:hover {
-            background-color: #f8f9fa !important;
-            padding-left: 1.25rem !important;
-        }
-        
-        /* Sidebar styling */
-        .sidebar {
-            background: #e7edf4;
-            min-height: calc(100vh - 70px);
-            padding: 2.5rem 2rem;
-        }
-        
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
-            background: #0E1B33;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-            border: 4px solid #0E1B33;
-            box-shadow: 0 4px 12px rgba(14, 27, 51, 0.2);
-        }
-        
-        .profile-name {
-            font-size: 1.75rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 0.5rem;
-        }
-        
-        .profile-subtitle {
-            font-size: 1rem;
-            color: #666;
-            margin-bottom: 1.5rem;
-        }
-        
-        /* Main content styling */
-        .main-content {
-            padding: 2.5rem;
-            background: #f9f9f9;
-            min-height: calc(100vh - 70px);
-        }
-        
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #333;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0;
-        }
-        
-        .section-title i {
-            color: #0E1B33;
-            font-size: 1.25rem;
-        }
-        
-        .section-description {
-            color: #666;
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 1.25rem;
-        }
-        
-        .info-card {
-            background: #e7edf4;
-            padding: 1.25rem;
-            border-radius: 12px;
-            border-left: 4px solid #0E1B33;
-            transition: all 0.3s ease;
-            margin-bottom: 1rem;
-        }
-        
-        .info-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(14, 27, 51, 0.15);
-        }
-        
-        .info-label {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #0E1B33;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.5rem;
-        }
-        
-        .info-value {
-            font-size: 1rem;
-            color: #333;
-            font-weight: 500;
-        }
-        
-        .btn-custom {
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: 2px solid #0E1B33;
-        }
-        
-        .btn-outline-custom {
-            background: #f9f9f9;
-            color: #0E1B33;
-        }
-        
-        .btn-outline-custom:hover {
-            background: #0E1B33;
-            color: #ffffff;
-        }
-        
-        .btn-primary-custom {
-            background: #0E1B33;
-            color: #ffffff;
-            border: 2px solid #0E1B33;
-        }
-        
-        .btn-primary-custom:hover {
-            background: #475569;
-            border-color: #475569;
-        }
-        
-        .bio-container {
-            background: #e7edf4;
-            padding: 1.5rem;
-            border-radius: 12px;
-            border-left: 4px solid #0E1B33;
-        }
-        
-        .bio-textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 1rem;
-            border: 2px solid #e2e8f0;
-            background: #f9f9f9;
-            border-radius: 8px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1rem;
-            line-height: 1.6;
-            resize: vertical;
-        }
-        
-        .bio-textarea:focus {
-            outline: none;
-            border-color: #0E1B33;
-        }
-        
-        .section-divider {
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 1rem;
-            margin-bottom: 1.25rem;
-        }
-        
-        .nav-actions-card {
-            background: #f8f9ff;
-            padding: 1.5rem;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-        }
-        
-        /* Responsive */
-        @media (max-width: 991px) {
-            .sidebar {
-                min-height: auto;
-                padding: 2rem 1.5rem;
-                border-bottom: 1px solid #e2e8f0;
-            }
-            
-            .main-content {
-                padding: 2rem 1.5rem;
-            }
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-50">
     <!-- Include Header Component -->
     @include('layouts.header')
     
     <!-- Main Profile Container -->
-    <div class="container-fluid p-0">
-        <div class="row g-0">
-            <!-- Left Sidebar -->
-            <div class="col-12 col-lg-3 sidebar">
-                <!-- Profile Header -->
-                <div class="text-center">
-                    <div class="profile-avatar">
-                        <i class="fas fa-user text-white" style="font-size: 60px;"></i>
-                    </div>
-                    <h1 class="profile-name">{{ $user->name }}</h1>
-                    <p class="profile-subtitle">{{ $user->field }} Enthusiast</p>
-                </div>
-                
-                <!-- Profile Actions -->
-                <div class="d-grid gap-3">
-                    <button class="btn btn-outline-custom d-flex align-items-center justify-content-center gap-2">
-                        <i class="fas fa-share-alt"></i>
-                        Share profile link
-                    </button>
-                    <button class="btn btn-link text-decoration-underline text-dark p-0" style="font-size: 0.875rem;">
-                        Update profile visibility
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Right Main Content -->
-            <div class="col-12 col-lg-9 main-content">
-                <!-- Personal Information Section -->
-                <div class="mb-5">
-                    <div class="section-divider">
-                        <h2 class="section-title">
-                            <i class="fas fa-user-circle"></i>
-                            Personal Information
-                        </h2>
-                    </div>
-                    <p class="section-description">
-                        Manage your personal information and account details. Keep your profile up to date to get the most out of your learning experience.
-                    </p>
-                    <div>
-                        <div class="info-card">
-                            <div class="info-label">Full Name</div>
-                            <div class="info-value">{{ $user->name }}</div>
+    <div class="pt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Left Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 sticky top-24">
+                        <!-- Profile Header -->
+                        <div class="text-center mb-6">
+                            <div class="w-28 h-28 mx-auto mb-4 bg-teal-600 rounded-full flex items-center justify-center shadow-lg">
+                                <i class="fas fa-user text-white text-5xl"></i>
+                            </div>
+                            <h1 class="text-2xl font-bold text-gray-900 mb-1">{{ $user->name }}</h1>
+                            <p class="text-sm text-gray-600">{{ $user->field }} Enthusiast</p>
                         </div>
-                        <div class="info-card">
-                            <div class="info-label">Email Address</div>
-                            <div class="info-value">{{ $user->email }}</div>
-                        </div>
-                        <div class="info-card">
-                            <div class="info-label">Phone Number</div>
-                            <div class="info-value">{{ $user->phone ?? 'Not provided' }}</div>
-                        </div>
-                        <div class="info-card">
-                            <div class="info-label">Field of Interest</div>
-                            <div class="info-value">{{ $user->field }}</div>
+                        
+                        <!-- Profile Actions -->
+                        <div class="space-y-3">
+                            <button class="w-full px-4 py-2.5 border-2 border-teal-600 text-teal-600 rounded-lg hover:bg-teal-50 transition-colors font-medium flex items-center justify-center gap-2">
+                                <i class="fas fa-share-alt"></i>
+                                Share profile link
+                            </button>
+                            <button class="w-full text-sm text-gray-600 hover:text-teal-600 transition-colors underline">
+                                Update profile visibility
+                            </button>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Account Information Section -->
-                <div class="mb-5">
-                    <div class="section-divider">
-                        <h2 class="section-title">
-                            <i class="fas fa-cog"></i>
-                            Account Information
-                        </h2>
-                    </div>
-                    <p class="section-description">
-                        View your account status and membership details. Your account information helps us provide you with personalized learning recommendations.
-                    </p>
-                    <div>
-                        <div class="info-card">
-                            <div class="info-label">Member Since</div>
-                            <div class="info-value">{{ $user->created_at->format('F j, Y') }}</div>
+                <!-- Right Main Content -->
+                <div class="lg:col-span-3 space-y-8">
+                    <!-- Personal Information Section -->
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 md:p-8">
+                        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+                            <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-user-circle text-teal-600 text-xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-gray-900">Personal Information</h2>
                         </div>
-                    </div>
-                </div>
-                
-                <!-- Bio Section -->
-                <div class="mb-5">
-                    <div class="d-flex justify-content-between align-items-center section-divider">
-                        <h2 class="section-title">
-                            <i class="fas fa-file-alt"></i>
-                            About Me
-                        </h2>
-                        <button class="btn btn-outline-custom btn-sm d-flex align-items-center gap-2" onclick="toggleBioEdit()" style="padding: 0.5rem 1rem;">
-                            <i class="fas fa-edit"></i>
-                            <span id="bio-edit-text">Add Bio</span>
-                        </button>
-                    </div>
-                    <p class="section-description">
-                        Share a bit about yourself, your learning goals, and what motivates you. This helps others in the community get to know you better.
-                    </p>
-                    <div class="bio-container">
-                        <div id="bio-display">
-                            <p class="mb-0 {{ $user->bio ? '' : 'text-muted fst-italic' }}">
-                                {{ $user->bio ?? 'No bio added yet. Click "Add Bio" to tell others about yourself, your learning journey, and your goals.' }}
-                            </p>
-                        </div>
-                        <div id="bio-edit" class="d-none">
-                            <textarea 
-                                class="bio-textarea mb-3"
-                                placeholder="Tell us about yourself, your learning goals, interests, and what motivates you to learn..."
-                                maxlength="500"
-                            >{{ $user->bio ?? '' }}</textarea>
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-primary-custom btn-sm d-flex align-items-center gap-2" onclick="saveBio()" style="padding: 0.5rem 1rem;">
-                                    <i class="fas fa-save"></i>
-                                    Save Bio
-                                </button>
-                                <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2" onclick="cancelBioEdit()" style="padding: 0.5rem 1rem;">
-                                    <i class="fas fa-times"></i>
-                                    Cancel
-                                </button>
+                        
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            Manage your personal information and account details. Keep your profile up to date to get the most out of your learning experience.
+                        </p>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-teal-600 hover:shadow-md transition-all">
+                                <div class="text-xs font-semibold text-teal-700 uppercase tracking-wide mb-1">Full Name</div>
+                                <div class="text-base font-medium text-gray-900">{{ $user->name }}</div>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-teal-600 hover:shadow-md transition-all">
+                                <div class="text-xs font-semibold text-teal-700 uppercase tracking-wide mb-1">Email Address</div>
+                                <div class="text-base font-medium text-gray-900">{{ $user->email }}</div>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-teal-600 hover:shadow-md transition-all">
+                                <div class="text-xs font-semibold text-teal-700 uppercase tracking-wide mb-1">Phone Number</div>
+                                <div class="text-base font-medium text-gray-900">{{ $user->phone ?? 'Not provided' }}</div>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-teal-600 hover:shadow-md transition-all">
+                                <div class="text-xs font-semibold text-teal-700 uppercase tracking-wide mb-1">Field of Interest</div>
+                                <div class="text-base font-medium text-gray-900">{{ $user->field }}</div>
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Account Information Section -->
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 md:p-8">
+                        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+                            <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-cog text-teal-600 text-xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-gray-900">Account Information</h2>
+                        </div>
+                        
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            View your account status and membership details. Your account information helps us provide you with personalized learning recommendations.
+                        </p>
+                        
+                        <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-teal-600 hover:shadow-md transition-all">
+                            <div class="text-xs font-semibold text-teal-700 uppercase tracking-wide mb-1">Member Since</div>
+                            <div class="text-base font-medium text-gray-900">{{ $user->created_at->format('F j, Y') }}</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bio Section -->
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 md:p-8" x-data="{ 
+                        editing: false, 
+                        bioText: '{{ $user->bio ?? '' }}',
+                        originalBio: '{{ $user->bio ?? '' }}',
+                        showToast: false,
+                        toggleEdit() {
+                            this.editing = !this.editing;
+                            if (this.editing) {
+                                this.$nextTick(() => {
+                                    this.$refs.bioTextarea.focus();
+                                });
+                            }
+                        },
+                        cancel() {
+                            this.bioText = this.originalBio;
+                            this.editing = false;
+                        },
+                        save() {
+                            this.originalBio = this.bioText;
+                            this.editing = false;
+                            this.showToast = true;
+                            setTimeout(() => { this.showToast = false; }, 3000);
+                        }
+                    }">
+                        <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-file-alt text-teal-600 text-xl"></i>
+                                </div>
+                                <h2 class="text-2xl font-bold text-gray-900">About Me</h2>
+                            </div>
+                            <button 
+                                @click="toggleEdit()"
+                                class="px-4 py-2 border-2 border-teal-600 text-teal-600 rounded-lg hover:bg-teal-50 transition-colors font-medium flex items-center gap-2">
+                                <i class="fas" :class="editing ? 'fa-times' : 'fa-edit'"></i>
+                                <span x-text="editing ? 'Cancel' : (bioText ? 'Edit Bio' : 'Add Bio')"></span>
+                            </button>
+                        </div>
+                        
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            Share a bit about yourself, your learning goals, and what motivates you. This helps others in the community get to know you better.
+                        </p>
+                        
+                        <div class="bg-gray-50 rounded-lg p-6 border-l-4 border-teal-600">
+                            <!-- Display Mode -->
+                            <div x-show="!editing">
+                                <p class="text-gray-900 leading-relaxed" 
+                                   :class="bioText ? '' : 'text-gray-500 italic'"
+                                   x-text="bioText || 'No bio added yet. Click \"Add Bio\" to tell others about yourself, your learning journey, and your goals.'">
+                                </p>
+                            </div>
+                            
+                            <!-- Edit Mode -->
+                            <div x-show="editing" x-cloak>
+                                <textarea 
+                                    x-ref="bioTextarea"
+                                    x-model="bioText"
+                                    class="w-full min-h-[150px] px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-vertical"
+                                    placeholder="Tell us about yourself, your learning goals, interests, and what motivates you to learn..."
+                                    maxlength="500"
+                                ></textarea>
+                                <div class="flex items-center justify-between mt-3">
+                                    <span class="text-sm text-gray-500">
+                                        <span x-text="bioText.length"></span> / 500 characters
+                                    </span>
+                                    <div class="flex gap-2">
+                                        <button 
+                                            @click="save()"
+                                            class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium flex items-center gap-2">
+                                            <i class="fas fa-save"></i>
+                                            Save Bio
+                                        </button>
+                                        <button 
+                                            @click="cancel()"
+                                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors font-medium flex items-center gap-2">
+                                            <i class="fas fa-times"></i>
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Success Toast -->
+                        <div x-show="showToast" 
+                             x-transition:enter="transition ease-out duration-300"
+                             x-transition:enter-start="opacity-0 translate-y-2"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-200"
+                             x-transition:leave-start="opacity-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 translate-y-2"
+                             class="fixed bottom-8 right-8 bg-green-600 text-white px-6 py-4 rounded-lg shadow-xl flex items-center gap-3 z-50"
+                             style="display: none;">
+                            <i class="fas fa-check-circle text-xl"></i>
+                            <span class="font-medium">Bio saved successfully!</span>
+                        </div>
+                    </div>
                 </div>
-                
-              
             </div>
         </div>
     </div>
     
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-    
-    <script>
-        function toggleBioEdit() {
-            const bioDisplay = document.getElementById('bio-display');
-            const bioEdit = document.getElementById('bio-edit');
-            const editText = document.getElementById('bio-edit-text');
-            
-            bioDisplay.classList.add('d-none');
-            bioEdit.classList.remove('d-none');
-            editText.textContent = 'Cancel';
-        }
-
-        function cancelBioEdit() {
-            const bioDisplay = document.getElementById('bio-display');
-            const bioEdit = document.getElementById('bio-edit');
-            const editText = document.getElementById('bio-edit-text');
-            
-            bioDisplay.classList.remove('d-none');
-            bioEdit.classList.add('d-none');
-            editText.textContent = 'Add Bio';
-        }
-
-        function saveBio() {
-            const textarea = document.querySelector('#bio-edit textarea');
-            const bioText = textarea.value.trim();
-            const bioDisplay = document.querySelector('#bio-display p');
-            
-            if (bioText) {
-                bioDisplay.textContent = bioText;
-                bioDisplay.classList.remove('text-muted', 'fst-italic');
-            } else {
-                bioDisplay.textContent = 'No bio added yet. Click "Add Bio" to tell others about yourself, your learning journey, and your goals.';
-                bioDisplay.classList.add('text-muted', 'fst-italic');
-            }
-            
-            cancelBioEdit();
-            
-            // Show success notification
-            const toastHtml = `
-                <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
-                    <div class="toast show align-items-center text-white bg-success border-0 rounded-3" role="alert">
-                        <div class="d-flex">
-                            <div class="toast-body">
-                                <i class="fas fa-check-circle me-2"></i>Bio saved successfully!
-                            </div>
-                            <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.closest('.position-fixed').remove()"></button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', toastHtml);
-            
-            setTimeout(() => {
-                const toast = document.querySelector('.position-fixed');
-                if (toast) toast.remove();
-            }, 3000);
-        }
-    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 </body>
 </html>
