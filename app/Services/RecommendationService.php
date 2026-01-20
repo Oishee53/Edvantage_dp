@@ -65,4 +65,4 @@ class RecommendationService
 
         return $query->latest()->limit($limit)->get();
     }
-}
+}///////
