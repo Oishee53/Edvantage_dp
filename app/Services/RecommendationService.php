@@ -10,11 +10,11 @@ class RecommendationService
 {
     public function getRecommendedCourses($userId, $limit = 6)
     {
-        // 🔥 EXCLUDE ALL BOUGHT / ENROLLED COURSES
+        //  EXCLUDE ALL BOUGHT / ENROLLED COURSES
         $enrolledCourseIds = Enrollment::where('user_id', $userId)
             ->pluck('course_id');
 
-        // 🔍 GET SEARCH KEYWORDS
+        //  GET SEARCH KEYWORDS
         $keywords = UserSearch::where('user_id', $userId)
             ->latest()
             ->take(5)
@@ -22,7 +22,7 @@ class RecommendationService
 
         $query = Courses::whereNotIn('id', $enrolledCourseIds);
 
-        // 🔁 MATCH BY SEARCH
+        //  MATCH BY SEARCH
         if ($keywords->count()) {
             $query->where(function ($q) use ($keywords) {
                 foreach ($keywords as $keyword) {
