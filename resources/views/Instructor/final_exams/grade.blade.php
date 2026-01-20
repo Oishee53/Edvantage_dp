@@ -605,6 +605,13 @@
                     </div>
                 </div>
             @endforeach
+            @if($submission->webcam_playback_id)
+    <h3 class="mt-4 font-bold">Webcam Recording</h3>
+    <video controls width="600">
+        <source src="https://stream.mux.com/{{ $submission->webcam_playback_id }}.m3u8" type="application/x-mpegURL">
+    </video>
+@endif
+
 
             <!-- Summary -->
             <div class="summary-card">
