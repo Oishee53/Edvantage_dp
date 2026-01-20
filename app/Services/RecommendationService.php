@@ -10,6 +10,11 @@ class RecommendationService
 {
     public function getRecommendedCourses($userId, $limit = 6)
     {
+        //  EXCLUDE ALL BOUGHT / ENROLLED COURSES
+        $enrolledCourseIds = Enrollment::where('user_id', $userId)
+            ->pluck('course_id');
+
+        //  GET SEARCH KEYWORDS
         // 1️⃣ Courses already bought
         $enrolledCourseIds = Enrollment::where('user_id', $userId)
             ->pluck('course_id');
@@ -33,6 +38,16 @@ class RecommendationService
         // 4️⃣ Build recommendation query
         $query = Courses::whereNotIn('id', $enrolledCourseIds);
 
+        //  MATCH BY SEARCH
+        if ($keywords->count()) {
+            $query->where(function ($q) use ($keywords) {
+                foreach ($keywords as $keyword) {
+                    $q->orWhere('title', 'LIKE', "%$keyword%")
+                      ->orWhere('description', 'LIKE', "%$keyword%")
+                      ->orWhere('category', 'LIKE', "%$keyword%");
+                }
+            });
+        }
         $query->where(function ($q) use ($purchasedCategories, $keywords) {
 
             // 🔥 Priority 1: Purchased category
