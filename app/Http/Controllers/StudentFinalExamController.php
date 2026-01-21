@@ -12,6 +12,7 @@ use App\Models\FinalExamSubmission;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\FinalExamSubmittedNotification;
+use App\Services\MuxService;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 
@@ -61,7 +62,8 @@ class StudentFinalExamController extends Controller
     /**
      * Start the exam
      */
-    public function start($examId)
+    public function start(Request $request, $examId)
+
     {
         $exam = FinalExam::with('questions')->findOrFail($examId);
 
@@ -89,6 +91,10 @@ class StudentFinalExamController extends Controller
         if ($submission->status === 'submitted' || $submission->status === 'graded') {
             return redirect()->route('student.final-exam.result', $submission->id);
         }
+
+        $request->validate([
+    'webcam_video' => 'nullable|file|mimes:webm,mp4|max:51200'
+]);
 
         // Start the exam
         if ($submission->status === 'not_started') {
@@ -333,7 +339,9 @@ class StudentFinalExamController extends Controller
     /**
      * Submit the exam
      */
-    public function submit($submissionId)
+    public function submit(Request $request, $submissionId, MuxService $muxService)
+
+
     {
         $submission = FinalExamSubmission::with('answers')->findOrFail($submissionId);
 
@@ -356,13 +364,36 @@ class StudentFinalExamController extends Controller
             }
         }
 
+        if ($request->hasFile('webcam_video')) {
+
+    // 1️⃣ Upload to Cloudinary
+    $cloudinaryResult = Cloudinary::uploadApi()->upload(
+        $request->file('webcam_video')->getRealPath(),
+        [
+            'resource_type' => 'video',
+            'folder' => "final_exam/{$submission->id}"
+        ]
+    );
+
+    $cloudinaryUrl = $cloudinaryResult['secure_url'];
+
+    //  Send to Mux (USING YOUR EXISTING SERVICE)
+    $muxResult = $muxService->uploadVideo($cloudinaryUrl);
+
+    if (isset($muxResult['playback_id'])) {
+        $submission->webcam_playback_id = $muxResult['playback_id'];
+        $submission->save();
+    }
+}
+
         // Update submission
         $submission->update([
             'status' => 'submitted',
             'submitted_at' => now()
         ]);
 
-        $instructor = User::find($submission->exam->instructor);
+        $instructor = User::where('id', $submission->exam->instructor)->first();
+
         if ($instructor) {
             $instructor->notify(new FinalExamSubmittedNotification($submission));
         }

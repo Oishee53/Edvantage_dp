@@ -384,6 +384,15 @@
                 </div>
             </div>
         </div>
+        <div class="mb-4">
+    <h3 class="font-bold mb-2">Webcam Monitoring</h3>
+    <video id="webcamPreview" autoplay muted class="border w-64 h-48"></video>
+    <p class="text-red-500 text-sm">
+Webcam recording is mandatory during the final exam.
+</p>
+
+</div>
+
 
         <!-- Questions -->
         @foreach($exam->questions as $question)
@@ -464,8 +473,10 @@
         <form action="{{ route('student.final-exam.submit', $submission->id) }}" 
               method="POST" 
               id="submit-form"
+              enctype="multipart/form-data"
               onsubmit="return confirmSubmit()">
             @csrf
+             <input type="file" name="webcam_video" id="webcamVideoInput" hidden>
             <button type="submit" class="submit-button" id="submit-btn" disabled>
                 Submit Exam
             </button>
@@ -698,6 +709,54 @@
 
         // Debug: Log the upload URL
         console.log('Upload URL will be:', `{{ url('/') }}/final-exam-submissions/${submissionId}/questions/[QUESTION_ID]/upload-answer`);
+        let mediaRecorder;
+let recordedChunks = [];
+let stream;
+
+async function startWebcamRecording() {
+    stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+    });
+
+    document.getElementById('webcamPreview').srcObject = stream;
+
+    mediaRecorder = new MediaRecorder(stream);
+
+    mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) recordedChunks.push(e.data);
+    };
+
+    mediaRecorder.start();
+}
+
+function stopWebcamRecording() {
+    return new Promise(resolve => {
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            const file = new File([blob], 'webcam.webm', { type: 'video/webm' });
+
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            document.getElementById('webcamVideoInput').files = dataTransfer.files;
+
+            stream.getTracks().forEach(track => track.stop());
+            resolve();
+        };
+        mediaRecorder.stop();
+    });
+}
+
+// Start recording when exam loads
+window.onload = startWebcamRecording;
+
+// On submit
+document.getElementById('submit-form').addEventListener('submit', async function (e) 
+ {
+   e.preventDefault();
+    await stopWebcamRecording();
+    this.submit();
+});
     </script>
 </body>
 </html>
