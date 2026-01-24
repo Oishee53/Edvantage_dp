@@ -14,26 +14,12 @@
             font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         body {
-            background: linear-gradient(135deg, #0E1B33 0%, #334155 100%); /* Darker gradient */
             min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
             position: relative;
             overflow: hidden;
         }
-        /* Background Pattern */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('/image/hero.png') center/cover;
-            opacity: 0.4; /* Increased opacity to make the image visible */
-            z-index: 1;
-        }
+
         /* Top Logo */
         .top-logo {
             position: absolute;
@@ -42,27 +28,57 @@
             z-index: 10;
             font-size: 2rem;
             font-weight: bold;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            color: #0E1B33;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
         .top-logo img {
             height: 40px;
             vertical-align: middle;
         }
-        /* Main Container */
-        .login-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
+
+        /* Left Side - Form Container */
+        .left-container {
+            flex: 1;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 3rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            max-width: 450px;
-            width: 90%;
             position: relative;
             z-index: 5;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: fadeInUp 0.8s ease forwards; /* Animation applied here */
+            order: 2; /* FORM ON RIGHT */
         }
+
+        /* Right Side - Image Container */
+        .right-container {
+            flex: 1;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+            order: 1; /* IMAGE ON LEFT */
+        }
+
+        .right-container img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            animation: fadeIn 1s ease forwards;
+        }
+
+        /* Main Container */
+        .login-container {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem;
+            max-width: 450px;
+            width: 100%;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
         /* Login Header */
         .login-header {
             text-align: center;
@@ -71,13 +87,14 @@
         .login-title {
             font-size: 1.8rem;
             font-weight: 600;
-            color: #0E1B33; /* Primary dark color */
+            color: #0E1B33;
             margin-bottom: 0.5rem;
         }
         .login-subtitle {
             color: #64748b;
             font-size: 0.95rem;
         }
+
         /* Error Message */
         .error-message {
             background: #fef2f2;
@@ -95,6 +112,7 @@
             content: '⚠️';
             font-size: 1.1rem;
         }
+
         /* Form Styles */
         .login-form {
             margin-bottom: 2rem;
@@ -120,32 +138,33 @@
         }
         .form-input:focus {
             outline: none;
-            border-color: #0E1B33; /* Primary dark color on focus */
+            border-color: #0E1B33;
             background: white;
-            box-shadow: 0 0 0 3px rgba(14, 27, 51, 0.1); /* Shadow with primary dark color */
+            box-shadow: 0 0 0 3px rgba(14, 27, 51, 0.1);
         }
         .form-input:hover {
             border-color: #d1d5db;
         }
-      .forgot-pass-link {
-    text-align: left;
-    margin-top: -1rem;
-    margin-bottom: 1.5rem;
-}
+        .forgot-pass-link {
+            text-align: left;
+            margin-top: -1rem;
+            margin-bottom: 1.5rem;
+        }
         .forgot-pass-link a {
-            color: #0E1B33; /* Primary dark color */
+            color: #0E1B33;
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s ease;
         }
         .forgot-pass-link a:hover {
-            color: #475569; /* A slightly lighter shade for hover */
+            color: #475569;
             text-decoration: underline;
         }
+
         /* Login Button */
         .login-button {
             width: 100%;
-            background: #0E1B33; /* Primary dark color */
+            background: #0E1B33;
             color: white;
             border: none;
             padding: 1rem;
@@ -160,19 +179,19 @@
             overflow: hidden;
         }
         .login-button:hover {
-            background: linear-gradient(135deg, #334155 0%, #475569 100%); /* Darker gradient for hover */
+            background: linear-gradient(135deg, #334155 0%, #475569 100%);
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(14, 27, 51, 0.3); /* Shadow with primary dark color */
+            box-shadow: 0 10px 25px rgba(14, 27, 51, 0.3);
         }
         .login-button:active {
             transform: translateY(0);
         }
-        /* Loading State */
+
         .login-button:disabled {
             opacity: 0.7;
             cursor: not-allowed;
-            transform: none;
         }
+
         /* Register Link */
         .register-link {
             text-align: center;
@@ -184,167 +203,113 @@
             font-size: 0.95rem;
         }
         .register-link a {
-            color: #0E1B33; /* Primary dark color */
+            color: #0E1B33;
             text-decoration: none;
             font-weight: 600;
-            transition: color 0.3s ease;
         }
-        .register-link a:hover {
-            color: #475569; /* A slightly lighter shade for hover */
-            text-decoration: underline;
-        }
+
         /* Responsive Design */
-        @media (max-width: 768px) {
-            .login-container {
-                padding: 2rem;
-                margin: 1rem;
+        @media (max-width: 1024px) {
+            body {
+                flex-direction: column;
             }
-            .login-title {
-                font-size: 1.5rem;
+            .right-container {
+                display: none;
+            }
+            .left-container {
+                min-height: 100vh;
+                background: linear-gradient(135deg, #0E1B33 0%, #334155 100%);
+                order: 1;
+            }
+            .left-container::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: url('/image/hero.png') center/cover;
+                opacity: 0.4;
+                z-index: 1;
+            }
+            .login-container {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(20px);
+                position: relative;
+                z-index: 5;
             }
             .top-logo {
-                top: 1rem;
-                left: 1rem;
-                font-size: 1.5rem;
+                color: white;
             }
         }
-        /* Animation */
+
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        /* Input Icons (No actual icons in original, but keeping styles for future use) */
-        .input-group {
-            position: relative;
-        }
-        .input-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #9ca3af;
-            font-size: 1.1rem;
-        }
-        .form-input.with-icon {
-            padding-left: 1rem; /* Adjusted from 2.5rem as no icon is present */
-        }
-        /* Ripple Effect */
-        .login-button::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-        .login-button:active::after {
-            width: 300px;
-            height: 300px;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
+
 <body>
-    <!-- Top Logo -->
-    <div class="top-logo">
-        <a href="/" class="logo">
-            <img src="/image/Edvantage.png" alt="EDVANTAGE Logo">
-        </a>
-    </div>
-    <!-- Main Container -->
+
+<div class="top-logo">
+    <a href="/">
+        <img src="/image/Edvantage.png" alt="EDVANTAGE Logo">
+    </a>
+</div>
+
+<div class="left-container">
     <div class="login-container">
-        <!-- Header -->
         <div class="login-header">
             <h2 class="login-title">Sign in</h2>
             <p class="login-subtitle">Welcome back! Please enter your credentials.</p>
         </div>
-        <!-- Error Message -->
+
         @if (session('error'))
-            <div class="error-message">
-                {{ session('error') }}
-            </div>
+            <div class="error-message">{{ session('error') }}</div>
         @endif
-        <!-- Login Form -->
+
         <form action="/login" method="POST" class="login-form" id="loginForm">
             @csrf
             <div class="form-group">
-                <label for="email" class="form-label">Email Address</label>
-                <div class="input-group">
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        class="form-input with-icon"
-                        placeholder="Enter your email"
-                        required
-                        value="{{ old('email') }}"
-                    >
-                </div>
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" class="form-input" required value="{{ old('email') }}">
             </div>
+
             <div class="form-group">
-                <label for="password" class="form-label">Password</label>
-                <div class="input-group">
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        class="form-input with-icon"
-                        placeholder="Enter your password"
-                        required
-                    >
-                </div>
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-input" required>
             </div>
-             <div class="forgot-pass-link">
-            <a href="/password/reset">Forgot Password?</a>
+
+            <div class="forgot-pass-link">
+                <a href="/password/reset">Forgot Password?</a>
             </div>
-            <button type="submit" class="login-button" id="loginBtn">
-                Sign In
-            </button>
+
+            <button type="submit" class="login-button" id="loginBtn">Sign In</button>
         </form>
-       
-        <!-- Register Link -->
+
         <div class="register-link">
             <p>Don't have an account? <a href="/register">Create one here</a></p>
         </div>
     </div>
-    <script>
-        // Form submission handling
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            const button = document.getElementById('loginBtn');
-            button.disabled = true;
-            button.innerHTML = 'Signing In...';
+</div>
 
-            // Re-enable button after 3 seconds in case of issues or no redirect
-            setTimeout(() => {
-                button.disabled = false;
-                button.innerHTML = 'Sign In';
-            }, 3000);
-        });
+<div class="right-container">
+    <img src="/image/login.jpg" alt="Education Illustration">
+</div>
 
-        // Input focus effects (simplified as original was for parentElement)
-        document.querySelectorAll('.form-input').forEach(input => {
-            input.addEventListener('focus', function() {
-                this.style.borderColor = '#0E1B33';
-                this.style.boxShadow = '0 0 0 3px rgba(14, 27, 51, 0.1)';
-            });
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function () {
+        const btn = document.getElementById('loginBtn');
+        btn.disabled = true;
+        btn.innerText = 'Signing In...';
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerText = 'Sign In';
+        }, 3000);
+    });
+</script>
 
-            input.addEventListener('blur', function() {
-                this.style.borderColor = '#e5e7eb';
-                this.style.boxShadow = 'none';
-            });
-        });
-
-        // Auto-focus first input
-        document.getElementById('email').focus();
-    </script>
 </body>
 </html>
