@@ -8,4 +8,3 @@ class UserSearch extends Model
 {
     protected $fillable = ['user_id', 'keyword'];
 }
-
