@@ -144,6 +144,7 @@
             border: none;
             font-weight: 600;
             cursor: pointer;
+            margin-top: 1rem;
         }
 
         /* ================= LOGIN LINK ================= */
