@@ -6,29 +6,216 @@
     <title>Lecture Resources - {{ $course->name }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #f8fafc;
+        }
+        
+        .resource-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .resource-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-color: #14b8a6;
+        }
+        
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            background: #f0fdfa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .icon-box i {
+            color: #14b8a6;
+            font-size: 1.25rem;
+        }
+        
+        .btn-teal {
+            background: #14b8a6;
+            color: white;
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-teal:hover {
+            background: #0d9488;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+        }
+        
+        .btn-navy {
+            background: #0E1B33;
+            color: white;
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-navy:hover {
+            background: #334155;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(14, 27, 51, 0.3);
+        }
+        
+        .video-container {
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .info-box {
+            background: #f0fdfa;
+            border: 1px solid #ccfbf1;
+            border-radius: 8px;
+            padding: 0.875rem 1rem;
+            color: #0f766e;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .alert-success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            border-left: 4px solid #22c55e;
+        }
+        
+        .alert-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .page-header {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            padding: 2rem;
+        }
+        
+        .page-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #0E1B33;
+            margin-bottom: 0.75rem;
+        }
+        
+        .lecture-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+        
+        .question-form {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            padding: 1.5rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #14b8a6;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+        
+        .empty-state i {
+            font-size: 2.5rem;
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state p {
+            color: #64748b;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <div class="container mx-auto px-6 py-8 max-w-5xl">
+<body class="min-h-screen px-20 pt-5">
+    @include('layouts.header')
+
+    <div class="container mx-auto px-6 py-8 max-w-5xl pt-24">
         {{-- Header --}}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
-            <h1 class="text-2xl font-semibold text-gray-900 mb-3">{{ $course->name }}</h1>
-            <div class="flex items-center text-gray-600">
-                <i class="fas fa-book-open mr-3 text-gray-400"></i>
-                <span class="text-base">Lecture {{ $moduleNumber }}</span>
+        <div class="page-header mb-8">
+            <h1 class="page-title">{{ $course->name }}</h1>
+            <div class="lecture-info">
+                <i class="fas fa-book-open"></i>
+                <span>Lecture {{ $moduleNumber }}</span>
             </div>
         </div>
 
         {{-- Flash messages --}}
         @if(session('error'))
-            <div class="bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl mb-6 flex items-center">
-                <i class="fas fa-exclamation-triangle mr-3 text-red-500"></i>
+            <div class="alert-error px-6 py-4 rounded-xl mb-6 flex items-center">
+                <i class="fas fa-exclamation-triangle mr-3"></i>
                 {{ session('error') }}
             </div>
         @endif
 
         @if(session('success'))
-            <div class="bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl mb-6 flex items-center">
-                <i class="fas fa-check-circle mr-3 text-green-500"></i>
+            <div class="alert-success px-6 py-4 rounded-xl mb-6 flex items-center">
+                <i class="fas fa-check-circle mr-3"></i>
                 {{ session('success') }}
             </div>
         @endif
@@ -37,12 +224,12 @@
             @auth
                 {{-- Video Section --}}
                 @if($resource->videos)
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div class="border-b border-gray-200 p-6">
+                    <div class="resource-card">
+                        <div class="card-header">
                             <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-4">
-                                        <i class="fas fa-play text-gray-600"></i>
+                                <div class="flex items-center gap-4">
+                                    <div class="icon-box">
+                                        <i class="fas fa-play"></i>
                                     </div>
                                     <div>
                                         <h2 class="text-lg font-semibold text-gray-900">Video Content</h2>
@@ -52,7 +239,7 @@
                                 <button 
                                     onclick="toggleVideo()" 
                                     id="videoToggleBtn"
-                                    class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                                    class="btn-teal">
                                     <i class="fas fa-eye" id="videoToggleIcon"></i>
                                     <span id="videoToggleText">View Video</span>
                                 </button>
@@ -60,7 +247,7 @@
                         </div>
 
                         <div id="videoPlayer" class="p-6 hidden">
-                            <div class="relative bg-black rounded-lg overflow-hidden">
+                            <div class="video-container">
                                 <mux-player 
                                     id="mux-player"
                                     playback-id="{{ $resource->videos }}"
@@ -69,9 +256,9 @@
                                     class="w-full aspect-video">
                                 </mux-player>
                             </div>
-                            <div class="mt-4 text-sm text-gray-500 flex items-center bg-gray-50 p-3 rounded-lg">
-                                <i class="fas fa-info-circle mr-2"></i>
-                                Your progress is automatically saved as you watch
+                            <div class="info-box mt-4">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Your progress is automatically saved as you watch</span>
                             </div>
                         </div>
                     </div>
@@ -79,12 +266,12 @@
 
                 {{-- PDF Section --}}
                 @if($resource->pdf)
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div class="border-b border-gray-200 p-6">
+                    <div class="resource-card">
+                        <div class="card-header">
                             <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-4">
-                                        <i class="fas fa-file-pdf text-gray-600"></i>
+                                <div class="flex items-center gap-4">
+                                    <div class="icon-box">
+                                        <i class="fas fa-file-pdf"></i>
                                     </div>
                                     <div>
                                         <h2 class="text-lg font-semibold text-gray-900">PDF Document</h2>
@@ -94,7 +281,7 @@
                                 <a href="{{ route('secure.pdf.view', ['id' => $resource->id]) }}" 
                                    target="_blank" 
                                    rel="noopener noreferrer"
-                                   class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                                   class="btn-teal">
                                     <i class="fas fa-external-link-alt"></i>
                                     <span>View PDF</span>
                                 </a>
@@ -104,22 +291,22 @@
                 @endif
             @else
                 {{-- Guest message --}}
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-lock text-gray-400 text-xl"></i>
+                <div class="resource-card">
+                    <div class="empty-state">
+                        <i class="fas fa-lock"></i>
+                        <h3>Authentication Required</h3>
+                        <p>Please log in to access the video content and resources.</p>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Authentication Required</h3>
-                    <p class="text-gray-600">Please log in to access the video content and resources.</p>
                 </div>
             @endauth
 
             {{-- Quiz Section --}}
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="border-b border-gray-200 p-6">
+            <div class="resource-card">
+                <div class="card-header">
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-4">
-                                <i class="fas fa-question-circle text-gray-600"></i>
+                        <div class="flex items-center gap-4">
+                            <div class="icon-box">
+                                <i class="fas fa-question-circle"></i>
                             </div>
                             <div>
                                 <h2 class="text-lg font-semibold text-gray-900">Lecture Quiz</h2>
@@ -128,7 +315,7 @@
                         </div>
                         @if($quiz)
                             <a href="{{ route('user.quiz.start', ['course' => $course->id, 'module' => $moduleNumber]) }}"
-                               class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                               class="btn-teal">
                                 <i class="fas fa-play"></i>
                                 <span>Take Quiz</span>
                             </a>
@@ -148,29 +335,33 @@
             @if($forum)
                 <x-discussion-forum :forum="$forum" :course="$course" />
             @else
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-comments text-gray-400 text-xl"></i>
+                <div class="resource-card">
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <h3>Discussion Forum Not Available</h3>
+                        <p>The discussion forum for this lecture is not yet set up.</p>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Discussion Forum Not Available</h3>
-                    <p class="text-gray-600">The discussion forum for this lecture is not yet set up.</p>
                 </div>
             @endif
 
             {{-- Ask Questions Form --}}
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="question-form">
                 <form action="{{ route('questions.store') }}" method="POST">
                     @csrf
-                    <label for="question" class="block text-gray-700 font-medium mb-2">Ask a Question</label>
+                    <label for="question" class="block text-gray-700 font-semibold mb-3">
+                        Ask a Question to your instructor
+                    </label>
                     <input type="text" id="question" name="question"
-                           class="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4 focus:ring-2 focus:ring-gray-900 focus:outline-none">
+                           class="form-input mb-4"
+                           placeholder="Type your question here...">
 
                     {{-- Hidden fields --}}
                     <input type="hidden" name="course_id" value="{{ $course->id }}">
                     <input type="hidden" name="module_number" value="{{ $moduleNumber }}">
 
-                    <button type="submit" class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg">
-                        Post
+                    <button type="submit" class="btn-teal">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Post</span>
                     </button>
                 </form>
             </div>
