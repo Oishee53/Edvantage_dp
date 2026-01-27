@@ -12,8 +12,8 @@
       --primary-light-hover-bg: #E3E6F3;
       --body-background: #f9fafb;
       --card-background: #ffffff;
-      --text-gray-700: #374151;
-      --text-gray-500: #6b7280;
+      --text-teal-700: #374151;
+      --text-teal-500: #6b7280;
       --border-color: #e5e7eb;
       --rejected-color: #DC2626;
       --rejected-bg: #FEF2F2;

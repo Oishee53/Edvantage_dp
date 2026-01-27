@@ -8,7 +8,7 @@
             buttonText: 'Sign up now',
             buttonLink: '/register',
             decorativeType: 'circles',
-            image: '/image/hero2.jpg',
+            image: '/image/hero3.jpg',
            
         },
         {
@@ -17,7 +17,7 @@
             buttonText: 'Browse courses',
             buttonLink: '#courses',
             decorativeType: 'squares',
-            image: '/image/hero3.jpg',
+            image: '/image/learning2.png',
             
         },
         {
@@ -26,7 +26,7 @@
             buttonText: 'Get started',
             buttonLink: '/register',
             decorativeType: 'waves',
-            image: '/image/hero1.png',
+            image: '/image/career.png',
             
         }
     ],

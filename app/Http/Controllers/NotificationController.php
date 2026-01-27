@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Queries;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
 
 class NotificationController extends Controller
 {
@@ -39,5 +40,47 @@ public function show($id)
 
     return view('Student.view_question', compact('question'));
 }
+
+    public function markAsReadAndRedirect(DatabaseNotification $notification, Request $request)
+    {
+        // Ensure the notification belongs to the authenticated user
+        if ($notification->notifiable_id !== auth()->id()) {
+            abort(403, 'Unauthorized access');
+        }
+
+        // Mark the notification as read
+        $notification->markAsRead();
+
+        // Get the redirect URL from query parameter
+        $redirectUrl = $request->query('redirect');
+
+        // Validate and redirect
+        if ($redirectUrl) {
+            return redirect($redirectUrl);
+        }
+
+        // Fallback redirect based on user role
+        if (auth()->user()->hasRole('instructor')) {
+            return redirect()->route('instructor.dashboard');
+        } elseif (auth()->user()->hasRole('student')) {
+            return redirect()->route('student.dashboard');
+        }
+
+        return redirect()->route('dashboard');
+    }
+
+    public function read(DatabaseNotification $notification)
+    {
+        // Ensure the notification belongs to the authenticated user
+        if ($notification->notifiable_id !== auth()->id()) {
+            abort(403, 'Unauthorized access');
+        }
+
+        // Mark as read
+        $notification->markAsRead();
+
+        // Redirect based on user role
+        return back();
+    }
 
 }

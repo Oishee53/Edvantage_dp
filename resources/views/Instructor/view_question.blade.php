@@ -15,9 +15,9 @@
             --body-background: #f9fafb;
             --card-background: #ffffff;
             --text-default: #333;
-            --text-gray-600: #4b5563;
-            --text-gray-700: #374151;
-            --text-gray-500: #6b7280;
+            --text-teal-600: #4b5563;
+            --text-teal-700: #374151;
+            --text-teal-500: #6b7280;
             --border-color: #e5e7eb;
         }
         
@@ -257,7 +257,7 @@
             align-items: center;
             gap: 0.5rem;
             font-size: 0.875rem;
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             margin-bottom: 1.5rem;
         }
 

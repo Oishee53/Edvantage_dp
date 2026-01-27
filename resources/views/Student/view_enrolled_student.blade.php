@@ -20,9 +20,9 @@
             --body-background: #f9fafb;
             --card-background: #ffffff;
             --text-default: #333;
-            --text-gray-600: #4b5563;
-            --text-gray-700: #374151;
-            --text-gray-500: #6b7280;
+            --text-teal-600: #4b5563;
+            --text-teal-700: #374151;
+            --text-teal-500: #6b7280;
             --border-color: #e5e7eb;
             --edit-bg: #EDF2FC;
             --edit-text: #0E1B33;
@@ -228,7 +228,7 @@
         }
 
         .page-header-text p {
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             margin: 0;
             font-size: 0.875rem;
         }
@@ -298,7 +298,7 @@
 
         .empty-state-icon {
             background-color: var(--primary-light-hover-bg);
-            color: var(--text-gray-500);
+            color: var(--text-teal-500);
             padding: 1rem;
             border-radius: 50%;
             width: 4rem;
@@ -316,12 +316,12 @@
         .empty-state h4 {
             font-size: 1rem;
             font-weight: 600;
-            color: var(--text-gray-700);
+            color: var(--text-teal-700);
             margin: 0 0 0.5rem 0;
         }
 
         .empty-state p {
-            color: var(--text-gray-500);
+            color: var(--text-teal-500);
             font-size: 0.875rem;
             margin: 0;
         }
@@ -385,11 +385,11 @@
 
         .student-name {
             font-weight: 500;
-            color: var(--text-gray-700);
+            color: var(--text-teal-700);
         }
 
         .student-email, .student-phone {
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             font-size: 0.875rem;
         }
 
@@ -423,7 +423,7 @@
 
         .no-courses-icon {
             background-color: var(--primary-light-hover-bg);
-            color: var(--text-gray-500);
+            color: var(--text-teal-500);
             padding: 1.5rem;
             border-radius: 50%;
             width: 5rem;
@@ -441,12 +441,12 @@
         .no-courses-state h3 {
             font-size: 1.125rem;
             font-weight: 600;
-            color: var(--text-gray-700);
+            color: var(--text-teal-700);
             margin: 0 0 0.5rem 0;
         }
 
         .no-courses-state p {
-            color: var(--text-gray-500);
+            color: var(--text-teal-500);
             margin: 0 0 1.5rem 0;
         }
 

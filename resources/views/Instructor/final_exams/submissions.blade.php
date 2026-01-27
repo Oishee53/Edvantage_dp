@@ -4,412 +4,188 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exam Submissions - {{ $exam->title }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <style>
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --bg-tertiary: #f1f3f5;
-            --text-primary: #000000;
-            --text-secondary: #495057;
-            --text-tertiary: #6c757d;
-            --border-color: #dee2e6;
-            --border-light: #e9ecef;
-            --accent: #212529;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            line-height: 1.5;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        /* Page Header */
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .page-title {
-            font-size: 1.75rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .breadcrumb {
-            font-size: 0.875rem;
-            color: var(--text-tertiary);
-            margin-top: 0.25rem;
-        }
-
-        .breadcrumb a {
-            color: var(--text-tertiary);
-            text-decoration: none;
-        }
-
-        .breadcrumb a:hover {
-            color: var(--text-primary);
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .stat-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 0.875rem 1rem;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .stat-label {
-            font-size: 0.6875rem;
-            color: var(--text-tertiary);
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-            margin-top: 0.25rem;
-        }
-
-        /* Table Card */
-        .table-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .table-header {
-            padding: 1rem 1.25rem;
-            background: var(--bg-tertiary);
-            border-bottom: 1px solid var(--border-color);
-            font-weight: 600;
-            font-size: 0.9375rem;
-        }
-
-        /* Table */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            background: var(--bg-tertiary);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        th {
-            padding: 0.875rem 1.25rem;
-            text-align: left;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-tertiary);
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid var(--border-light);
-            transition: background-color 0.15s ease;
-        }
-
-        tbody tr:last-child {
-            border-bottom: none;
-        }
-
-        tbody tr:hover {
-            background-color: var(--bg-secondary);
-        }
-
-        td {
-            padding: 1rem 1.25rem;
-            font-size: 0.875rem;
-        }
-
-        .student-name {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.125rem;
-        }
-
-        .student-email {
-            font-size: 0.8125rem;
-            color: var(--text-tertiary);
-        }
-
-        .date-text {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        /* Status Badges */
-        .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-        }
-
-        .status-pending {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-
-        .status-graded {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .status-other {
-            background-color: var(--bg-tertiary);
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
-        }
-
-        /* Score Display */
-        .score-value {
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: 0.875rem;
-        }
-
-        .score-percentage {
-            font-size: 0.8125rem;
-            margin-top: 0.125rem;
-        }
-
-        .score-pass {
-            color: #155724;
-        }
-
-        .score-fail {
-            color: #dc3545;
-        }
-
-        .score-na {
-            color: var(--text-tertiary);
-        }
-
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            white-space: nowrap;
-        }
-
-        .btn:hover {
-            background-color: var(--bg-tertiary);
-            border-color: var(--accent);
-        }
-
-        .btn-primary {
-            background-color: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-
-        .btn-primary:hover {
-            background-color: #000000;
-        }
-
-        .btn-sm {
-            padding: 0.375rem 0.875rem;
-            font-size: 0.8125rem;
-        }
-
-        .empty-state {
-            padding: 3rem 2rem;
-            text-align: center;
-            color: var(--text-tertiary);
-            font-size: 0.875rem;
-        }
-
-        .back-button {
-            margin-top: 1.5rem;
-        }
-
-        @media (max-width: 1024px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { 50: '#f0f2f9', 100: '#e3e6f3', 600: '#1a2d52', 700: '#0E1B33', 800: '#0a1426' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
             }
         }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-
-            .page-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .table-card {
-                overflow-x: auto;
-            }
-
-            table {
-                min-width: 800px;
-            }
-        }
-    </style>
+    </script>
 </head>
-<body>
-    <div class="container">
-        <!-- Page Header -->
-        <div class="page-header">
-            <div>
-                <h1 class="page-title">Exam Submissions</h1>
-                <div class="breadcrumb">
-                    <a href="/instructor/manage_courses">Manage Courses</a> / 
-                    <a href="/instructor/manage_courses">{{ $exam->course->title }}</a> / 
-                    <span>{{ $exam->title }}</span>
+<body class="bg-gray-50 min-h-screen font-sans antialiased">
+
+    <div x-data="{ sidebarOpen: window.innerWidth >= 1024, sidebarCollapsed: false }"
+         @resize.window="if (window.innerWidth >= 1024) sidebarOpen = true; else if (window.innerWidth < 1024) sidebarCollapsed = false"
+         class="flex min-h-screen">
+        
+        @include('layouts.sidebar')
+
+        <main class="flex-1 transition-all duration-300"
+              :class="sidebarCollapsed && window.innerWidth >= 1024 ? 'lg:ml-20' : 'lg:ml-72'">
+            
+            <x-instructor-header 
+                :title="'Exam Submissions - ' . $exam->title"
+            />
+
+            <div class="p-6 lg:p-8 max-w-7xl mx-auto mr-6">
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-3xl font-semibold text-teal-900">{{ $submissions->count() }}</span>
+                        </div>
+                        <p class="text-sm font-semibold text-teal-700 uppercase tracking-wide">Total Submissions</p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-3xl font-semibold text-teal-900">{{ $submissions->where('status', 'submitted')->count() }}</span>
+                        </div>
+                        <p class="text-sm font-semibold text-teal-700 uppercase tracking-wide">Pending Grading</p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-3xl font-semibold text-teal-900">{{ $submissions->where('status', 'graded')->count() }}</span>
+                        </div>
+                        <p class="text-sm font-semibold text-teal-700 uppercase tracking-wide">Graded</p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            @php
+                                $graded = $submissions->where('status', 'graded')->count();
+                                $passed = $submissions->where('status', 'graded')->where('percentage', '>=', 70)->count();
+                                $passRate = $graded > 0 ? round(($passed / $graded) * 100) : 0;
+                            @endphp
+                            <span class="text-3xl font-semibold text-teal-900">{{ $passRate }}%</span>
+                        </div>
+                        <p class="text-sm font-semibold text-teal-700 uppercase tracking-wide">Pass Rate</p>
+                    </div>
+                </div>
+
+                <!-- Submissions Table -->
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+                        <h2 class="text-xl font-bold text-teal-900 flex items-center gap-3">
+                            All Submissions
+                            <span class="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-bold">
+                                {{ $submissions->count() }}
+                            </span>
+                        </h2>
+                        <a href="{{ route('instructor.final-exams.show', $exam->id) }}" 
+                           class="inline-flex items-center gap-2 px-4 py-2 bg-white text-teal-700 border-2 border-teal-700 rounded-xl font-semibold hover:bg-teal-700 hover:text-white transition-all">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>Back</span>
+                        </a>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Student</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Submitted At</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Score</th>
+                                    <th class="px-6 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                @forelse($submissions as $submission)
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                                                    <span class="text-white font-bold text-sm">{{ substr($submission->user->name, 0, 1) }}</span>
+                                                </div>
+                                                <div>
+                                                    <div class="font-bold text-teal-900">{{ $submission->user->name }}</div>
+                                                    <div class="text-sm text-teal-700">{{ $submission->user->email }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-teal-700 font-medium">
+                                                {{ $submission->submitted_at ? $submission->submitted_at->format('M d, Y') : 'Not submitted' }}
+                                            </div>
+                                            @if($submission->submitted_at)
+                                                <div class="text-sm text-teal-700">{{ $submission->submitted_at->format('g:i A') }}</div>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            @if($submission->status === 'submitted')
+                                                <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold">
+                                                    PENDING
+                                                </span>
+                                            @elseif($submission->status === 'graded')
+                                                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
+                                                    GRADED
+                                                </span>
+                                            @else
+                                                <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold">
+                                                    {{ strtoupper($submission->status) }}
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            @if($submission->status === 'graded')
+                                                <div class="font-bold text-teal-900">{{ $submission->total_score }}/{{ $exam->total_marks }}</div>
+                                                <div class="text-sm font-semibold {{ $submission->percentage >= 70 ? 'text-green-600' : 'text-red-600' }}">
+                                                    {{ number_format($submission->percentage, 1) }}%
+                                                    @if($submission->percentage >= 70)
+                                                        <i class="fas fa-check-circle ml-1"></i>
+                                                    @else
+                                                        <i class="fas fa-times-circle ml-1"></i>
+                                                    @endif
+                                                </div>
+                                            @else
+                                                <span class="text-gray-500 text-sm font-medium">Not graded</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            @if($submission->status === 'submitted')
+                                                <a href="{{ route('instructor.final-exams.grade-submission', $submission->id) }}" 
+                                                   class="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 transition-all text-sm">
+                                                    <i class="fas fa-pen"></i>
+                                                    Grade Now
+                                                </a>
+                                            @elseif($submission->status === 'graded')
+                                                <a href="{{ route('instructor.final-exams.grade-submission', $submission->id) }}" 
+                                                   class="inline-flex items-center gap-2 px-4 py-2 bg-white text-teal-700 border-2 border-teal-700 rounded-lg font-semibold hover:bg-teal-700 hover:text-white transition-all text-sm">
+                                                    View Grading
+                                                </a>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-16">
+                                            <div class="text-center">
+                                                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                    <i class="fas fa-inbox text-4xl text-gray-400"></i>
+                                                </div>
+                                                <h3 class="text-lg font-bold text-teal-900 mb-2">No Submissions Yet</h3>
+                                                <p class="text-teal-700">Student submissions will appear here once they submit the exam.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-            <div>
-                <a href="/instructor/manage_courses" class="btn">Back</a>
-            </div>
-        </div>
-
-        <!-- Stats Grid -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value">{{ $submissions->count() }}</div>
-                <div class="stat-label">Total Submissions</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">{{ $submissions->where('status', 'submitted')->count() }}</div>
-                <div class="stat-label">Pending</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">{{ $submissions->where('status', 'graded')->count() }}</div>
-                <div class="stat-label">Graded</div>
-            </div>
-            <div class="stat-card">
-                @php
-                    $graded = $submissions->where('status', 'graded')->count();
-                    $passed = $submissions->where('status', 'graded')->where('percentage', '>=', 70)->count();
-                    $passRate = $graded > 0 ? round(($passed / $graded) * 100) : 0;
-                @endphp
-                <div class="stat-value">{{ $passRate }}%</div>
-                <div class="stat-label">Pass Rate</div>
-            </div>
-        </div>
-
-        <!-- Submissions Table -->
-        <div class="table-card">
-            <div class="table-header">All Submissions ({{ $submissions->count() }})</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Submitted At</th>
-                        <th>Status</th>
-                        <th>Score</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($submissions as $submission)
-                        <tr>
-                            <td>
-                                <div class="student-name">{{ $submission->user->name }}</div>
-                                <div class="student-email">{{ $submission->user->email }}</div>
-                            </td>
-                            <td>
-                                <span class="date-text">
-                                    {{ $submission->submitted_at ? $submission->submitted_at->format('M d, Y g:i A') : 'Not submitted' }}
-                                </span>
-                            </td>
-                            <td>
-                                @if($submission->status === 'submitted')
-                                    <span class="status-badge status-pending">Pending</span>
-                                @elseif($submission->status === 'graded')
-                                    <span class="status-badge status-graded">Graded</span>
-                                @else
-                                    <span class="status-badge status-other">{{ ucfirst($submission->status) }}</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if($submission->status === 'graded')
-                                    <div class="score-value">{{ $submission->total_score }}/{{ $exam->total_marks }}</div>
-                                    <div class="score-percentage {{ $submission->percentage >= 70 ? 'score-pass' : 'score-fail' }}">
-                                        {{ number_format($submission->percentage, 1) }}%
-                                    </div>
-                                @else
-                                    <span class="score-na">Not graded</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if($submission->status === 'submitted')
-                                    <a href="{{ route('instructor.final-exams.grade-submission', $submission->id) }}" class="btn btn-sm btn-primary">
-                                        Grade Now
-                                    </a>
-                                @elseif($submission->status === 'graded')
-                                    <a href="{{ route('instructor.final-exams.grade-submission', $submission->id) }}" class="btn btn-sm">
-                                        View Grading
-                                    </a>
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5">
-                                <div class="empty-state">No submissions yet</div>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+        </main>
     </div>
 </body>
 </html>

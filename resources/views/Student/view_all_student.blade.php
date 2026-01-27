@@ -20,9 +20,9 @@
             --body-background: #f9fafb;
             --card-background: #ffffff;
             --text-default: #333;
-            --text-gray-600: #4b5563;
-            --text-gray-700: #374151;
-            --text-gray-500: #6b7280;
+            --text-teal-600: #4b5563;
+            --text-teal-700: #374151;
+            --text-teal-500: #6b7280;
             --border-color: #e5e7eb;
             --edit-bg: #EDF2FC;
             --edit-text: #0E1B33;
@@ -233,7 +233,7 @@
         }
 
         .page-header-text p {
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             margin: 0;
             font-size: 0.875rem;
         }
@@ -287,7 +287,7 @@
             left: 0.75rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-gray-500);
+            color: var(--text-teal-500);
         }
 
         .export-button {
@@ -357,7 +357,7 @@
         .student-info h3 {
             font-size: 1.125rem;
             font-weight: 600;
-            color: var(--text-gray-700);
+            color: var(--text-teal-700);
             margin: 0 0 0.25rem 0;
         }
 
@@ -396,7 +396,7 @@
 
         .student-detail-icon i {
             font-size: 0.875rem;
-            color: var(--text-gray-500);
+            color: var(--text-teal-500);
         }
 
         .student-detail-content {
@@ -405,13 +405,13 @@
 
         .student-detail-label {
             font-size: 0.75rem;
-            color: var(--text-gray-500);
+            color: var(--text-teal-500);
             margin-bottom: 0.125rem;
         }
 
         .student-detail-value {
             font-weight: 500;
-            color: var(--text-gray-700);
+            color: var(--text-teal-700);
             font-size: 0.875rem;
         }
 
@@ -468,7 +468,7 @@
 
         .empty-state-icon {
             background-color: #f3f4f6;
-            color: var(--text-gray-500);
+            color: var(--text-teal-500);
             padding: 1.5rem;
             border-radius: 50%;
             width: 5rem;
@@ -486,12 +486,12 @@
         .empty-state h3 {
             font-size: 1.125rem;
             font-weight: 600;
-            color: var(--text-gray-700);
+            color: var(--text-teal-700);
             margin: 0 0 0.5rem 0;
         }
 
         .empty-state p {
-            color: var(--text-gray-500);
+            color: var(--text-teal-500);
             margin: 0;
         }
 
@@ -505,7 +505,7 @@
         }
 
         .results-footer p {
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             margin: 0;
             font-size: 0.875rem;
         }

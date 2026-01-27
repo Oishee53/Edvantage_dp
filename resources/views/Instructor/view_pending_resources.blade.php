@@ -14,9 +14,9 @@
             --body-background: #f9fafb;
             --card-background: #ffffff;
             --text-default: #333;
-            --text-gray-600: #4b5563;
-            --text-gray-700: #374151;
-            --text-gray-500: #6b7280;
+            --text-teal-600: #4b5563;
+            --text-teal-700: #374151;
+            --text-teal-500: #6b7280;
             --border-color: #e5e7eb;
             --edit-bg: #EDF2FC;
             --edit-text: #0E1B33;
@@ -177,7 +177,7 @@
         }
 
         .module-info {
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             font-size: 1rem;
             margin: 0;
         }
@@ -221,7 +221,7 @@
 
         .resource-label {
             font-weight: 600;
-            color: var(--text-gray-700);
+            color: var(--text-teal-700);
             margin-bottom: 0.75rem;
             display: flex;
             align-items: center;
@@ -317,7 +317,7 @@
 
         .not-logged-in {
             text-align: center;
-            color: var(--text-gray-700);
+            color: var(--text-teal-700);
             padding: 2rem;
             background-color: var(--card-background);
             border-radius: 0.5rem;
@@ -345,7 +345,7 @@
         .empty-state {
             padding: 3rem;
             text-align: center;
-            color: var(--text-gray-500);
+            color: var(--text-teal-500);
             font-size: 0.875rem;
         }
 

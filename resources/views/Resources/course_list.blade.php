@@ -6,6 +6,9 @@
     <title>Edit Courses</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom CSS Variables */
         :root {
@@ -14,9 +17,9 @@
             --body-background: #f9fafb;
             --card-background: #ffffff;
             --text-default: #333;
-            --text-gray-600: #4b5563;
-            --text-gray-700: #374151;
-            --text-gray-500: #6b7280;
+            --text-teal-600: #4b5563;
+            --text-teal-700: #374151;
+            --text-teal-500: #6b7280;
             --border-color: #e5e7eb;
             --edit-bg: #EDF2FC;
             --edit-text: #0E1B33;
@@ -187,7 +190,7 @@
 
         .course-table th {
             background-color: var(--body-background);
-            color: var(--text-gray-500);
+            color: var(--text-teal-500);
             font-weight: 500;
             padding: 0.75rem 1rem;
             text-align: left;
@@ -198,7 +201,7 @@
         .course-table td {
             padding: 0.75rem 1rem;
             border-bottom: 1px solid var(--border-color);
-            color: var(--text-gray-700);
+            color: var(--text-teal-700);
             vertical-align: middle;
         }
 
@@ -228,7 +231,7 @@
         }
 
         .status-not-submitted {
-            color: var(--text-gray-500);
+            color: var(--text-teal-500);
             font-weight: 500;
         }
 
@@ -236,7 +239,7 @@
         .empty-state {
             padding: 3rem;
             text-align: center;
-            color: var(--text-gray-500);
+            color: var(--text-teal-500);
             font-size: 0.875rem;
         }
 
@@ -266,7 +269,7 @@
         /* Not logged in state */
         .not-logged-in {
             text-align: center;
-            color: var(--text-gray-700);
+            color: var(--text-teal-700);
             padding: 2rem;
         }
 

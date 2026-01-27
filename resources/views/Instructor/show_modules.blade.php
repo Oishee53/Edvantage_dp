@@ -14,9 +14,9 @@
             --body-background: #f9fafb;
             --card-background: #ffffff;
             --text-default: #333;
-            --text-gray-600: #4b5563;
-            --text-gray-700: #374151;
-            --text-gray-500: #6b7280;
+            --text-teal-600: #4b5563;
+            --text-teal-700: #374151;
+            --text-teal-500: #6b7280;
             --border-color: #e5e7eb;
             --edit-bg: #EDF2FC;
             --edit-text: #0E1B33;
@@ -154,7 +154,7 @@
         }
 
         .course-title {
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             font-size: 1.125rem;
             font-weight: 500;
             margin-bottom: 1.5rem;
@@ -182,7 +182,7 @@
 
         .progress-text {
             font-size: 0.875rem;
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             margin-top: 0.5rem;
             font-weight: 500;
         }
@@ -275,7 +275,7 @@
 
         .status-text {
             font-size: 0.875rem;
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             font-weight: 500;
         }
 
@@ -359,7 +359,7 @@
         }
 
         .submit-btn:disabled {
-            background-color: var(--text-gray-500);
+            background-color: var(--text-teal-500);
             cursor: not-allowed;
             opacity: 0.6;
         }
@@ -398,7 +398,7 @@
 
         .not-logged-in {
             text-align: center;
-            color: var(--text-gray-700);
+            color: var(--text-teal-700);
             padding: 2rem;
             background-color: var(--card-background);
             border-radius: 0.5rem;
