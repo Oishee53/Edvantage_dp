@@ -88,6 +88,84 @@
             50% { opacity: 0.7; }
         }
 
+        /* Recording Status Section */
+        .recording-status {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .recording-status h3 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            color: #0E1B33;
+        }
+
+        .monitoring-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .monitor-box {
+            background: #f8fafc;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .monitor-box h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .monitor-box video {
+            width: 100%;
+            height: 180px;
+            background: #000;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .recording-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .recording-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc2626;
+            animation: pulse 1.5s infinite;
+        }
+
+        .recording-dot.active {
+            background: #dc2626;
+        }
+
+        .recording-dot.inactive {
+            background: #9ca3af;
+            animation: none;
+        }
+
+        .warning-notice {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            color: #92400e;
+        }
+
         /* Question Cards */
         .question-card {
             background: white;
@@ -349,6 +427,10 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
+            .monitoring-grid {
+                grid-template-columns: 1fr;
+            }
+
             .question-card {
                 padding: 1rem;
             }
@@ -384,15 +466,37 @@
                 </div>
             </div>
         </div>
-        <div class="mb-4">
-    <h3 class="font-bold mb-2">Webcam Monitoring</h3>
-    <video id="webcamPreview" autoplay muted class="border w-64 h-48"></video>
-    <p class="text-red-500 text-sm">
-Webcam recording is mandatory during the final exam.
-</p>
 
-</div>
+        <!-- Recording Status Section -->
+        <div class="recording-status">
+            <h3>🎥 Exam Monitoring Active</h3>
+            
+            <div class="monitoring-grid">
+                <!-- Webcam Monitor -->
+                <div class="monitor-box">
+                    <h4>📹 Webcam Recording</h4>
+                    <video id="webcamPreview" autoplay muted playsinline></video>
+                    <div class="recording-indicator">
+                        <div class="recording-dot" id="webcamDot"></div>
+                        <span id="webcamStatus">Initializing...</span>
+                    </div>
+                </div>
 
+                <!-- Screen Recording Monitor -->
+                <div class="monitor-box">
+                    <h4>🖥️ Screen Recording</h4>
+                    <video id="screenPreview" autoplay muted playsinline></video>
+                    <div class="recording-indicator">
+                        <div class="recording-dot" id="screenDot"></div>
+                        <span id="screenStatus">Initializing...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="warning-notice">
+                ⚠️ <strong>Important:</strong> Both webcam and screen recording are mandatory. Do not close this tab or minimize the window during the exam. Any suspicious activity will be flagged.
+            </div>
+        </div>
 
         <!-- Questions -->
         @foreach($exam->questions as $question)
@@ -476,7 +580,8 @@ Webcam recording is mandatory during the final exam.
               enctype="multipart/form-data"
               onsubmit="return confirmSubmit()">
             @csrf
-             <input type="file" name="webcam_video" id="webcamVideoInput" hidden>
+            <input type="file" name="webcam_video" id="webcamVideoInput" hidden>
+            <input type="file" name="screen_recording" id="screenRecordingInput" hidden>
             <button type="submit" class="submit-button" id="submit-btn" disabled>
                 Submit Exam
             </button>
@@ -707,56 +812,188 @@ Webcam recording is mandatory during the final exam.
 
         updateProgress();
 
-        // Debug: Log the upload URL
-        console.log('Upload URL will be:', `{{ url('/') }}/final-exam-submissions/${submissionId}/questions/[QUESTION_ID]/upload-answer`);
-        let mediaRecorder;
-let recordedChunks = [];
-let stream;
+        // ============================================
+        // 🎥 WEBCAM & SCREEN RECORDING
+        // ============================================
+        let webcamRecorder, screenRecorder;
+        let webcamChunks = [], screenChunks = [];
+        let webcamStream, screenStream;
+        let recordingsReady = { webcam: false, screen: false };
 
-async function startWebcamRecording() {
-    stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true
-    });
+        // Start Webcam Recording
+        async function startWebcamRecording() {
+            try {
+                webcamStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
 
-    document.getElementById('webcamPreview').srcObject = stream;
+                document.getElementById('webcamPreview').srcObject = webcamStream;
+                
+                webcamRecorder = new MediaRecorder(webcamStream, {
+                    mimeType: 'video/webm;codecs=vp8,opus'
+                });
 
-    mediaRecorder = new MediaRecorder(stream);
+                webcamRecorder.ondataavailable = e => {
+                    if (e.data.size > 0) webcamChunks.push(e.data);
+                };
 
-    mediaRecorder.ondataavailable = e => {
-        if (e.data.size > 0) recordedChunks.push(e.data);
-    };
+                webcamRecorder.onstart = () => {
+                    document.getElementById('webcamDot').classList.add('active');
+                    document.getElementById('webcamStatus').textContent = 'Recording...';
+                };
 
-    mediaRecorder.start();
-}
+                webcamRecorder.start();
+                recordingsReady.webcam = true;
 
-function stopWebcamRecording() {
-    return new Promise(resolve => {
-        mediaRecorder.onstop = () => {
-            const blob = new Blob(recordedChunks, { type: 'video/webm' });
-            const file = new File([blob], 'webcam.webm', { type: 'video/webm' });
+            } catch (error) {
+                console.error('Webcam error:', error);
+                document.getElementById('webcamStatus').textContent = 'Failed to start';
+                document.getElementById('webcamDot').classList.add('inactive');
+                alert('⚠️ Webcam access is required for this exam. Please enable your webcam.');
+            }
+        }
 
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            document.getElementById('webcamVideoInput').files = dataTransfer.files;
+        // Start Screen Recording
+        async function startScreenRecording() {
+            try {
+                screenStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: { mediaSource: 'screen' },
+                    audio: false
+                });
 
-            stream.getTracks().forEach(track => track.stop());
-            resolve();
+                document.getElementById('screenPreview').srcObject = screenStream;
+
+                screenRecorder = new MediaRecorder(screenStream, {
+                    mimeType: 'video/webm;codecs=vp8'
+                });
+
+                screenRecorder.ondataavailable = e => {
+                    if (e.data.size > 0) screenChunks.push(e.data);
+                };
+
+                screenRecorder.onstart = () => {
+                    document.getElementById('screenDot').classList.add('active');
+                    document.getElementById('screenStatus').textContent = 'Recording...';
+                };
+
+                screenRecorder.onstop = () => {
+                    document.getElementById('screenDot').classList.remove('active');
+                    document.getElementById('screenDot').classList.add('inactive');
+                    document.getElementById('screenStatus').textContent = 'Stopped';
+                };
+
+                // Detect when user stops sharing screen
+                screenStream.getVideoTracks()[0].onended = () => {
+                    alert('⚠️ Screen sharing stopped! You must share your screen to continue the exam.');
+                    // Attempt to restart
+                    startScreenRecording();
+                };
+
+                screenRecorder.start();
+                recordingsReady.screen = true;
+
+            } catch (error) {
+                console.error('Screen recording error:', error);
+                document.getElementById('screenStatus').textContent = 'Failed to start';
+                document.getElementById('screenDot').classList.add('inactive');
+                alert('⚠️ Screen recording is required for this exam. Please share your screen.');
+            }
+        }
+
+        // Stop Webcam Recording
+        function stopWebcamRecording() {
+            return new Promise(resolve => {
+                if (!webcamRecorder || webcamRecorder.state === 'inactive') {
+                    resolve();
+                    return;
+                }
+
+                webcamRecorder.onstop = () => {
+                    const blob = new Blob(webcamChunks, { type: 'video/webm' });
+                    const file = new File([blob], 'webcam_recording.webm', { type: 'video/webm' });
+
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    document.getElementById('webcamVideoInput').files = dataTransfer.files;
+
+                    webcamStream.getTracks().forEach(track => track.stop());
+                    
+                    document.getElementById('webcamDot').classList.remove('active');
+                    document.getElementById('webcamDot').classList.add('inactive');
+                    document.getElementById('webcamStatus').textContent = 'Stopped';
+                    
+                    resolve();
+                };
+                
+                webcamRecorder.stop();
+            });
+        }
+
+        // Stop Screen Recording
+        function stopScreenRecording() {
+            return new Promise(resolve => {
+                if (!screenRecorder || screenRecorder.state === 'inactive') {
+                    resolve();
+                    return;
+                }
+
+                screenRecorder.onstop = () => {
+                    const blob = new Blob(screenChunks, { type: 'video/webm' });
+                    const file = new File([blob], 'screen_recording.webm', { type: 'video/webm' });
+
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    document.getElementById('screenRecordingInput').files = dataTransfer.files;
+
+                    screenStream.getTracks().forEach(track => track.stop());
+                    resolve();
+                };
+                
+                screenRecorder.stop();
+            });
+        }
+
+        // Initialize recordings when page loads
+        window.onload = async function() {
+            await startWebcamRecording();
+            await startScreenRecording();
         };
-        mediaRecorder.stop();
-    });
-}
 
-// Start recording when exam loads
-window.onload = startWebcamRecording;
+        // Handle form submission
+        document.getElementById('submit-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Submitting... <span class="loading"></span>';
 
-// On submit
-document.getElementById('submit-form').addEventListener('submit', async function (e) 
- {
-   e.preventDefault();
-    await stopWebcamRecording();
-    this.submit();
-});
+            try {
+                // Stop both recordings
+                await Promise.all([
+                    stopWebcamRecording(),
+                    stopScreenRecording()
+                ]);
+
+                // Small delay to ensure files are attached
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Submit the form
+                this.submit();
+            } catch (error) {
+                console.error('Error during submission:', error);
+                alert('Error preparing recordings. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Exam';
+            }
+        });
+
+        // Prevent tab close/navigation
+        window.addEventListener('beforeunload', (e) => {
+            e.preventDefault();
+            e.returnValue = '';
+        });
     </script>
 </body>
 </html>

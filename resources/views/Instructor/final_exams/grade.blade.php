@@ -248,6 +248,53 @@
             font-size: 0.875rem;
         }
 
+        /* Proctoring Recordings Section */
+        .recordings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .recording-box {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 1rem;
+        }
+
+        .video-container {
+            margin-top: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: #000;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .recording-video {
+            width: 100%;
+            height: auto;
+            min-height: 300px;
+            display: block;
+        }
+
+        .recording-info {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            font-style: italic;
+            padding: 0.5rem;
+            background: var(--bg-primary);
+            border-radius: 3px;
+        }
+
+        .proctoring-notes {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 4px;
+        }
+
         /* Grading Section */
         .grading-section {
             padding: 1rem;
@@ -453,6 +500,10 @@
             .info-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .recordings-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 768px) {
@@ -492,6 +543,10 @@
 
             .btn {
                 width: 100%;
+            }
+
+            .recordings-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -540,6 +595,62 @@
         <!-- Grading Form -->
         <form action="{{ route('instructor.final-exams.save-grades', $submission->id) }}" method="POST" id="grading-form">
             @csrf
+
+            <!-- Proctoring Recordings Section -->
+            @if($submission->webcam_playback_id || $submission->screen_recording_playback_id)
+                <div class="question-card">
+                    <div class="question-header">
+                        <div style="flex: 1;">
+                            <h3 class="question-title">🎥 Proctoring Recordings</h3>
+                            <p class="question-text">Review the student's webcam and screen recordings during the exam</p>
+                        </div>
+                    </div>
+
+                    <div class="question-body">
+                        <div class="recordings-grid">
+                            @if($submission->webcam_playback_id)
+                                <div class="recording-box">
+                                    <div class="section-label">📹 Webcam Recording</div>
+                                    <div class="video-container">
+                                        <video controls controlsList="nodownload" class="recording-video">
+                                            <source src="https://stream.mux.com/{{ $submission->webcam_playback_id }}.m3u8" type="application/x-mpegURL">
+                                            Your browser doesn't support HLS playback.
+                                        </video>
+                                    </div>
+                                    <div class="recording-info">
+                                        <small>Watch for: Face visibility, eye movement, suspicious behavior</small>
+                                    </div>
+                                </div>
+                            @endif
+
+                            @if($submission->screen_recording_playback_id)
+                                <div class="recording-box">
+                                    <div class="section-label">🖥️ Screen Recording</div>
+                                    <div class="video-container">
+                                        <video controls controlsList="nodownload" class="recording-video">
+                                            <source src="https://stream.mux.com/{{ $submission->screen_recording_playback_id }}.m3u8" type="application/x-mpegURL">
+                                            Your browser doesn't support HLS playback.
+                                        </video>
+                                    </div>
+                                    <div class="recording-info">
+                                        <small>Watch for: Tab switching, external resources, screen sharing</small>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="proctoring-notes">
+                            <div class="section-label">⚠️ Proctoring Notes</div>
+                            <div class="form-group">
+                                <textarea name="proctoring_notes" 
+                                          class="form-input"
+                                          style="min-height: 80px;"
+                                          placeholder="Note any suspicious activity or violations observed in the recordings...">{{ $submission->proctoring_notes ?? '' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <!-- Questions -->
             @foreach($submission->answers as $answer)
@@ -605,13 +716,6 @@
                     </div>
                 </div>
             @endforeach
-            @if($submission->webcam_playback_id)
-    <h3 class="mt-4 font-bold">Webcam Recording</h3>
-    <video controls width="600">
-        <source src="https://stream.mux.com/{{ $submission->webcam_playback_id }}.m3u8" type="application/x-mpegURL">
-    </video>
-@endif
-
 
             <!-- Summary -->
             <div class="summary-card">
@@ -668,7 +772,25 @@
         <img id="modal-image" src="" onclick="event.stopPropagation()">
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
+        // Initialize HLS for video playback
+        document.addEventListener('DOMContentLoaded', function() {
+            const videos = document.querySelectorAll('.recording-video');
+            
+            videos.forEach(video => {
+                const source = video.querySelector('source');
+                if (source && Hls.isSupported()) {
+                    const hls = new Hls();
+                    hls.loadSource(source.src);
+                    hls.attachMedia(video);
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    // Native HLS support (Safari)
+                    video.src = source.src;
+                }
+            });
+        });
+
         function calculateTotal() {
             let total = 0;
             const totalMarks = {{ $submission->exam->total_marks }};

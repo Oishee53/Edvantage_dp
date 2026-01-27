@@ -92,10 +92,6 @@ class StudentFinalExamController extends Controller
             return redirect()->route('student.final-exam.result', $submission->id);
         }
 
-        $request->validate([
-    'webcam_video' => 'nullable|file|mimes:webm,mp4|max:51200'
-]);
-
         // Start the exam
         if ($submission->status === 'not_started') {
             $submission->update([
@@ -121,165 +117,93 @@ class StudentFinalExamController extends Controller
     /**
      * Upload answer image for a question (AJAX - handles ONE image at a time)
      */
- public function uploadAnswer(Request $request, $submissionId, $questionId)
-{
-    try {
-        // Validate
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:5120'
-        ]);
-
-        // Get submission
-        $submission = FinalExamSubmission::findOrFail($submissionId);
-
-        // Authorization
-        if ($submission->user_id !== Auth::id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        // Status check
-        if ($submission->status !== 'in_progress') {
-            return response()->json(['error' => 'Cannot upload after submission'], 400);
-        }
-
-        // Get or create answer record
-        $answer = FinalExamAnswer::where('submission_id', $submissionId)
-            ->where('question_id', $questionId)
-            ->first();
-
-        if (!$answer) {
-            $answer = FinalExamAnswer::create([
-                'submission_id' => $submissionId,
-                'question_id' => $questionId,
-                'answer_images' => json_encode([])
+    public function uploadAnswer(Request $request, $submissionId, $questionId)
+    {
+        try {
+            // Validate
+            $request->validate([
+                'image' => 'required|image|mimes:jpeg,png,jpg|max:5120'
             ]);
+
+            // Get submission
+            $submission = FinalExamSubmission::findOrFail($submissionId);
+
+            // Authorization
+            if ($submission->user_id !== Auth::id()) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
+
+            // Status check
+            if ($submission->status !== 'in_progress') {
+                return response()->json(['error' => 'Cannot upload after submission'], 400);
+            }
+
+            // Get or create answer record
+            $answer = FinalExamAnswer::where('submission_id', $submissionId)
+                ->where('question_id', $questionId)
+                ->first();
+
+            if (!$answer) {
+                $answer = FinalExamAnswer::create([
+                    'submission_id' => $submissionId,
+                    'question_id' => $questionId,
+                    'answer_images' => json_encode([])
+                ]);
+            }
+
+            // Get existing images
+            $existingImages = $answer->answer_images ? json_decode($answer->answer_images, true) : [];
+            if (!is_array($existingImages)) {
+                $existingImages = [];
+            }
+
+            // Check limit
+            if (count($existingImages) >= 5) {
+                return response()->json(['error' => 'Maximum 5 images per question'], 400);
+            }
+
+            // ✅ Upload to Cloudinary - SAME METHOD as your UploadController
+            $uploadedFile = $request->file('image');
+            
+            $result = Cloudinary::uploadApi()->upload($uploadedFile->getRealPath(), [
+                'resource_type' => 'image',
+                'folder' => "final_exams/submission_{$submissionId}/question_{$questionId}",
+            ]);
+
+            $imageUrl = $result['secure_url'];
+
+            // Add to array
+            $existingImages[] = $imageUrl;
+
+            // Save
+            $answer->answer_images = json_encode($existingImages);
+            $answer->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Image uploaded successfully',
+                'image_url' => $imageUrl,
+                'images' => $existingImages
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'error' => 'Validation failed',
+                'details' => $e->errors()
+            ], 422);
+
+        } catch (\Exception $e) {
+            \Log::error('Upload failed', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return response()->json([
+                'error' => 'Upload failed: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Get existing images
-        $existingImages = $answer->answer_images ? json_decode($answer->answer_images, true) : [];
-        if (!is_array($existingImages)) {
-            $existingImages = [];
-        }
-
-        // Check limit
-        if (count($existingImages) >= 5) {
-            return response()->json(['error' => 'Maximum 5 images per question'], 400);
-        }
-
-        // ✅ Upload to Cloudinary - SAME METHOD as your UploadController
-        $uploadedFile = $request->file('image');
-        
-        $result = Cloudinary::uploadApi()->upload($uploadedFile->getRealPath(), [
-            'resource_type' => 'image',
-            'folder' => "final_exams/submission_{$submissionId}/question_{$questionId}",
-        ]);
-
-        $imageUrl = $result['secure_url'];
-
-        // Add to array
-        $existingImages[] = $imageUrl;
-
-        // Save
-        $answer->answer_images = json_encode($existingImages);
-        $answer->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Image uploaded successfully',
-            'image_url' => $imageUrl,
-            'images' => $existingImages
-        ]);
-
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json([
-            'error' => 'Validation failed',
-            'details' => $e->errors()
-        ], 422);
-
-    } catch (\Exception $e) {
-        \Log::error('Upload failed', [
-            'error' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine()
-        ]);
-
-        return response()->json([
-            'error' => 'Upload failed: ' . $e->getMessage()
-        ], 500);
     }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * Delete an answer image (AJAX)
@@ -340,8 +264,6 @@ class StudentFinalExamController extends Controller
      * Submit the exam
      */
     public function submit(Request $request, $submissionId, MuxService $muxService)
-
-
     {
         $submission = FinalExamSubmission::with('answers')->findOrFail($submissionId);
 
@@ -364,34 +286,54 @@ class StudentFinalExamController extends Controller
             }
         }
 
+        // 🎥 HANDLE WEBCAM VIDEO
         if ($request->hasFile('webcam_video')) {
+            // 1️⃣ Upload to Cloudinary
+            $cloudinaryResult = Cloudinary::uploadApi()->upload(
+                $request->file('webcam_video')->getRealPath(),
+                [
+                    'resource_type' => 'video',
+                    'folder' => "final_exam/{$submission->id}/webcam"
+                ]
+            );
 
-    // 1️⃣ Upload to Cloudinary
-    $cloudinaryResult = Cloudinary::uploadApi()->upload(
-        $request->file('webcam_video')->getRealPath(),
-        [
-            'resource_type' => 'video',
-            'folder' => "final_exam/{$submission->id}"
-        ]
-    );
+            $cloudinaryUrl = $cloudinaryResult['secure_url'];
 
-    $cloudinaryUrl = $cloudinaryResult['secure_url'];
+            // 2️⃣ Send to Mux (USING YOUR EXISTING SERVICE)
+            $muxResult = $muxService->uploadVideo($cloudinaryUrl);
 
-    //  Send to Mux (USING YOUR EXISTING SERVICE)
-    $muxResult = $muxService->uploadVideo($cloudinaryUrl);
+            if (isset($muxResult['playback_id'])) {
+                $submission->webcam_playback_id = $muxResult['playback_id'];
+            }
+        }
 
-    if (isset($muxResult['playback_id'])) {
-        $submission->webcam_playback_id = $muxResult['playback_id'];
+        // 🖥️ HANDLE SCREEN RECORDING
+        if ($request->hasFile('screen_recording')) {
+            // 1️⃣ Upload to Cloudinary
+            $cloudinaryResult = Cloudinary::uploadApi()->upload(
+                $request->file('screen_recording')->getRealPath(),
+                [
+                    'resource_type' => 'video',
+                    'folder' => "final_exam/{$submission->id}/screen"
+                ]
+            );
+
+            $cloudinaryUrl = $cloudinaryResult['secure_url'];
+
+            // 2️⃣ Send to Mux
+            $muxResult = $muxService->uploadVideo($cloudinaryUrl);
+
+            if (isset($muxResult['playback_id'])) {
+                $submission->screen_recording_playback_id = $muxResult['playback_id'];
+            }
+        }
+
+        // Save submission
+        $submission->status = 'submitted';
+        $submission->submitted_at = now();
         $submission->save();
-    }
-}
 
-        // Update submission
-        $submission->update([
-            'status' => 'submitted',
-            'submitted_at' => now()
-        ]);
-
+        // Notify instructor
         $instructor = User::where('id', $submission->exam->instructor)->first();
 
         if ($instructor) {
