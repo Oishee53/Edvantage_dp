@@ -57,9 +57,7 @@
                 <!-- Enrolled Courses -->
                 <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg hover:border-teal-500 transition-all">
                     <div class="flex items-start justify-between mb-4">
-                        <div class="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center">
-                            <i class="fas fa-book-open text-teal-600 text-xl"></i>
-                        </div>
+                       
                         <div class="text-right">
                             <div class="text-3xl font-bold text-gray-900">{{ count($courseProgress) }}</div>
                         </div>
@@ -71,9 +69,7 @@
                 <!-- Completed -->
                 <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg hover:border-teal-500 transition-all">
                     <div class="flex items-start justify-between mb-4">
-                        <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
-                            <i class="fas fa-trophy text-green-600 text-xl"></i>
-                        </div>
+                        
                         <div class="text-right">
                             <div class="text-3xl font-bold text-gray-900">{{ collect($courseProgress)->where('completion_percentage', 100)->count() }}</div>
                         </div>
@@ -85,9 +81,7 @@
                 <!-- Certificates -->
                 <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg hover:border-teal-500 transition-all">
                     <div class="flex items-start justify-between mb-4">
-                        <div class="w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center">
-                            <i class="fas fa-certificate text-amber-600 text-xl"></i>
-                        </div>
+                       
                         <div class="text-right">
                             <div class="text-3xl font-bold text-gray-900">{{ collect($courseProgress)->where('completion_percentage', 100)->where('average_percentage', '>=', 70)->count() }}</div>
                         </div>
@@ -99,9 +93,7 @@
                 <!-- Average Progress -->
                 <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg hover:border-teal-500 transition-all">
                     <div class="flex items-start justify-between mb-4">
-                        <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
-                            <i class="fas fa-chart-line text-blue-600 text-xl"></i>
-                        </div>
+                        
                         <div class="text-right">
                             @php $totalProgress = collect($courseProgress)->avg('completion_percentage'); @endphp
                             <div class="text-3xl font-bold text-gray-900">{{ round($totalProgress) }}%</div>
