@@ -56,12 +56,13 @@
             margin-right: -1rem;
         }
         .nav-menu a:hover{
-            color: #0E1B33;
+            color: #0F7C73;
         }
         .nav-menu a {
             font-family: 'Montserrat', sans-serif;
             text-decoration: none;
-            color: #374151;
+            color: #0F7C73
+;
             font-weight: 500;
             font-size: 0.9rem;
             transition: color 0.3s ease;
@@ -78,17 +79,18 @@
         }
         .btn-outline {
             background: transparent;
-            color: #0E1B33;
-            border: 2px solid #0E1B33;
+            color: #0F7C73;
+            border: 2px solid #0F7C73;
         }
         .btn-outline:hover {
             background: #dcdcdd;
-            color: #0E1B33;
+            color: #0F7C73
+;
         }
         .btn-primary {
-            background: #0E1B33;
+            background: #0F7C73;
             color: white;
-            border: 2px solid #0E1B33;
+            border: 2px solid #0F7C73;
         }
         .btn-primary:hover {
             background: #475569;
@@ -107,7 +109,8 @@
             width: 44px;
             height: 44px;
             font-size: 1.1rem;
-            color: #0E1B33;
+            color: #0F7C73
+;
             background: rgba(14, 27, 51, 0.08);
             border: 1px solid rgba(14, 27, 51, 0.2);
             border-radius: 10px;
@@ -126,7 +129,8 @@
         .user-menu-button {
             width: 44px;
             height: 44px;
-            background: linear-gradient(135deg, #0E1B33 0%, #475569 100%);
+            background: linear-gradient(135deg, #0F7C73
+ 0%, #475569 100%);
             border: none;
             border-radius: 10px;
             color: white;
@@ -188,14 +192,16 @@
         }
         .user-dropdown a:hover {
             background: #f8fafc;
-            color: #0E1B33;
+            color: #0F7C73
+;
         }
         .user-dropdown .icon {
             margin-right: 12px;
             font-size: 0.9rem;
             width: 16px;
             text-align: center;
-            color: #0E1B33;
+            color: #0F7C73
+;
         }
         .user-dropdown .separator {
             height: 1px;
@@ -219,7 +225,8 @@
         .username {
             margin-left: 1.5rem;
             font-weight: 500;
-            color: #374151;
+            color: #0F7C73
+;
         }
         
         /* Main content padding to account for fixed header */
@@ -230,10 +237,13 @@
         /* Main content */
         .main-content { padding:8rem 2rem 2rem; display:flex; justify-content:center; align-items:center; min-height:100vh; }
         .success-container { background:#fff; padding:3rem 2rem; border-radius:8px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.1); max-width:500px; width:100%; }
-        .success-container i { font-size:3rem; color:#0E1B33; margin-bottom:1rem; }
-        .success-container h2 { margin-bottom:1rem; color:#0E1B33; }
+        .success-container i { font-size:3rem; color:#0F7C73
+; margin-bottom:1rem; }
+        .success-container h2 { margin-bottom:1rem; color:#0F7C73
+; }
         .success-container p { margin-bottom:2rem; color:#555; }
-        .browse-btn { padding:0.75rem 2rem; background:#0E1B33; color:#fff; border:none; border-radius:4px; text-decoration:none; font-weight:500; transition:0.3s; }
+        .browse-btn { padding:0.75rem 2rem; background:#0F7C73
+; color:#fff; border:none; border-radius:4px; text-decoration:none; font-weight:500; transition:0.3s; }
         .browse-btn:hover { background:#475569; }
         
         /* Mobile Responsive */
