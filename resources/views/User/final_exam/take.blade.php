@@ -5,8 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $exam->title }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #FFFFFF;
+            --bg-secondary: #F8F9FA;
+            --text: #1A1A1A;
+            --text-secondary: #6B7280;
+            --border: #E5E7EB;
+            --teal: #14B8A6;
+            --teal-dark: #0D9488;
+            --teal-light: #5EEAD4;
+            --black: #1A1A1A;
+            --radius: 8px;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,165 +27,132 @@
         }
 
         body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f9fafb;
-            padding-bottom: 120px;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding-bottom: 80px;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 1rem;
         }
 
-        /* Compact Header */
+        /* ===== COMPACT HEADER ===== */
         .exam-header {
-            background: white;
+            background: var(--bg);
             padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 90;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.98);
         }
 
-        .exam-header h1 {
-            color: #0E1B33;
-            font-size: 1.25rem;
-            margin-bottom: 0.75rem;
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
         }
 
-        .exam-info {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.75rem;
+        .exam-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            flex: 1;
         }
 
-        .info-item {
-            background: #f3f4f6;
-            padding: 0.5rem;
-            border-radius: 4px;
-            text-align: center;
-        }
-
-        .info-label {
-            font-size: 0.7rem;
-            color: #6b7280;
-            margin-bottom: 0.25rem;
-        }
-
-        .info-value {
-            font-weight: 700;
-            color: #0E1B33;
-            font-size: 0.95rem;
+        .header-stats {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
         }
 
         .timer {
-            font-size: 1.25rem;
             font-weight: 700;
-            color: #059669;
+            color: var(--teal);
+            font-size: 1.125rem;
+            font-variant-numeric: tabular-nums;
         }
 
-        .timer.warning {
-            color: #f59e0b;
+        .timer.warning { color: #F59E0B; }
+        .timer.danger { color: #EF4444; }
+
+        /* ===== FLOATING VIDEO FEEDS ===== */
+        .video-feeds {
+            position: fixed;
+            top: 80px;
+            right: 1rem;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
-        .timer.danger {
-            color: #dc2626;
-            animation: pulse 1s infinite;
+        .video-feed {
+            width: 200px;
+            background: var(--black);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 2px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        /* Recording Status Section */
-        .recording-status {
-            background: white;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .recording-status h3 {
-            font-size: 1rem;
-            margin-bottom: 0.75rem;
-            color: #0E1B33;
-        }
-
-        .monitoring-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .monitor-box {
-            background: #f8fafc;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 1rem;
-        }
-
-        .monitor-box h4 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #374151;
-        }
-
-        .monitor-box video {
-            width: 100%;
-            height: 180px;
-            background: #000;
-            border-radius: 4px;
-            object-fit: cover;
-        }
-
-        .recording-indicator {
+        .video-feed-header {
+            background: var(--black);
+            padding: 0.5rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-            font-size: 0.875rem;
+            justify-content: space-between;
+            font-size: 0.75rem;
         }
 
-        .recording-dot {
-            width: 12px;
-            height: 12px;
+        .video-feed-label {
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .rec-dot {
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            background: #dc2626;
-            animation: pulse 1.5s infinite;
+            background: #EF4444;
+            animation: blink 1.5s infinite;
         }
 
-        .recording-dot.active {
-            background: #dc2626;
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
 
-        .recording-dot.inactive {
-            background: #9ca3af;
+        .rec-dot.inactive {
+            background: #6B7280;
             animation: none;
         }
 
-        .warning-notice {
-            background: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            padding: 0.75rem;
-            margin-top: 0.75rem;
-            border-radius: 4px;
-            font-size: 0.875rem;
-            color: #92400e;
+        .video-feed video {
+            width: 100%;
+            height: 112px;
+            display: block;
+            object-fit: cover;
         }
 
-        /* Question Cards */
-        .question-card {
-            background: white;
+        /* ===== QUESTIONS ===== */
+        .question {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
         }
 
         .question-header {
@@ -181,34 +161,34 @@
             align-items: center;
             margin-bottom: 1rem;
             padding-bottom: 0.75rem;
-            border-bottom: 2px solid #e5e7eb;
+            border-bottom: 1px solid var(--border);
         }
 
         .question-number {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #0E1B33;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.9375rem;
         }
 
         .question-marks {
-            background: #dbeafe;
-            color: #1e40af;
-            padding: 0.375rem 0.75rem;
-            border-radius: 20px;
+            background: var(--teal);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8125rem;
             font-weight: 600;
-            font-size: 0.875rem;
         }
 
         .question-text {
-            font-size: 1rem;
-            line-height: 1.6;
-            color: #374151;
+            font-size: 0.9375rem;
+            color: var(--text);
             margin-bottom: 1rem;
+            line-height: 1.7;
         }
 
         .marking-criteria {
-            background: #f0fdf4;
-            border-left: 4px solid #10b981;
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--teal);
             padding: 0.75rem;
             margin-bottom: 1rem;
             border-radius: 4px;
@@ -216,286 +196,363 @@
         }
 
         .marking-criteria strong {
-            color: #065f46;
+            display: block;
+            margin-bottom: 0.375rem;
+            color: var(--text);
         }
 
-        /* Upload Section */
+        .marking-criteria p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* ===== UPLOAD ===== */
         .upload-section {
-            margin-top: 1.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
         }
 
-        .upload-section h4 {
-            color: #0E1B33;
+        .upload-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text);
             margin-bottom: 0.75rem;
-            font-size: 0.95rem;
+            display: block;
         }
 
         .upload-area {
-            border: 2px dashed #cbd5e1;
-            border-radius: 8px;
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
             padding: 1.5rem;
             text-align: center;
-            background: #f8fafc;
-            transition: all 0.3s;
+            background: var(--bg-secondary);
             cursor: pointer;
+            transition: all 0.2s;
         }
 
         .upload-area:hover {
-            border-color: #0E1B33;
-            background: #f1f5f9;
+            border-color: var(--teal);
+            background: var(--bg);
         }
 
         .upload-area.dragover {
-            border-color: #0E1B33;
-            background: #e0e7ff;
+            border-color: var(--teal);
+            background: #F0FDFA;
+            border-style: solid;
         }
 
         .upload-icon {
-            font-size: 2.5rem;
+            font-size: 2rem;
             margin-bottom: 0.5rem;
+            opacity: 0.5;
         }
 
-        .upload-instructions {
-            color: #6b7280;
-            margin-bottom: 0.75rem;
+        .upload-text {
             font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+
+        .upload-button {
+            background: var(--teal);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.25rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .upload-button:hover {
+            background: var(--teal-dark);
         }
 
         .file-input {
             display: none;
         }
 
-        .upload-button {
-            background: #0E1B33;
-            color: white;
-            border: none;
-            padding: 0.625rem 1.5rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            font-size: 0.875rem;
-        }
-
-        .upload-button:hover {
-            background: #1a2645;
-            transform: translateY(-2px);
-        }
-
-        .preview-area {
+        .preview-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.75rem;
             margin-top: 1rem;
         }
 
         .image-preview {
             position: relative;
-            border-radius: 8px;
+            border-radius: var(--radius);
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
         }
 
         .image-preview img {
             width: 100%;
-            height: 180px;
+            height: 140px;
             object-fit: cover;
             display: block;
             cursor: pointer;
         }
 
-        .image-preview .delete-btn {
+        .delete-btn {
             position: absolute;
             top: 0.5rem;
             right: 0.5rem;
-            background: #dc2626;
+            background: rgba(0, 0, 0, 0.7);
             color: white;
             border: none;
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
-        .image-preview .delete-btn:hover {
-            background: #b91c1c;
+        .delete-btn:hover {
+            background: #EF4444;
             transform: scale(1.1);
         }
 
-        .status-indicator {
-            margin-top: 0.5rem;
+        .status {
+            margin-top: 0.75rem;
             padding: 0.5rem;
-            border-radius: 4px;
+            border-radius: var(--radius);
             text-align: center;
-            font-size: 0.875rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
         }
 
         .status-uploaded {
-            background: #d1fae5;
-            color: #065f46;
+            background: #ECFDF5;
+            color: #065F46;
         }
 
         .status-not-uploaded {
-            background: #fee2e2;
-            color: #991b1b;
+            background: #FEF2F2;
+            color: #991B1B;
         }
 
         .status-uploading {
-            background: #fef3c7;
-            color: #92400e;
+            background: #FFFBEB;
+            color: #92400E;
         }
 
-        /* Fixed Submit Section */
-        .submit-section {
+        .error-alert {
+            background: #FEF2F2;
+            color: #991B1B;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            margin-top: 0.75rem;
+            font-size: 0.8125rem;
+            display: none;
+        }
+
+        /* ===== SUBMIT BAR ===== */
+        .submit-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: white;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
             padding: 1rem;
-            text-align: center;
-            box-shadow: 0 -4px 6px rgba(0,0,0,0.1);
-            z-index: 99;
+            z-index: 90;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.98);
         }
 
-        .progress-summary {
-            margin-bottom: 0.75rem;
-            font-size: 1rem;
+        .submit-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .progress {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .progress strong {
+            color: var(--text);
             font-weight: 600;
         }
 
         .submit-button {
-            background: #059669;
+            background: var(--teal);
             color: white;
             border: none;
-            padding: 0.875rem 2.5rem;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-weight: 700;
+            padding: 0.75rem 2rem;
+            border-radius: var(--radius);
+            font-size: 0.9375rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
         .submit-button:hover:not(:disabled) {
-            background: #047857;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+            background: var(--teal-dark);
         }
 
         .submit-button:disabled {
-            background: #9ca3af;
+            background: #D1D5DB;
             cursor: not-allowed;
-            transform: none;
         }
 
         .loading {
             display: inline-block;
-            width: 18px;
-            height: 18px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #0E1B33;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.6s linear infinite;
             margin-left: 0.5rem;
+            vertical-align: middle;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
 
-        .error-alert {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 0.75rem;
+        /* ===== MONITORING NOTICE ===== */
+        .monitoring-notice {
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--black);
+            padding: 0.875rem;
+            margin-bottom: 1rem;
             border-radius: 4px;
-            margin-top: 0.5rem;
-            font-size: 0.875rem;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
         }
 
+        .monitoring-notice strong {
+            color: var(--text);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        /* ===== IMAGE OVERLAY ===== */
+        .image-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 2rem;
+        }
+
+        .image-overlay img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: var(--radius);
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             body {
-                padding-bottom: 140px;
+                padding-bottom: 90px;
             }
 
-            .exam-info {
-                grid-template-columns: repeat(2, 1fr);
+            .container {
+                padding: 0.75rem;
             }
 
-            .monitoring-grid {
-                grid-template-columns: 1fr;
+            .header-content {
+                flex-wrap: wrap;
+                gap: 0.75rem;
             }
 
-            .question-card {
+            .header-stats {
+                gap: 1rem;
+                font-size: 0.8125rem;
+            }
+
+            .video-feeds {
+                top: 60px;
+                right: 0.5rem;
+            }
+
+            .video-feed {
+                width: 140px;
+            }
+
+            .video-feed video {
+                height: 80px;
+            }
+
+            .question {
                 padding: 1rem;
             }
 
-            .preview-area {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            .preview-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 0.5rem;
+            }
+
+            .image-preview img {
+                height: 100px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Compact Header -->
-        <div class="exam-header">
-            <h1>{{ $exam->title }}</h1>
-            
-            <div class="exam-info">
-                <div class="info-item">
-                    <div class="info-label">Course</div>
-                    <div class="info-value">{{ Str::limit($exam->course->title, 15) }}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Marks</div>
-                    <div class="info-value">{{ $exam->total_marks }}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Questions</div>
-                    <div class="info-value">{{ $exam->questions()->count() }}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Time Left</div>
-                    <div class="timer" id="timer">{{ $exam->duration_minutes }}:00</div>
-                </div>
+    <!-- Compact Header -->
+    <div class="exam-header">
+        <div class="header-content">
+            <div class="exam-title">{{ $exam->title }}</div>
+            <div class="header-stats">
+                <span>{{ $exam->course->title }}</span>
+                <span>•</span>
+                <span>{{ $exam->questions()->count() }} questions</span>
+                <span>•</span>
+                <span class="timer" id="timer">{{ $exam->duration_minutes }}:00</span>
             </div>
         </div>
+    </div>
 
-        <!-- Recording Status Section -->
-        <div class="recording-status">
-            <h3>🎥 Exam Monitoring Active</h3>
-            
-            <div class="monitoring-grid">
-                <!-- Webcam Monitor -->
-                <div class="monitor-box">
-                    <h4>📹 Webcam Recording</h4>
-                    <video id="webcamPreview" autoplay muted playsinline></video>
-                    <div class="recording-indicator">
-                        <div class="recording-dot" id="webcamDot"></div>
-                        <span id="webcamStatus">Initializing...</span>
-                    </div>
-                </div>
-
-                <!-- Screen Recording Monitor -->
-                <div class="monitor-box">
-                    <h4>🖥️ Screen Recording</h4>
-                    <video id="screenPreview" autoplay muted playsinline></video>
-                    <div class="recording-indicator">
-                        <div class="recording-dot" id="screenDot"></div>
-                        <span id="screenStatus">Initializing...</span>
-                    </div>
+    <!-- Floating Video Feeds -->
+    <div class="video-feeds">
+        <div class="video-feed">
+            <div class="video-feed-header">
+                <div class="video-feed-label">
+                    <div class="rec-dot" id="webcamDot"></div>
+                    <span id="webcamStatus">Camera</span>
                 </div>
             </div>
-
-            <div class="warning-notice">
-                ⚠️ <strong>Important:</strong> Both webcam and screen recording are mandatory. Do not close this tab or minimize the window during the exam. Any suspicious activity will be flagged.
+            <video id="webcamPreview" autoplay muted playsinline></video>
+        </div>
+        
+        <div class="video-feed">
+            <div class="video-feed-header">
+                <div class="video-feed-label">
+                    <div class="rec-dot" id="screenDot"></div>
+                    <span id="screenStatus">Screen</span>
+                </div>
             </div>
+            <video id="screenPreview" autoplay muted playsinline></video>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Monitoring Notice -->
+        <div class="monitoring-notice">
+            <strong>Exam Proctoring Active</strong>
+            Your webcam and screen are being recorded. Do not close or minimize this window.
         </div>
 
         <!-- Questions -->
@@ -505,37 +562,33 @@
                 $existingImages = $answer && $answer->answer_images ? json_decode($answer->answer_images, true) : [];
             @endphp
 
-            <div class="question-card" id="question-{{ $question->id }}">
+            <div class="question" id="question-{{ $question->id }}">
                 <div class="question-header">
-                    <span class="question-number">Q{{ $question->question_number }}</span>
+                    <span class="question-number">Question {{ $question->question_number }}</span>
                     <span class="question-marks">{{ $question->marks }} marks</span>
                 </div>
 
-                <div class="question-text">
-                    {{ $question->question_text }}
-                </div>
+                <div class="question-text">{{ $question->question_text }}</div>
 
                 @if($question->marking_criteria)
                     <div class="marking-criteria">
-                        <strong>Marking Criteria:</strong>
-                        <p style="margin: 0.25rem 0 0 0;">{{ $question->marking_criteria }}</p>
+                        <strong>Marking Criteria</strong>
+                        <p>{{ $question->marking_criteria }}</p>
                     </div>
                 @endif
 
                 <div class="upload-section">
-                    <h4>📤 Upload Answer Images (1-5 images)</h4>
+                    <label class="upload-label">Upload Answer (1-5 images)</label>
                     
                     <div class="upload-area" 
                          id="upload-area-{{ $question->id }}"
                          onclick="document.getElementById('file-input-{{ $question->id }}').click()">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-instructions">
-                            Click or drag & drop<br>
-                            <small>JPEG, PNG · Max 5MB each</small>
+                        <div class="upload-icon">📎</div>
+                        <div class="upload-text">
+                            Click or drag images here<br>
+                            <small>JPG, PNG • Max 5MB each</small>
                         </div>
-                        <button type="button" class="upload-button">
-                            Choose Files
-                        </button>
+                        <button type="button" class="upload-button">Browse</button>
                     </div>
 
                     <input type="file" 
@@ -545,7 +598,7 @@
                            multiple
                            onchange="handleFileSelect({{ $question->id }}, this.files)">
 
-                    <div class="preview-area" id="preview-{{ $question->id }}">
+                    <div class="preview-grid" id="preview-{{ $question->id }}">
                         @foreach($existingImages as $imageUrl)
                             <div class="image-preview">
                                 <img src="{{ $imageUrl }}" alt="Answer" onclick="enlargeImage('{{ $imageUrl }}')">
@@ -554,38 +607,40 @@
                         @endforeach
                     </div>
 
-                    <div class="status-indicator" id="status-{{ $question->id }}">
+                    <div class="status" id="status-{{ $question->id }}">
                         @if(count($existingImages) > 0)
-                            <span class="status-uploaded">✅ {{ count($existingImages) }} image(s) uploaded</span>
+                            <span class="status-uploaded">✓ {{ count($existingImages) }} image(s) uploaded</span>
                         @else
-                            <span class="status-not-uploaded">❌ Not uploaded</span>
+                            <span class="status-not-uploaded">Not uploaded</span>
                         @endif
                     </div>
 
-                    <div id="error-{{ $question->id }}" style="display: none;" class="error-alert"></div>
+                    <div id="error-{{ $question->id }}" class="error-alert"></div>
                 </div>
             </div>
         @endforeach
     </div>
 
-    <!-- Fixed Submit Section -->
-    <div class="submit-section">
-        <div class="progress-summary">
-            Answered: <strong><span id="answered-count">0</span>/{{ $exam->questions()->count() }}</strong>
-        </div>
+    <!-- Submit Bar -->
+    <div class="submit-bar">
+        <div class="submit-content">
+            <div class="progress">
+                <strong><span id="answered-count">0</span>/{{ $exam->questions()->count() }}</strong> answered
+            </div>
 
-        <form action="{{ route('student.final-exam.submit', $submission->id) }}" 
-              method="POST" 
-              id="submit-form"
-              enctype="multipart/form-data"
-              onsubmit="return confirmSubmit()">
-            @csrf
-            <input type="file" name="webcam_video" id="webcamVideoInput" hidden>
-            <input type="file" name="screen_recording" id="screenRecordingInput" hidden>
-            <button type="submit" class="submit-button" id="submit-btn" disabled>
-                Submit Exam
-            </button>
-        </form>
+            <form action="{{ route('student.final-exam.submit', $submission->id) }}" 
+                  method="POST" 
+                  id="submit-form"
+                  enctype="multipart/form-data"
+                  onsubmit="return confirmSubmit()">
+                @csrf
+                <input type="file" name="webcam_video" id="webcamVideoInput" hidden>
+                <input type="file" name="screen_recording" id="screenRecordingInput" hidden>
+                <button type="submit" class="submit-button" id="submit-btn" disabled>
+                    Submit Exam
+                </button>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -604,7 +659,6 @@
             @endforeach
         };
 
-        // Initialize answered questions
         @foreach($exam->questions as $question)
             @php
                 $answer = $submission->answers->where('question_id', $question->id)->first();
@@ -624,13 +678,14 @@
             const seconds = duration % 60;
             timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
             
+            timerDisplay.classList.remove('warning', 'danger');
             if (duration <= 300) timerDisplay.classList.add('danger');
             else if (duration <= 600) timerDisplay.classList.add('warning');
             
             duration--;
             
             if (duration < 0) {
-                alert('Time is up! Auto-submitting...');
+                alert('Time up! Auto-submitting...');
                 document.getElementById('submit-form').submit();
             }
         }
@@ -641,12 +696,9 @@
             const errorDiv = document.getElementById(`error-${questionId}`);
             errorDiv.textContent = message;
             errorDiv.style.display = 'block';
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 5000);
+            setTimeout(() => errorDiv.style.display = 'none', 5000);
         }
 
-        // Upload handling
         async function handleFileSelect(questionId, files) {
             if (files.length === 0) return;
             
@@ -658,7 +710,7 @@
 
             for (let file of files) {
                 if (file.size > 5 * 1024 * 1024) {
-                    showError(questionId, `${file.name} is too large (max 5MB)`);
+                    showError(questionId, `${file.name} exceeds 5MB`);
                     return;
                 }
             }
@@ -679,10 +731,6 @@
                         }
                     );
 
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
                     const data = await response.json();
 
                     if (data.success) {
@@ -695,8 +743,7 @@
                         updateStatus(questionId, 'not-uploaded');
                     }
                 } catch (error) {
-                    console.error('Upload error:', error);
-                    showError(questionId, `Upload failed: ${error.message}`);
+                    showError(questionId, 'Upload failed');
                     updateStatus(questionId, 'not-uploaded');
                 }
             }
@@ -708,11 +755,11 @@
             const previewArea = document.getElementById(`preview-${questionId}`);
             previewArea.innerHTML = '';
 
-            images.forEach((url, i) => {
+            images.forEach((url) => {
                 const div = document.createElement('div');
                 div.className = 'image-preview';
                 div.innerHTML = `
-                    <img src="${url}" alt="Answer ${i+1}" onclick="enlargeImage('${url}')">
+                    <img src="${url}" alt="Answer" onclick="enlargeImage('${url}')">
                     <button class="delete-btn" onclick="deleteImage(${questionId}, '${url}', event)">×</button>
                 `;
                 previewArea.appendChild(div);
@@ -721,10 +768,9 @@
 
         function enlargeImage(url) {
             const overlay = document.createElement('div');
-            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;';
+            overlay.className = 'image-overlay';
             const img = document.createElement('img');
             img.src = url;
-            img.style.cssText = 'max-width:90%;max-height:90%;border-radius:8px;';
             overlay.appendChild(img);
             overlay.onclick = () => document.body.removeChild(overlay);
             document.body.appendChild(overlay);
@@ -762,10 +808,9 @@
                     }
                     updateProgress();
                 } else {
-                    showError(questionId, data.error || 'Delete failed');
+                    showError(questionId, 'Delete failed');
                 }
             } catch (error) {
-                console.error('Delete error:', error);
                 showError(questionId, 'Delete failed');
             }
         }
@@ -774,12 +819,12 @@
             const statusDiv = document.getElementById(`status-${questionId}`);
             
             if (status === 'uploading') {
-                statusDiv.innerHTML = '<span class="status-uploading">⏳ Uploading...<span class="loading"></span></span>';
+                statusDiv.innerHTML = '<span class="status-uploading">Uploading...<span class="loading"></span></span>';
             } else if (status === 'uploaded') {
                 const count = uploadedImages[questionId].length;
-                statusDiv.innerHTML = `<span class="status-uploaded">✅ ${count} image(s) uploaded</span>`;
+                statusDiv.innerHTML = `<span class="status-uploaded">✓ ${count} image(s) uploaded</span>`;
             } else {
-                statusDiv.innerHTML = '<span class="status-not-uploaded">❌ Not uploaded</span>';
+                statusDiv.innerHTML = '<span class="status-not-uploaded">Not uploaded</span>';
             }
         }
 
@@ -793,7 +838,7 @@
                 alert(`Please answer all questions (${answeredQuestions.size}/${totalQuestions})`);
                 return false;
             }
-            return confirm('⚠️ Submit exam? You cannot change answers after submission.');
+            return confirm('Submit exam? You cannot change answers after submission.');
         }
 
         // Drag & drop
@@ -812,96 +857,50 @@
 
         updateProgress();
 
-        // ============================================
-        // 🎥 WEBCAM & SCREEN RECORDING
-        // ============================================
+        // ===== RECORDING =====
         let webcamRecorder, screenRecorder;
         let webcamChunks = [], screenChunks = [];
         let webcamStream, screenStream;
-        let recordingsReady = { webcam: false, screen: false };
 
-        // Start Webcam Recording
         async function startWebcamRecording() {
             try {
-                webcamStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
-                    audio: true
-                });
-
+                webcamStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 document.getElementById('webcamPreview').srcObject = webcamStream;
                 
-                webcamRecorder = new MediaRecorder(webcamStream, {
-                    mimeType: 'video/webm;codecs=vp8,opus'
-                });
-
-                webcamRecorder.ondataavailable = e => {
-                    if (e.data.size > 0) webcamChunks.push(e.data);
-                };
-
-                webcamRecorder.onstart = () => {
-                    document.getElementById('webcamDot').classList.add('active');
-                    document.getElementById('webcamStatus').textContent = 'Recording...';
-                };
-
+                webcamRecorder = new MediaRecorder(webcamStream, { mimeType: 'video/webm;codecs=vp8,opus' });
+                webcamRecorder.ondataavailable = e => { if (e.data.size > 0) webcamChunks.push(e.data); };
                 webcamRecorder.start();
-                recordingsReady.webcam = true;
 
+                document.getElementById('webcamDot').classList.remove('inactive');
             } catch (error) {
-                console.error('Webcam error:', error);
-                document.getElementById('webcamStatus').textContent = 'Failed to start';
                 document.getElementById('webcamDot').classList.add('inactive');
-                alert('⚠️ Webcam access is required for this exam. Please enable your webcam.');
+                document.getElementById('webcamStatus').textContent = 'Failed';
+                alert('Webcam access required');
             }
         }
 
-        // Start Screen Recording
         async function startScreenRecording() {
             try {
-                screenStream = await navigator.mediaDevices.getDisplayMedia({
-                    video: { mediaSource: 'screen' },
-                    audio: false
-                });
-
+                screenStream = await navigator.mediaDevices.getDisplayMedia({ video: { mediaSource: 'screen' }, audio: false });
                 document.getElementById('screenPreview').srcObject = screenStream;
 
-                screenRecorder = new MediaRecorder(screenStream, {
-                    mimeType: 'video/webm;codecs=vp8'
-                });
+                screenRecorder = new MediaRecorder(screenStream, { mimeType: 'video/webm;codecs=vp8' });
+                screenRecorder.ondataavailable = e => { if (e.data.size > 0) screenChunks.push(e.data); };
+                screenRecorder.start();
 
-                screenRecorder.ondataavailable = e => {
-                    if (e.data.size > 0) screenChunks.push(e.data);
-                };
+                document.getElementById('screenDot').classList.remove('inactive');
 
-                screenRecorder.onstart = () => {
-                    document.getElementById('screenDot').classList.add('active');
-                    document.getElementById('screenStatus').textContent = 'Recording...';
-                };
-
-                screenRecorder.onstop = () => {
-                    document.getElementById('screenDot').classList.remove('active');
-                    document.getElementById('screenDot').classList.add('inactive');
-                    document.getElementById('screenStatus').textContent = 'Stopped';
-                };
-
-                // Detect when user stops sharing screen
                 screenStream.getVideoTracks()[0].onended = () => {
-                    alert('⚠️ Screen sharing stopped! You must share your screen to continue the exam.');
-                    // Attempt to restart
+                    alert('Screen sharing stopped! Please restart.');
                     startScreenRecording();
                 };
-
-                screenRecorder.start();
-                recordingsReady.screen = true;
-
             } catch (error) {
-                console.error('Screen recording error:', error);
-                document.getElementById('screenStatus').textContent = 'Failed to start';
                 document.getElementById('screenDot').classList.add('inactive');
-                alert('⚠️ Screen recording is required for this exam. Please share your screen.');
+                document.getElementById('screenStatus').textContent = 'Failed';
+                alert('Screen recording required');
             }
         }
 
-        // Stop Webcam Recording
         function stopWebcamRecording() {
             return new Promise(resolve => {
                 if (!webcamRecorder || webcamRecorder.state === 'inactive') {
@@ -911,18 +910,12 @@
 
                 webcamRecorder.onstop = () => {
                     const blob = new Blob(webcamChunks, { type: 'video/webm' });
-                    const file = new File([blob], 'webcam_recording.webm', { type: 'video/webm' });
-
+                    const file = new File([blob], 'webcam.webm', { type: 'video/webm' });
                     const dataTransfer = new DataTransfer();
                     dataTransfer.items.add(file);
                     document.getElementById('webcamVideoInput').files = dataTransfer.files;
-
                     webcamStream.getTracks().forEach(track => track.stop());
-                    
-                    document.getElementById('webcamDot').classList.remove('active');
                     document.getElementById('webcamDot').classList.add('inactive');
-                    document.getElementById('webcamStatus').textContent = 'Stopped';
-                    
                     resolve();
                 };
                 
@@ -930,7 +923,6 @@
             });
         }
 
-        // Stop Screen Recording
         function stopScreenRecording() {
             return new Promise(resolve => {
                 if (!screenRecorder || screenRecorder.state === 'inactive') {
@@ -940,13 +932,12 @@
 
                 screenRecorder.onstop = () => {
                     const blob = new Blob(screenChunks, { type: 'video/webm' });
-                    const file = new File([blob], 'screen_recording.webm', { type: 'video/webm' });
-
+                    const file = new File([blob], 'screen.webm', { type: 'video/webm' });
                     const dataTransfer = new DataTransfer();
                     dataTransfer.items.add(file);
                     document.getElementById('screenRecordingInput').files = dataTransfer.files;
-
                     screenStream.getTracks().forEach(track => track.stop());
+                    document.getElementById('screenDot').classList.add('inactive');
                     resolve();
                 };
                 
@@ -954,45 +945,27 @@
             });
         }
 
-        // Initialize recordings when page loads
         window.onload = async function() {
             await startWebcamRecording();
             await startScreenRecording();
         };
 
-        // Handle form submission
         document.getElementById('submit-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Show loading state
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
             submitBtn.innerHTML = 'Submitting... <span class="loading"></span>';
 
             try {
-                // Stop both recordings
-                await Promise.all([
-                    stopWebcamRecording(),
-                    stopScreenRecording()
-                ]);
-
-                // Small delay to ensure files are attached
+                await Promise.all([stopWebcamRecording(), stopScreenRecording()]);
                 await new Promise(resolve => setTimeout(resolve, 500));
-
-                // Submit the form
                 this.submit();
             } catch (error) {
-                console.error('Error during submission:', error);
-                alert('Error preparing recordings. Please try again.');
+                alert('Error preparing recordings');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Exam';
             }
-        });
-
-        // Prevent tab close/navigation
-        window.addEventListener('beforeunload', (e) => {
-            e.preventDefault();
-            e.returnValue = '';
         });
     </script>
 </body>
