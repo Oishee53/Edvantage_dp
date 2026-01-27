@@ -4,446 +4,242 @@
     <meta charset="UTF-8">
     <title>Add New Course</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <!-- Updated font weights to match dashboard exactly (400, 600, 700) -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f2f9',
+                            100: '#e3e6f3',
+                            600: '#1a2d52',
+                            700: '#0E1B33',
+                            800: '#0a1426',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
-        /* Updated CSS variables to match dashboard exactly */
-        :root {
-            --primary-color: #0E1B33;
-            --primary-light-hover-bg: #E3E6F3;
-            --body-background: #f9fafb;
-            --card-background: #ffffff;
-            --text-default: #333;
-            --text-gray-600: #4b5563;
-            --text-gray-700: #374151;
-            --text-gray-500: #6b7280;
-            --border-color: #e5e7eb;
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        /* Updated body to use flex layout like dashboard */
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--body-background);
-            margin: 0;
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Updated sidebar to match dashboard exactly - removed fixed positioning */
-        .sidebar {
-            @if(auth()->user() && auth()->user()->role === 2)
-                width: 17.5rem;
-            @elseif(auth()->user() && auth()->user()->role === 3)
-                width: 15rem;
-            @endif
-            background-color: var(--card-background);
-            min-height: 100vh;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-
-        .sidebar-header {
-            padding: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--primary-color);
-            font-weight: 700;
-            font-size: 1.25rem;
-        }
-
-        .sidebar-header img {
-            height: 2.5rem;
-        }
-
-        /* Updated sidebar nav spacing to match dashboard */
-        .sidebar-nav {
-            margin-top: 2.5rem;
-        }
-
-        .sidebar-nav a {
-            display: block;
-            padding: 0.75rem 1.5rem;
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-        }
-
-        .sidebar-nav a:hover {
-            background-color: var(--primary-light-hover-bg);
-            color: #0E1B33;
-        }
-
-        .sidebar-nav a.active {
-            background-color: var(--primary-light-hover-bg);
-            color: #0E1B33;
-            font-weight: 600;
-        }
-
-        /* Updated main content to use flex-1 like dashboard, removed margin-left */
-        .main-content {
-            flex: 1;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Updated top header to match dashboard top-bar styling */
-        .top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .top-header h1 {
-            font-size: 1.5rem;
-            font-weight: 400;
-            color: var(--primary-color);
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .user-info span {
-            color: var(--primary-color);
-            font-weight: 500;
-        }
-
-        .logout-btn {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.25rem;
-            border: none;
-            cursor: pointer;
-            transition: opacity 0.2s ease-in-out;
-        }
-
-        .logout-btn:hover {
-            opacity: 0.9;
-        }
-
-        /* Form Content */
-        .content-area {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-
-        .form-card {
-            background: var(--card-background);
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            padding: 1.5rem;
-            min-width: 400px;
-            max-width: 520px;
-            width: 100%;
-            font-size: 0.9rem;
-        }
-
-        .form-card h2 {
-            font-size: 1.125rem;
-            color: var(--primary-color);
-            font-weight: 600;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            justify-content: center;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-
-        .required {
-            color: #DC2626;
-            font-size: 1em;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        input[type="file"],
-        textarea,
-        select {
-            width: 100%;
-            padding: 8px 10px;
-            border-radius: 8px;
-            border: 1.5px solid #E3E6F3;
-            background: #f8fafc;
-            font-size: 0.85rem;
-            color: var(--text-default);
-            font-family: inherit;
-            transition: border 0.18s, box-shadow 0.18s;
-            box-shadow: 0 1.5px 8px rgba(14, 27, 51, 0.03);
-        }
-
-        input[type="file"] {
-            background: var(--card-background);
-            font-size: 0.85rem;
-        }
-
-        input:focus,
-        textarea:focus,
-        select:focus {
-            border: 1.5px solid #0E1B33;
-            outline: 2px solid #0E1B33;
-            background: var(--card-background);
-            box-shadow: 0 0 0 2px rgba(14, 27, 51, 0.07);
-        }
-
-        textarea {
-            min-height: 56px;
-            resize: vertical;
-        }
-
-        button[type="submit"] {
-            width: 100%;
-            padding: 10px 0;
-            font-size: 0.9rem;
-            background: var(--primary-color);
-            color: #fff;
-            font-weight: 700;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(14, 27, 51, 0.07);
-            transition: background 0.2s, transform 0.18s;
-            margin-top: 10px;
-            letter-spacing: 0.2px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        button[type="submit"]:hover,
-        button[type="submit"]:focus {
-            background: #0A1426;
-            transform: translateY(-1px) scale(1.01);
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 14px;
-            color: var(--primary-color);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            text-align: center;
-            transition: color 0.18s;
-        }
-
-        .back-link:hover {
-            color: #0A1426;
-            text-decoration: underline;
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            body {
-                flex-direction: column;
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
-            
-            .sidebar {
-                width: 100%;
-                min-height: auto;
-                order: 2;
-                transform: translateY(100%);
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                z-index: 1000;
-                transition: transform 0.3s;
-            }
-            
-            .sidebar.open {
+            to {
+                opacity: 1;
                 transform: translateY(0);
             }
-            
-            .main-content {
-                order: 1;
-                padding: 1rem;
-            }
-            
-            .mobile-menu-btn {
-                display: block;
-                background: none;
-                border: none;
-                font-size: 1.2rem;
-                color: var(--primary-color);
-                cursor: pointer;
-            }
-            
-            .form-card {
-                padding: 1rem;
-                min-width: 0;
-                max-width: 98vw;
-                font-size: 0.85rem;
-            }
-            
-            .form-card h2 { font-size: 1rem; }
-            label, input, select, textarea, .back-link { font-size: 0.8rem; }
-            button[type="submit"] { font-size: 0.85rem; }
-            
-            .top-header {
-                padding: 0;
-                margin-bottom: 1rem;
-            }
         }
-
-        .mobile-menu-btn {
-            display: none;
+        .animate-slide-in {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        
+        @media (min-width: 1024px) {
+            aside {
+                display: block !important;
+            }
         }
     </style>
 </head>
-<body>
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <img src="/image/Edvantage.png" alt="Edvantage Logo">
-        </div>
-        <nav class="sidebar-nav">
-                <a href="/instructor_homepage">Dashboard</a>
-                <a href="/instructor/manage_courses" class="active">Manage Course</a>
-        </nav>
-    </aside>
+<body class="bg-gray-50 min-h-screen font-sans antialiased">
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Top Header -->
-        <header class="top-header">
-            <div style="display: flex; align-items: center; gap: 16px;">
-                <button class="mobile-menu-btn" onclick="toggleSidebar()">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1>Add New Course</h1>
-            </div>
-            @auth
-                <div class="user-info">
-                    <span>{{ auth()->user()->name }}</span>
-                    <form action="/logout" method="POST" style="margin: 0;">
-                        @csrf
-                        <button class="logout-btn">Logout</button>
-                    </form>
-                </div>
-            @else
-                <div style="display: flex; gap: 8px;">
-                    <a href="/login" style="border: 1px solid var(--primary-color); color: var(--primary-color); padding: 8px 16px; border-radius: 4px; text-decoration: none;">Login</a>
-                    <a href="/register" style="background: var(--primary-color); color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none;">Sign Up</a>
-                </div>
-            @endauth
-        </header>
+    <div x-data="{ sidebarOpen: window.innerWidth >= 1024, sidebarCollapsed: false }" 
+         @resize.window="if (window.innerWidth >= 1024) sidebarOpen = true; else if (window.innerWidth < 1024) sidebarCollapsed = false"
+         class="flex min-h-screen">
+        
+        <!-- Sidebar -->
+        @include('layouts.sidebar')
 
-        <!-- Form Content -->
-        <div class="content-area">
-            <div class="form-card">
+        <!-- Main Content -->
+        <main class="flex-1 transition-all duration-300"
+              :class="sidebarCollapsed && window.innerWidth >= 1024 ? 'lg:ml-20' : 'lg:ml-72'">
+            
+            <x-instructor-header :title="$pageTitle ?? 'Add New Course'" />
+
+            <!-- Page Content -->
+            <div class="p-4 lg:p-6 max-w-7xl mx-auto">
                 @auth
-                <h2><i class="fas fa-plus-circle" style="color:var(--primary-color);"></i>Add New Course</h2>
-                @if(auth()->user()->role === 2)
-                <form action="/admin/manage_courses/create" method="POST" enctype="multipart/form-data">
-                @elseif(auth()->user()->role === 3)
-                <form action="/instructor/manage_courses/create" method="POST" enctype="multipart/form-data">
-                @endif
-                    @csrf
-                    <div class="form-group">
-                        <label for="image">Course Image <span class="required">*</span></label>
-                        <input type="file" id="image" name="image" accept="image/*" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="title">Course Title <span class="required">*</span></label>
-                        <input type="text" id="title" name="title" placeholder="Enter course title" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="description">Course Description</label>
-                        <textarea id="description" name="description" placeholder="Enter course description"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="category">Category <span class="required">*</span></label>
-                        <select id="category" name="category" required>
-                            <option value="">Select Category</option>
-                            <option value="Web Development">Web Development</option>
-                            <option value="Mobile Development">Mobile Development</option>
-                            <option value="Data Science">Data Science</option>
-                            <option value="Machine Learning">Machine Learning</option>
-                            <option value="Design">Design</option>
-                            <option value="Business">Business</option>
-                            <option value="Marketing">Marketing</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="video_count">Number of Lectures <span class="required">*</span></label>
-                        <input type="number" id="video_count" name="video_count"  min="1" required>
+                    <!-- Form Card -->
+                    <div class="max-w-xl mx-auto">
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden opacity-0 animate-slide-in">
+                            <div class="p-6 lg:p-8">
+                                @if(auth()->user()->role === 2)
+                                <form action="/admin/manage_courses/create" method="POST" enctype="multipart/form-data" class="space-y-6">
+                                @elseif(auth()->user()->role === 3)
+                                <form action="/instructor/manage_courses/create" method="POST" enctype="multipart/form-data" class="space-y-6">
+                                @endif
+                                    @csrf
+                                    
+                                    <!-- Course Image -->
+                                    <div>
+                                        <label for="image" class="block text-sm font-bold text-teal-900 mb-2">
+                                            </i>Course Image <span class="text-gray-900">*</span>
+                                        </label>
+                                        <input type="file" id="image" name="image" accept="image/*" 
+                                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-gray-900 focus:ring-2 focus:ring-teal-900/10 transition-all outline-none font-medium bg-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-teal-600 file:text-white hover:file:bg-teal-800 file:cursor-pointer" 
+                                            required>
+                                    </div>
+
+                                    <!-- Course Title -->
+                                    <div>
+                                        <label for="title" class="block text-sm font-bold text-teal-900 mb-2">
+                                            </i>Course Title <span class="text-gray-900">*</span>
+                                        </label>
+                                        <input type="text" id="title" name="title" 
+                                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-gray-900 focus:ring-2 focus:ring-teal-900/10 transition-all outline-none font-medium" 
+                                            placeholder="Enter course title..."
+                                            required>
+                                    </div>
+
+                                    <!-- Course Description -->
+                                    <div>
+                                        <label for="description" class="block text-sm font-bold text-teal-900 mb-2">
+                                            Course Description
+                                        </label>
+                                        <textarea id="description" name="description" rows="4"
+                                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-gray-900 focus:ring-2 focus:ring-teal-900/10 transition-all outline-none font-medium resize-none" 
+                                            placeholder="Enter course description..."></textarea>
+                                    </div>
+
+                                    <!-- Category -->
+                                    <div>
+                                        <label for="category" class="block text-sm font-bold text-teal-900 mb-2">
+                                            Category <span class="text-gray-900">*</span>
+                                        </label>
+                                        <select id="category" name="category" 
+                                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-gray-900 focus:ring-2 focus:ring-teal-900/10 transition-all outline-none font-medium bg-white" 
+                                            required>
+                                            <option value="">Select Category</option>
+                                            <option value="Web Development">Web Development</option>
+                                            <option value="Mobile Development">Mobile Development</option>
+                                            <option value="Data Science">Data Science</option>
+                                            <option value="Machine Learning">Machine Learning</option>
+                                            <option value="Design">Design</option>
+                                            <option value="Business">Business</option>
+                                            <option value="Marketing">Marketing</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label for="level" class="block text-sm font-bold text-teal-900 mb-2">
+                                            Course Level <span class="text-gray-900">*</span>
+                                        </label>
+                                        <select id="level" name="level"
+                                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-gray-900 focus:ring-2 focus:ring-teal-900/10 transition-all outline-none font-medium bg-white"
+                                            required>
+                                            <option value="">Select Level</option>
+                                            <option value="beginner">Beginner</option>
+                                            <option value="intermediate">Intermediate</option>
+                                            <option value="advanced">Advanced</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Grid for Number Fields -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <!-- Number of Lectures -->
+                                        <div>
+                                            <label for="video_count" class="block text-sm font-bold text-teal-900 mb-2">
+                                                Number of Lectures <span class="text-gray-900">*</span>
+                                            </label>
+                                            <input type="number" id="video_count" name="video_count" min="1"
+                                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-gray-900 focus:ring-2 focus:ring-teal-900/10 transition-all outline-none font-medium" 
+                                                placeholder="10"
+                                                required>
+                                        </div>
+
+                                        <!-- Approx Video Length -->
+                                        <div>
+                                            <label for="approx_video_length" class="block text-sm font-bold text-teal-900 mb-2">
+                                                Avg. Lecture Length (min) <span class="text-gray-900">*</span>
+                                            </label>
+                                            <input type="number" id="approx_video_length" name="approx_video_length" min="1"
+                                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-gray-900 focus:ring-2 focus:ring-teal-900/10 transition-all outline-none font-medium" 
+                                                placeholder="45"
+                                                required>
+                                        </div>
+
+                                        <!-- Total Duration -->
+                                        <div>
+                                            <label for="total_duration" class="block text-sm font-bold text-teal-900 mb-2">
+                                                Total Duration (hours) <span class="text-gray-900">*</span>
+                                            </label>
+                                            <input type="number" id="total_duration" name="total_duration" step="0.1" min="0.1"
+                                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-gray-900 focus:ring-2 focus:ring-teal-900/10 transition-all outline-none font-medium" 
+                                                placeholder="8.5"
+                                                required>
+                                        </div>
+
+                                        <!-- Price -->
+                                        <div>
+                                            <label for="price" class="block text-sm font-bold text-teal-900 mb-2">
+                                                Price (৳) <span class="text-gray-900">*</span>
+                                            </label>
+                                            <input type="number" id="price" name="price" step="0.01" min="0"
+                                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-gray-900 focus:ring-2 focus:ring-teal-900/10 transition-all outline-none font-medium" 
+                                                placeholder="2500"
+                                                required>
+                                        </div>
+                                    </div>
+
+                                    <!-- Course Prerequisite -->
+                                    <div>
+                                        <label for="prerequisite" class="block text-sm font-bold text-teal-900 mb-2">
+                                            Course Prerequisites (Optional)
+                                        </label>
+                                        <input type="text" id="prerequisite" name="prerequisite"
+                                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-gray-900 focus:ring-2 focus:ring-teal-900/10 transition-all outline-none font-medium" 
+                                            placeholder="Basic HTML & CSS knowledge">
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div class="flex flex-col sm:flex-row items-center gap-3 pt-6 border-t border-gray-200">
+                                        <button type="submit" class="w-full sm:flex-1 inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-800 transition-all hover:shadow-md">
+                                            <i class="fas fa-save"></i>
+                                            <span>Save Course</span>
+                                        </button>
+                                        
+                                        @if(auth()->user()->role === 2)
+                                        <a href="/admin_panel/manage_courses" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-white text-teal-700 border border-gray-300 rounded-lg font-medium hover:bg-teal-50 hover:border-gray-900 transition-all">
+                                        @elseif(auth()->user()->role === 3)
+                                        <a href="/instructor/manage_courses" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-white text-teal-700 border border-gray-300 rounded-lg font-medium hover:bg-teal-50 hover:border-gray-900 transition-all">
+                                        @endif
+                                            <i class="fas fa-arrow-left"></i>
+                                            <span>Back</span>
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="approx_video_length">Approx Video Length (minutes) <span class="required">*</span></label>
-                        <input type="number" id="approx_video_length" name="approx_video_length"  min="1" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="total_duration">Total Duration (hours) <span class="required">*</span></label>
-                        <input type="number" id="total_duration" name="total_duration"  step="0.1" min="0.1" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="price">Price (৳) <span class="required">*</span></label>
-                        <input type="number" id="price" name="price" step="0.01" min="0" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="course_prerequisite">Course Prerequisite(If any)</label>
-                        <input type="text" id="prerequisite" name="prerequisite">
-                    </div>
-
-                    <button type="submit"><i class="fas fa-save"></i> Save Course</button>
-                </form>
-                @if(auth()->user()->role === 2)
-                <a class="back-link" href="/admin_panel/manage_courses"><i class="fas fa-arrow-left"></i> Back to Manage Courses</a>
-                @elseif(auth()->user()->role === 3)
-                <a class="back-link" href="/instructor/manage_courses"><i class="fas fa-arrow-left"></i> Back to Manage Courses</a>
-                @endif
                 @else
-                <p style="text-align:center;color:#DC2626;">You are not logged in. <a href="/" style="color:var(--primary-color);">Go to Login</a></p>
+                    <!-- Not Logged In -->
+                    <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden max-w-md mx-auto">
+                        <div class="p-12 text-center">
+                            <div class="w-20 h-20 bg-red-50 rounded-xl flex items-center justify-center mx-auto mb-6 border border-red-200">
+                                <i class="fas fa-lock text-3xl text-red-600"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-teal-900 mb-3">Access Denied</h2>
+                            <p class="text-teal-600 mb-6">You need to be logged in to view this page.</p>
+                            <a href="/" class="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-800 transition-all hover:shadow-lg">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Go to Login
+                            </a>
+                        </div>
+                    </div>
                 @endauth
             </div>
-        </div>
-    </main>
-
-    <script>
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('open');
-        }
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function(event) {
-            const sidebar = document.getElementById('sidebar');
-            const menuBtn = document.querySelector('.mobile-menu-btn');
-            
-            if (window.innerWidth <= 768 && 
-                !sidebar.contains(event.target) && 
-                !menuBtn.contains(event.target)) {
-                sidebar.classList.remove('open');
-            }
-        });
-    </script>
+        </main>
+    </div>
 </body>
 </html>

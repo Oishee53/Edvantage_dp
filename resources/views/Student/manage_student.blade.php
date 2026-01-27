@@ -20,9 +20,9 @@
             --body-background: #f9fafb;
             --card-background: #ffffff;
             --text-default: #333;
-            --text-gray-600: #4b5563;
-            --text-gray-700: #374151;
-            --text-gray-500: #6b7280;
+            --text-teal-600: #4b5563;
+            --text-teal-700: #374151;
+            --text-teal-500: #6b7280;
             --border-color: #e5e7eb;
             --edit-bg: #EDF2FC;
             --edit-text: #0E1B33;
@@ -183,7 +183,7 @@
         }
 
         .page-header p {
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             margin: 0;
             font-size: 0.875rem;
         }
@@ -250,7 +250,7 @@
         }
 
         .action-card-content p {
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             font-size: 0.875rem;
             margin: 0;
         }
@@ -308,7 +308,7 @@
         }
 
         .stat-card-label {
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             font-size: 0.875rem;
             margin-bottom: 0.25rem;
         }

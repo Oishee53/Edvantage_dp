@@ -232,8 +232,8 @@
                                         <i class="fas fa-play"></i>
                                     </div>
                                     <div>
-                                        <h2 class="text-lg font-semibold text-gray-900">Video Content</h2>
-                                        <p class="text-sm text-gray-500">Watch the lecture video</p>
+                                        <h2 class="text-lg font-semibold text-teal-900">Video Content</h2>
+                                        <p class="text-sm text-teal-500">Watch the lecture video</p>
                                     </div>
                                 </div>
                                 <button 
@@ -274,8 +274,8 @@
                                         <i class="fas fa-file-pdf"></i>
                                     </div>
                                     <div>
-                                        <h2 class="text-lg font-semibold text-gray-900">PDF Document</h2>
-                                        <p class="text-sm text-gray-500">Download or view the lecture PDF</p>
+                                        <h2 class="text-lg font-semibold text-teal-900">PDF Document</h2>
+                                        <p class="text-sm text-teal-500">Download or view the lecture PDF</p>
                                     </div>
                                 </div>
                                 <a href="{{ route('secure.pdf.view', ['id' => $resource->id]) }}" 
@@ -309,8 +309,8 @@
                                 <i class="fas fa-question-circle"></i>
                             </div>
                             <div>
-                                <h2 class="text-lg font-semibold text-gray-900">Lecture Quiz</h2>
-                                <p class="text-sm text-gray-500">Test your knowledge</p>
+                                <h2 class="text-lg font-semibold text-teal-900">Lecture Quiz</h2>
+                                <p class="text-sm text-teal-500">Test your knowledge</p>
                             </div>
                         </div>
                         @if($quiz)
@@ -324,7 +324,7 @@
                 </div>
                 
                 @if(!$quiz)
-                    <div class="p-6 text-gray-500 text-center bg-gray-50">
+                    <div class="p-6 text-teal-500 text-center bg-teal-50">
                         <i class="fas fa-info-circle mr-2"></i>
                         No quiz available for this lecture.
                     </div>

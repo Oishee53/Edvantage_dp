@@ -22,7 +22,7 @@ public function homepage(RecommendationService $recommendationService)
     $courses = Courses::withCount('quizzes')
         ->get()
         ->filter(function ($course) {
-            return $course->quizzes_count == $course->video_count;
+            return $course->quizzes_count == $course->video_count && $course->hasPublishedFinalExam();
         });
 
     $uniqueCategories = $courses->pluck('category')->unique();
@@ -32,7 +32,11 @@ public function homepage(RecommendationService $recommendationService)
 
     if ($user) {
         $recommendedCourses = $recommendationService
-            ->getRecommendedCourses($user->id);
+            ->getRecommendedCourses($user->id)
+            ->filter(function ($course) {
+                return $course->quizzes_count == $course->video_count && $course->hasPublishedFinalExam();
+            });
+    
     }
 
     return view('homepage', compact(

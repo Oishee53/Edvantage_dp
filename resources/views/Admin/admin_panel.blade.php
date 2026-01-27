@@ -14,10 +14,10 @@
       --body-background: #f9fafb;
       --card-background: #ffffff;
       --text-default: #333;
-      --text-gray-600: #4b5563; /* Equivalent to Tailwind's gray-600 */
-      --text-gray-700: #374151; /* Equivalent to Tailwind's gray-700 */
-      --text-gray-500: #6b7280; /* Equivalent to Tailwind's gray-500 */
-      --border-color: #e5e7eb; /* Equivalent to Tailwind's gray-200 */
+      --text-teal-600: #4b5563; /* Equivalent to Tailwind's teal-600 */
+      --text-teal-700: #374151; /* Equivalent to Tailwind's teal-700 */
+      --text-teal-500: #6b7280; /* Equivalent to Tailwind's teal-500 */
+      --border-color: #e5e7eb; /* Equivalent to Tailwind's teal-200 */
     }
 
     body {
@@ -129,7 +129,7 @@
     }
 
     .stat-card-label {
-      color: var(--text-gray-600);
+      color: var(--text-teal-600);
     }
 
     .stat-card-value {
@@ -179,12 +179,12 @@
     .contact-table {
       min-width: 100%; /* min-w-full */
       font-size: 0.875rem; /* text-sm */
-      color: var(--text-gray-700);
+      color: var(--text-teal-700);
       border-collapse: collapse;
     }
 
     .contact-table thead {
-      color: var(--text-gray-500);
+      color: var(--text-teal-500);
       border-bottom: 1px solid var(--border-color);
     }
 

@@ -13,6 +13,7 @@ class Courses extends Model
         'title',
         'description',
         'category',
+        'level',
         'video_count',
         'approx_video_length',
         'total_duration',

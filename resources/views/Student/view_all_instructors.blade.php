@@ -20,9 +20,9 @@
             --body-background: #f9fafb;
             --card-background: #ffffff;
             --text-default: #333;
-            --text-gray-600: #4b5563;
-            --text-gray-700: #374151;
-            --text-gray-500: #6b7280;
+            --text-teal-600: #4b5563;
+            --text-teal-700: #374151;
+            --text-teal-500: #6b7280;
             --border-color: #e5e7eb;
             --edit-bg: #EDF2FC;
             --edit-text: #0E1B33;
@@ -239,7 +239,7 @@
         }
 
         .page-header p {
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             margin: 0;
             font-size: 0.875rem;
         }
@@ -325,7 +325,7 @@
             padding: 1rem 1.5rem;
             text-align: left;
             font-weight: 600;
-            color: var(--text-gray-700);
+            color: var(--text-teal-700);
             font-size: 0.875rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -355,27 +355,27 @@
         }
 
         .instructor-email {
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             max-width: 200px;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .instructor-phone {
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             white-space: nowrap;
         }
 
         .instructor-expertise,
         .instructor-qualifications {
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             max-width: 150px;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .instructor-bio {
-            color: var(--text-gray-600);
+            color: var(--text-teal-600);
             max-width: 200px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -432,7 +432,7 @@
         .empty-state {
             padding: 4rem 2rem;
             text-align: center;
-            color: var(--text-gray-500);
+            color: var(--text-teal-500);
         }
 
         .empty-state i {

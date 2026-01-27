@@ -14,9 +14,9 @@
       --body-background: #f9fafb;
       --card-background: #ffffff;
       --text-default: #333;
-      --text-gray-600: #4b5563;
-      --text-gray-700: #374151;
-      --text-gray-500: #6b7280;
+      --text-teal-600: #4b5563;
+      --text-teal-700: #374151;
+      --text-teal-500: #6b7280;
       --border-color: #e5e7eb;
       --edit-bg: #EDF2FC;
       --edit-text: #0E1B33;
@@ -220,7 +220,7 @@
 
     .courses-table th {
       background-color: var(--body-background);
-      color: var(--text-gray-500);
+      color: var(--text-teal-500);
       font-weight: 500;
       padding: 0.5rem 0.75rem;
       text-align: left;
@@ -232,7 +232,7 @@
     .courses-table td {
       padding: 0.5rem 0.75rem;
       border-bottom: 1px solid var(--border-color);
-      color: var(--text-gray-700);
+      color: var(--text-teal-700);
       vertical-align: middle;
       font-size: 0.8rem;
     }
@@ -282,7 +282,7 @@
     }
 
     .no-image-text {
-      color: var(--text-gray-500);
+      color: var(--text-teal-500);
       font-style: italic;
       font-size: 0.7rem;
     }
@@ -359,13 +359,13 @@
     .empty-state {
       padding: 3rem;
       text-align: center;
-      color: var(--text-gray-500);
+      color: var(--text-teal-500);
       font-size: 0.875rem;
     }
 
     .not-logged-in {
       text-align: center;
-      color: var(--text-gray-700);
+      color: var(--text-teal-700);
       padding: 2rem;
     }
 

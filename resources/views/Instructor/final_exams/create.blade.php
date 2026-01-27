@@ -4,250 +4,259 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Final Exam</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f2f9',
+                            100: '#e3e6f3',
+                            600: '#1a2d52',
+                            700: '#0E1B33',
+                            800: '#0a1426',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f9fafb;
-            padding: 2rem;
+        .animate-slide-in {
+            animation: slideIn 0.5s ease-out forwards;
         }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            padding: 2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        h1 {
-            color: #0E1B33;
-            margin-bottom: 2rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #374151;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 4px;
-            font-family: inherit;
-        }
-
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .question-card {
-            background: #f3f4f6;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            position: relative;
-        }
-
-        .question-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .question-number {
-            font-weight: 700;
-            color: #0E1B33;
-            font-size: 1.1rem;
-        }
-
-        .remove-question-btn {
-            background: #DC2626;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .remove-question-btn:hover {
-            background: #B91C1C;
-        }
-
-        .add-question-btn {
-            background: #0E1B33;
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-bottom: 1.5rem;
-        }
-
-        .add-question-btn:hover {
-            background: #1a2645;
-        }
-
-        .submit-btn {
-            background: #059669;
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .submit-btn:hover {
-            background: #047857;
-        }
-
-        .error {
-            background: #FEE2E2;
-            color: #DC2626;
-            padding: 1rem;
-            border-radius: 4px;
-            margin-bottom: 1rem;
-        }
-
-        .info-box {
-            background: #DBEAFE;
-            padding: 1rem;
-            border-radius: 4px;
-            margin-bottom: 2rem;
-            border-left: 4px solid #3B82F6;
-        }
-
-        .row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .total-marks-display {
-            background: #FEF3C7;
-            padding: 1rem;
-            border-radius: 4px;
-            margin: 1rem 0;
-            text-align: center;
-            font-weight: 600;
-        }
+        .question-card:nth-child(1) { animation-delay: 0.1s; }
+        .question-card:nth-child(2) { animation-delay: 0.15s; }
+        .question-card:nth-child(3) { animation-delay: 0.2s; }
+        .question-card:nth-child(4) { animation-delay: 0.25s; }
+        .question-card:nth-child(5) { animation-delay: 0.3s; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Create Final Exam</h1>
+<body class="bg-gray-50 min-h-screen font-sans antialiased">
 
-        <div class="info-box">
-            <strong>Important:</strong> You can save as draft or publish immediately. Passing mark is automatically set to 70%.
-        </div>
+    <div x-data="{ sidebarOpen: window.innerWidth >= 1024, sidebarCollapsed: false }" 
+         @resize.window="if (window.innerWidth >= 1024) sidebarOpen = true; else if (window.innerWidth < 1024) sidebarCollapsed = false"
+         class="flex min-h-screen">
+        <!-- Sidebar -->
+        @include('layouts.sidebar')
 
-        @if ($errors->any())
-            <div class="error">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+        <!-- Main Content -->
+        <main class="flex-1 transition-all duration-300"
+              :class="sidebarCollapsed && window.innerWidth >= 1024 ? 'lg:ml-20' : 'lg:ml-72'">
+            
+            <x-instructor-header :title="$pageTitle ?? 'Create Final Exam'" />
+
+            <!-- Page Content -->
+            <div class="p-6 lg:p-8 max-w-4xl mx-auto">
+                @auth
+                    <!-- Info Box -->
+                    <div class="bg-teal-50 rounded-2xl shadow-sm border border-gray-200 overflow-hidden mb-6 opacity-0 animate-slide-in">
+                        <div class="p-6">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-teal-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-info-circle text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-teal-900 mb-1">Important Information</h3>
+                                    <p class="text-teal-700">You can save as draft or publish immediately. Passing mark is automatically set to 70%.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Error Messages -->
+                    @if ($errors->any())
+                        <div class="bg-red-50 border-2 border-red-200 rounded-2xl p-6 mb-6 opacity-0 animate-slide-in" style="animation-delay: 0.1s;">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-white"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-bold text-red-900 mb-2">Please fix the following errors:</h3>
+                                    <ul class="space-y-1">
+                                        @foreach ($errors->all() as $error)
+                                            <li class="text-red-700 flex items-center gap-2">
+                                                <i class="fas fa-circle text-xs"></i>
+                                                {{ $error }}
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Form Card -->
+                    <div class="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden opacity-0 animate-slide-in" style="animation-delay: 0.15s;">
+                        <div class="px-12 py-6 border-b border-gray-200 bg-gray-50">
+                            <h2 class="text-2xl font-bold text-teal-800 flex items-center gap-3">
+                                Exam Details
+                            </h2>
+                        </div>
+                        
+                        <div class="p-12">
+                            <form action="{{ route('instructor.final-exams.store') }}" method="POST" id="examForm">
+                                @csrf
+
+                                <!-- Course Selection -->
+                                <div class="mb-6">
+                                    <label for="course_id" class="block text-sm font-bold text-teal-900 mb-2">
+                                        Select Course <span class="text-gray-600">*</span>
+                                    </label>
+                                    <select name="course_id" id="course_id" 
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium bg-white" 
+                                        required>
+                                        <option value="">-- Select Course --</option>
+                                        @foreach($courses as $course)
+                                            <option value="{{ $course->id }}" {{ old('course_id') == $course->id ? 'selected' : '' }}>
+                                                {{ $course->title }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Exam Title -->
+                                <div class="mb-6">
+                                    <label for="title" class="block text-sm font-bold text-teal-900 mb-2">
+                                        Exam Title <span class="text-gray-600">*</span>
+                                    </label>
+                                    <input type="text" name="title" id="title" value="{{ old('title') }}" 
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium" 
+                                        placeholder="Final Written Examination"
+                                        required>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="mb-6">
+                                    <label for="description" class="block text-sm font-bold text-teal-900 mb-2">
+                                        Description / Instructions
+                                    </label>
+                                    <textarea name="description" id="description" rows="4"
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium resize-none" 
+                                        placeholder="Provide instructions or overview for students">{{ old('description') }}</textarea>
+                                </div>
+
+                                <!-- Total Marks and Duration -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label for="total_marks" class="block text-sm font-bold text-teal-900 mb-2">
+                                            Total Marks <span class="text-gray-600">*</span>
+                                        </label>
+                                        <input type="number" name="total_marks" id="total_marks" 
+                                            value="{{ old('total_marks', 100) }}" min="1"
+                                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium" 
+                                            required>
+                                        <p class="text-sm text-teal-600 mt-1">Must match sum of question marks</p>
+                                    </div>
+
+                                    <div>
+                                        <label for="duration_minutes" class="block text-sm font-bold text-teal-900 mb-2">
+                                            Duration (minutes) <span class="text-gray-600">*</span>
+                                        </label>
+                                        <input type="number" name="duration_minutes" id="duration_minutes" 
+                                            value="{{ old('duration_minutes', 180) }}" min="30" max="480"
+                                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium" 
+                                            required>
+                                        <p class="text-sm text-teal-600 mt-1">Default: 180 minutes (3 hours)</p>
+                                    </div>
+                                </div>
+
+                                <hr class="my-8 border-gray-200">
+
+                                <!-- Questions Section Header -->
+                                <div class="flex items-center justify-between mb-6">
+                                    <h3 class="text-xl font-bold text-teal-900 flex items-center gap-2">
+                                        Exam Questions
+                                    </h3>
+                                    <button type="button" onclick="addQuestion()" 
+                                        class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 text-sm">
+                                        <i class="fas fa-plus"></i>
+                                        Add Question
+                                    </button>
+                                </div>
+
+                                <!-- Questions Container -->
+                                <div id="questions-container" class="space-y-4 mb-6">
+                                    <!-- Questions will be added here dynamically -->
+                                </div>
+
+                                <!-- Total Marks Display -->
+                                <div id="totalMarksCheck" class="bg-amber-50 rounded-xl p-6 text-center mb-6">
+                                    <div class="flex items-center justify-center gap-3">
+                                        <p class="text-lg font-semibold text-teal-900">
+                                            Total Question Marks: <span id="sumDisplay" class="text-amber-700">0</span> / <span id="targetMarks" class="text-amber-700">100</span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Publish Option -->
+                                <div class="bg-teal-50 rounded-xl border-1 border-teal-200 p-6 mb-6">
+                                    <label class="flex items-start gap-3 cursor-pointer group">
+                                        <input type="checkbox" name="publish_now" value="1" 
+                                            class="w-5 h-5 text-teal-600 rounded focus:ring-2 focus:ring-teal-500 mt-0.5 cursor-pointer">
+                                        <div>
+                                            <span class="text-sm font-bold text-teal-900 group-hover:text-teal-700 transition-colors">
+                                                <i class="fas fa-globe text-green-600 mr-2"></i>Publish immediately (make available to students now)
+                                            </span>
+                                            <p class="text-sm text-teal-600 mt-1">
+                                                If unchecked, exam will be saved as draft. You can publish it later.
+                                            </p>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex items-center gap-4 pt-6 border-t border-gray-200">
+                                    <button type="submit" 
+                                        class="flex-1 inline-flex items-center justify-center gap-2 px-8 py-3 bg-teal-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
+                                        <span>Create Final Exam</span>
+                                    </button>
+                                    
+                                    <a href="javascript:history.back()" 
+                                        class="inline-flex items-center gap-2 px-8 py-3 bg-white text-teal-700 border-2 border-teal-700 rounded-xl font-semibold hover:bg-teal-700 hover:text-white transition-all">
+                                        <i class="fas fa-arrow-left"></i>
+                                        <span>Cancel</span>
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                @else
+                    <!-- Not Logged In -->
+                    <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+                        <div class="p-16 text-center">
+                            <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <i class="fas fa-lock text-4xl text-red-600"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-teal-900 mb-3">Access Denied</h2>
+                            <p class="text-teal-600 mb-6">You need to be logged in to view this page.</p>
+                            <a href="/" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Go to Login
+                            </a>
+                        </div>
+                    </div>
+                @endauth
             </div>
-        @endif
-
-        <form action="{{ route('instructor.final-exams.store') }}" method="POST" id="examForm">
-            @csrf
-
-            <!-- Course Selection -->
-            <div class="form-group">
-                <label for="course_id">Select Course *</label>
-                <select name="course_id" id="course_id" required>
-                    <option value="">-- Select Course --</option>
-                    @foreach($courses as $course)
-                        <option value="{{ $course->id }}" {{ old('course_id') == $course->id ? 'selected' : '' }}>
-                            {{ $course->title }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- Exam Title -->
-            <div class="form-group">
-                <label for="title">Exam Title *</label>
-                <input type="text" name="title" id="title" value="{{ old('title') }}" 
-                       placeholder="e.g., Final Written Examination" required>
-            </div>
-
-            <!-- Description -->
-            <div class="form-group">
-                <label for="description">Description / Instructions</label>
-                <textarea name="description" id="description" 
-                          placeholder="Provide instructions or overview for students">{{ old('description') }}</textarea>
-            </div>
-
-            <!-- Total Marks and Duration -->
-            <div class="row">
-                <div class="form-group">
-                    <label for="total_marks">Total Marks *</label>
-                    <input type="number" name="total_marks" id="total_marks" 
-                           value="{{ old('total_marks', 100) }}" min="1" required>
-                    <small style="color: #6b7280;">Must match sum of question marks</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="duration_minutes">Duration (minutes) *</label>
-                    <input type="number" name="duration_minutes" id="duration_minutes" 
-                           value="{{ old('duration_minutes', 180) }}" min="30" max="480" required>
-                    <small style="color: #6b7280;">Default: 180 minutes (3 hours)</small>
-                </div>
-            </div>
-
-            <!-- Questions Section -->
-            <h2 style="margin: 2rem 0 1rem 0; color: #0E1B33;">Exam Questions</h2>
-
-            <div id="questions-container">
-                <!-- Questions will be added here dynamically -->
-            </div>
-
-            <button type="button" class="add-question-btn" onclick="addQuestion()" style="padding: 0.5rem 1rem; margin-bottom: 1rem;">
-                + Add Question
-            </button>
-
-            <div class="total-marks-display" id="totalMarksCheck">
-                Total Question Marks: <span id="sumDisplay">0</span> / <span id="targetMarks">100</span>
-            </div>
-
-            <!-- Publish Option -->
-            <div class="form-group" style="margin: 2rem 0;">
-                <label style="display: flex; align-items: center; cursor: pointer;">
-                    <input type="checkbox" name="publish_now" value="1" style="width: auto; margin-right: 0.5rem;">
-                    <span>Publish immediately (make available to students now)</span>
-                </label>
-                <small style="color: #6b7280; margin-left: 1.75rem;">
-                    If unchecked, exam will be saved as draft. You can publish it later.
-                </small>
-            </div>
-
-            <!-- Submit Button -->
-            <button type="submit" class="submit-btn" style="padding: 0.75rem 1.5rem; font-size: 0.95rem;">Create Final Exam</button>
-        </form>
+        </main>
     </div>
 
     <script>
@@ -267,33 +276,47 @@
             const container = document.getElementById('questions-container');
             
             const questionCard = document.createElement('div');
-            questionCard.className = 'question-card';
+            questionCard.className = 'question-card bg-gray-50 border-2 border-gray-200 rounded-2xl p-6 hover:border-gray-300 hover:shadow-lg transition-all duration-200 opacity-0 animate-slide-in';
             questionCard.innerHTML = `
-                <div class="question-header">
-                    <span class="question-number">Question ${questionCount}</span>
-                    <button type="button" class="remove-question-btn" onclick="removeQuestion(this)">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <h4 class="text-xl font-bold text-teal-900">Question ${questionCount}</h4>
+                    </div>
+                    <button type="button" onclick="removeQuestion(this)" 
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-all text-sm">
+                        <i class="fas fa-trash"></i>
                         Remove
                     </button>
                 </div>
 
-                <div class="form-group">
-                    <label>Question Text *</label>
-                    <textarea name="questions[${questionCount-1}][question_text]" required 
-                              placeholder="Enter the question..."></textarea>
+                <div class="mb-5">
+                    <label class="block text-sm font-bold text-teal-900 mb-2">
+                       Question Text <span class="text-gray-600">*</span>
+                    </label>
+                    <textarea name="questions[${questionCount-1}][question_text]" 
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium resize-none" 
+                        rows="3"
+                        placeholder="Enter the question..."
+                        required></textarea>
                 </div>
 
-                <div class="row">
-                    <div class="form-group">
-                        <label>Marks for this Question *</label>
-                        <input type="number" name="questions[${questionCount-1}][marks]" 
-                               min="1" required value="20" onchange="updateTotalMarks()">
-                    </div>
+                <div class="mb-5">
+                    <label class="block text-sm font-bold text-teal-900 mb-2">
+                        Marks for this Question <span class="text-gray-600">*</span>
+                    </label>
+                    <input type="number" name="questions[${questionCount-1}][marks]" 
+                        class="w-full md:w-48 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium" 
+                        min="1" value="20" onchange="updateTotalMarks()" required>
                 </div>
 
-                <div class="form-group">
-                    <label>Marking Criteria (Optional)</label>
+                <div>
+                    <label class="block text-sm font-bold text-teal-900 mb-2">
+                        Marking Criteria (Optional)
+                    </label>
                     <textarea name="questions[${questionCount-1}][marking_criteria]" 
-                              placeholder="Guidelines for grading this question..."></textarea>
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium resize-none" 
+                        rows="2"
+                        placeholder="Guidelines for grading this question..."></textarea>
                 </div>
             `;
             
@@ -315,7 +338,10 @@
         function updateQuestionNumbers() {
             const questions = document.querySelectorAll('.question-card');
             questions.forEach((card, index) => {
-                card.querySelector('.question-number').textContent = `Question ${index + 1}`;
+                const numberBadge = card.querySelector('.w-10.h-10 span');
+                const titleText = card.querySelector('h4');
+                if (numberBadge) numberBadge.textContent = index + 1;
+                if (titleText) titleText.textContent = `Question ${index + 1}`;
             });
         }
 
@@ -335,11 +361,15 @@
             // Visual feedback
             const display = document.getElementById('totalMarksCheck');
             if (sum === targetMarks) {
-                display.style.background = '#D1FAE5';
-                display.style.color = '#065F46';
+                display.className = 'bg-green-50 border-2 border-green-200 rounded-xl p-6 text-center mb-6';
+                display.querySelector('.fa-calculator').className = 'fas fa-check-circle text-green-600 text-xl';
+                display.querySelector('#sumDisplay').className = 'text-green-700';
+                display.querySelector('#targetMarks').className = 'text-green-700';
             } else {
-                display.style.background = '#FEF3C7';
-                display.style.color = '#92400E';
+                display.className = 'bg-amber-50 border-2 border-amber-200 rounded-xl p-6 text-center mb-6';
+                display.querySelector('.fa-check-circle, .fa-calculator').className = 'fas fa-calculator text-amber-600 text-xl';
+                display.querySelector('#sumDisplay').className = 'text-amber-700';
+                display.querySelector('#targetMarks').className = 'text-amber-700';
             }
         }
 

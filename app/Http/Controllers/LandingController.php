@@ -14,7 +14,7 @@ class LandingController extends Controller
         ->withCount('quizzes')
         ->get()
         ->filter(function ($course) {
-            return $course->quizzes_count == $course->video_count;
+            return $course->quizzes_count == $course->video_count && $course->hasPublishedFinalExam();
         });
 
     $uniqueCategories = $courses->pluck('category')->unique();

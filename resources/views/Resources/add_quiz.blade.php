@@ -4,485 +4,269 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Add Quiz</title>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#f0f2f9',
+              100: '#e3e6f3',
+              600: '#1a2d52',
+              700: '#0E1B33',
+              800: '#0a1426',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
   <style>
-    /* Custom CSS Variables */
-    :root {
-      --primary-color: #0E1B33;
-      --primary-light-hover-bg: #2D336B;
-      --body-background: #f9fafb;
-      --card-background: #ffffff;
-      --text-default: #333;
-      --text-gray-600: #4b5563;
-      --text-gray-700: #374151;
-      --text-gray-500: #6b7280;
-      --border-color: #e5e7eb;
-      --edit-bg: #EDF2FC;
-      --edit-text: #0E1B33;
-      --delete-bg: #FEF2F2;
-      --delete-icon: #DC2626;
-      --green-600: #059669;
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-
-    body {
-      font-family: 'Montserrat', sans-serif;
-      background-color: var(--body-background);
-      margin: 0;
-      display: flex;
-      min-height: 100vh;
+    .animate-slide-in {
+      animation: slideIn 0.5s ease-out forwards;
     }
-
-    /* Sidebar */
-    .sidebar {
-      width: 18rem;
-      background-color: var(--card-background);
-      min-height: 100vh;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      position: fixed;
-      left: 0;
-      top: 0;
-    }
-
-    .sidebar-header {
-      padding: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--primary-color);
-      font-weight: 700;
-      font-size: 1.25rem;
-    }
-
-    .sidebar-header img {
-      height: 2.5rem;
-    }
-
-    .sidebar-nav {
-      margin-top: 2.5rem;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .sidebar-nav a {
-      display: block;
-      padding: 0.75rem 1.5rem;
-      color: var(--primary-color);
-      font-weight: 500;
-      text-decoration: none;
-      transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-    }
-
-    .sidebar-nav a:hover {
-      background-color: #E3E6F3;
-      color: var(--primary-color);
-    }
-
-    .sidebar-nav a.active {
-      background-color: #E3E6F3;
-      color: var(--primary-color);
-    }
-
-
-    /* Main Content Wrapper */
-    .main-wrapper {
-      margin-left: 17.5rem;
-      flex: 1;
-    }
-    /* Back Link */
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 2.75rem;
-            border-radius: 0.25rem;
-            border: 2px solid var(--primary-color);
-            transition: all 0.2s ease-in-out;
-            margin-top: 1rem;
-            font-size: 0.875rem;
-        }
-
-        .back-link:hover {
-            background-color: var(--primary-color);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(14, 27, 51, 0.2);
-        }
-
-    /* Top bar */
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-    }
-
-    .top-bar-title {
-      font-size: 1.5rem;
-      font-weight: 400;
-      color: var(--primary-color);
-    }
-
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .user-info span {
-      color: var(--primary-color);
-      font-weight: 500;
-    }
-
-    .logout-button, .login-button, .signup-button {
-      padding: 0.5rem 0.75rem;
-      border-radius: 0.25rem;
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-      font-weight: 500;
-      transition: opacity 0.2s ease-in-out;
-    }
-
-    .logout-button, .signup-button {
-      background-color: var(--primary-color);
-      color: white;
-    }
-
-    .logout-button:hover, .signup-button:hover {
-      opacity: 0.9;
-    }
-
-    .login-button {
-      border: 1px solid var(--primary-color);
-      color: var(--primary-color);
-      background-color: transparent;
-    }
-
-    .login-button:hover {
-      background-color: var(--primary-light-hover-bg);
-      color: white;
-    }
-
-    .auth-buttons {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    /* Main Content */
-    .main-content {
-      padding: 2rem;
-    }
-
-    /* Form Styles */
-    .form-container {
-      background-color: var(--card-background);
-      border-radius: 0.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      padding: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .form-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--primary-color);
-      margin-bottom: 2rem;
-    }
-
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .form-label {
-      display: block;
-      font-weight: 500;
-      color: var(--primary-color);
-      margin-bottom: 0.5rem;
-    }
-
-    .form-input, .form-textarea, .form-select {
-      width: 100%;
-      border: 1px solid var(--border-color);
-      border-radius: 0.25rem;
-      padding: 0.75rem;
-      outline: none;
-      transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-      font-family: 'Montserrat', sans-serif;
-    }
-
-    .form-input:focus, .form-textarea:focus, .form-select:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 2px rgba(14, 27, 51, 0.2);
-    }
-
-    .form-textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
-
-    .form-input-small {
-      width: auto;
-      display: inline-block;
-      min-width: 80px;
-    }
-
-    /* Question Section */
-    .question-section {
-      border: 1px solid var(--border-color);
-      border-radius: 0.5rem;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      background-color: #fafbfc;
-    }
-
-    .question-title {
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: var(--primary-color);
-      margin-bottom: 1rem;
-    }
-
-    .option-group {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 0.75rem;
-      padding: 0.5rem;
-      background-color: var(--card-background);
-      border-radius: 0.25rem;
-      border: 1px solid var(--border-color);
-    }
-
-    .option-input {
-      flex: 1;
-      border: none;
-      outline: none;
-      padding: 0.25rem;
-    }
-
-    .radio-input {
-      margin: 0;
-    }
-
-    .radio-label {
-      font-size: 0.875rem;
-      color: var(--text-gray-600);
-      margin: 0;
-    }
-
-    /* Buttons */
-    .btn-primary {
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 0.25rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: opacity 0.2s ease-in-out;
-      font-family: 'Montserrat', sans-serif;
-    }
-
-    .btn-primary:hover {
-      opacity: 0.9;
-    }
-
-    .btn-secondary {
-      background-color: transparent;
-      color: var(--primary-color);
-      border: 1px solid var(--primary-color);
-      padding: 0.5rem 1rem;
-      border-radius: 0.25rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-      font-family: 'Montserrat', sans-serif;
-    }
-
-    .btn-secondary:hover {
-      background-color: var(--primary-color);
-      color: white;
-    }
-
-    .divider {
-      border: none;
-      border-top: 1px solid var(--border-color);
-      margin: 2rem 0;
-    }
-
-    .not-logged-in {
-      text-align: center;
-      color: var(--text-gray-700);
-    }
-
-    .login-link {
-      color: var(--primary-color);
-      text-decoration: none;
-      transition: text-decoration 0.2s ease-in-out;
-    }
-
-    .login-link:hover {
-      text-decoration: underline;
-    }
-
-    .course-info {
-      background-color: var(--edit-bg);
-      padding: 1rem;
-      border-radius: 0.25rem;
-      margin-bottom: 2rem;
-      color: var(--edit-text);
+    .question-section:nth-child(1) { animation-delay: 0.1s; }
+    .question-section:nth-child(2) { animation-delay: 0.15s; }
+    .question-section:nth-child(3) { animation-delay: 0.2s; }
+    .question-section:nth-child(4) { animation-delay: 0.25s; }
+    .question-section:nth-child(5) { animation-delay: 0.3s; }
+    
+    @media (min-width: 1024px) {
+      aside {
+        display: block !important;
+      }
     }
   </style>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen font-sans antialiased">
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <img src="/image/Edvantage.png" alt="Edvantage Logo">
-      <span></span>
+  @auth
+    <div x-data="{ sidebarOpen: window.innerWidth >= 1024, sidebarCollapsed: false }" 
+         @resize.window="if (window.innerWidth >= 1024) sidebarOpen = true; else if (window.innerWidth < 1024) sidebarCollapsed = false"
+         class="flex min-h-screen">
+      
+      <!-- Sidebar Component -->
+      @include('layouts.sidebar')
+
+      <!-- Main Content Wrapper -->
+      <main class="flex-1 transition-all duration-300"
+            :class="sidebarCollapsed && window.innerWidth >= 1024 ? 'lg:ml-20' : 'lg:ml-72'">
+        
+        <!-- Header -->
+        <x-instructor-header :title="$pageTitle ?? 'Add New Quiz'" />
+
+        <!-- Main Content -->
+        <div class="p-4 lg:p-6 max-w-7xl mx-auto px-20">
+          <!-- Course Info Card -->
+          <div class="bg-teal-600 rounded-2xl shadow-sm overflow-hidden mb-6 opacity-0 animate-slide-in">
+            <div class="p-6">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-book-open text-white text-sm"></i>
+                </div>
+                <div>
+                  <p class="text-sm text-teal-300 font-medium">Creating quiz for</p>
+                  <h3 class="text-lg font-bold text-white">{{ $course->title ?? 'Sample Course Title' }} - Lecture {{ $moduleNumber ?? '1' }}</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quiz Form Card -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden opacity-0 animate-slide-in" style="animation-delay: 0.15s;">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+              <h2 class="text-xl font-bold text-teal-900 flex items-center gap-3">
+                <div class="w-9 h-9 bg-teal-600 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-clipboard-question text-white text-sm"></i>
+                </div>
+                Quiz Details
+              </h2>
+            </div>
+            
+            <div class="p-6">
+              <form action="{{ route('quiz.store', ['course' => $course->id ?? 1, 'module' => $moduleNumber ?? 1]) }}" method="POST">
+                @csrf
+
+                <input type="hidden" name="course_id" value="{{ $course->id ?? 1 }}">
+                <input type="hidden" name="module_number" value="{{ $moduleNumber ?? 1 }}">
+
+                <!-- Quiz Title -->
+                <div class="mb-6">
+                  <label for="title" class="block text-sm font-bold text-teal-900 mb-2">
+                    <i class="fas fa-heading text-teal-700 mr-2"></i>Quiz Title
+                  </label>
+                  <input type="text" name="title" id="title" 
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-gray-900 focus:ring-2 focus:ring-teal-900/10 transition-all outline-none font-medium" 
+                    placeholder="Enter quiz title..."
+                    required>
+                </div>
+
+                <!-- Quiz Description -->
+                <div class="mb-6">
+                  <label for="description" class="block text-sm font-bold text-teal-900 mb-2">
+                    <i class="fas fa-align-left text-teal-700 mr-2"></i>Quiz Description
+                  </label>
+                  <textarea name="description" id="description" rows="4"
+                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-gray-900 focus:ring-2 focus:ring-teal-900/10 transition-all outline-none font-medium resize-none" 
+                    placeholder="Describe the quiz and what students will learn..."
+                    required></textarea>
+                </div>
+
+                <hr class="my-6 border-gray-200">
+
+                <!-- Number of Questions -->
+                <div class="mb-6">
+                  <label for="question_count" class="block text-sm font-bold text-teal-900 mb-2">
+                    <i class="fas fa-list-ol text-teal-700 mr-2"></i>Number of Questions
+                  </label>
+                  <div class="flex items-center gap-4">
+                    <input type="number" name="question_count" id="question_count" 
+                      class="w-32 px-4 py-2.5 border border-gray-300 rounded-lg focus:border-gray-900 focus:ring-2 focus:ring-teal-900/10 transition-all outline-none font-bold text-center text-lg" 
+                      min="1" max="20" value="5" required>
+                    <span class="text-sm text-teal-600 font-medium">Choose between 1 and 20 questions</span>
+                  </div>
+                </div>
+
+                <!-- Questions Section -->
+                <div id="questions-section" class="space-y-4">
+                  <!-- Questions will be generated by JavaScript -->
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row items-center gap-3 mt-6 pt-6 border-t border-gray-200">
+                  <button type="submit" class="w-full sm:flex-1 inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-800 transition-all hover:shadow-md">
+                    <i class="fas fa-check"></i>
+                    <span>Create Quiz</span>
+                  </button>
+                  
+                  <a href="javascript:history.back()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-white text-teal-700 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 hover:border-gray-900 transition-all">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Go Back</span>
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
-    <nav class="sidebar-nav">
-                @if(auth()->user()->role === 2)
-                    <a href="/admin_panel">Dashboard</a>
-                    <a href="/admin_panel/manage_courses" class="active">Manage Courses</a>
-                    <a href="/admin_panel/manage_user">Manage Users</a>
-                    <a href="/pending-courses">Manage Pending Courses ({{ $pendingCoursesCount ?? 0 }})</a>
-                @elseif(auth()->user()->role === 3)
-                    <a href="/instructor_homepage">Dashboard</a>
-                    <a href="/instructor/manage_courses">Manage Courses</a>
-                    <a href="/instructor/manage_user" class="active">Manage Users</a>
-                @endif
-            </nav>
-  </aside>
 
-  <!-- Main Content Wrapper -->
-  <div class="main-wrapper">
-    <!-- Top bar -->
-    <header class="top-bar">
-      <h1 class="top-bar-title">Add Quiz</h1>
-      @auth
-        <div class="user-info">
-          <span>{{ auth()->user()->name }}</span>
-          <form action="/logout" method="POST">
-            @csrf
-            <button class="logout-button">Logout</button>
-          </form>
-        </div>
-      @else
-        <div class="auth-buttons">
-          <a href="/login" class="login-button">Login</a>
-          <a href="/register" class="signup-button">Sign Up</a>
-        </div>
-      @endauth
-    </header>
+    <script>
+      document.getElementById('question_count').addEventListener('change', generateQuestions);
 
-    <!-- Main Content -->
-    <section class="main-content">
-      @auth
-        <div class="course-info">
-          <strong>Course:</strong> {{ $course->title ?? 'Sample Course Title' }} | <strong>Lecture:</strong> {{ $moduleNumber ?? '1' }}
-        </div>
+      function generateQuestions() {
+        const count = parseInt(document.getElementById('question_count').value);
+        const container = document.getElementById('questions-section');
+        container.innerHTML = '';
 
-        <div class="form-container">
-          <h2 class="form-title">Add Quiz for Lecture {{ $moduleNumber ?? '1' }} of {{ $course->title ?? 'Sample Course' }}</h2>
-          
-          <form action="{{ route('quiz.store', ['course' => $course->id ?? 1, 'module' => $moduleNumber ?? 1]) }}" method="POST">
-            @csrf
-
-            <input type="hidden" name="course_id" value="{{ $course->id ?? 1 }}">
-            <input type="hidden" name="module_number" value="{{ $moduleNumber ?? 1 }}">
-
-            <div class="form-group">
-              <label for="title" class="form-label">Quiz Title:</label>
-              <input type="text" name="title" id="title" class="form-input" required>
+        for (let i = 1; i <= count; i++) {
+          const qDiv = document.createElement('div');
+          qDiv.className = 'question-section bg-white border border-gray-200 rounded-xl p-5 hover:border-gray-900 hover:shadow-md transition-all duration-200 opacity-0 animate-slide-in';
+          qDiv.innerHTML = `
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-9 h-9 bg-teal-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <span class="text-white font-bold text-sm">${i}</span>
+              </div>
+              <h3 class="text-lg font-bold text-teal-900">Question ${i}</h3>
             </div>
 
-            <div class="form-group">
-              <label for="description" class="form-label">Quiz Description:</label>
-              <textarea name="description" id="description" class="form-textarea" required></textarea>
+            <div class="mb-4">
+              <label class="block text-sm font-bold text-teal-900 mb-2">
+                <i class="fas fa-question-circle text-teal-700 mr-2"></i>Question Text
+              </label>
+              <input type="text" name="questions[${i}][text]" 
+                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-gray-900 focus:ring-2 focus:ring-teal-900/10 transition-all outline-none font-medium" 
+                placeholder="Enter your question here..."
+                required>
             </div>
 
-            <hr class="divider">
-
-            <div class="form-group">
-              <label for="question_count" class="form-label">Number of Questions:</label>
-              <input type="number" name="question_count" id="question_count" class="form-input form-input-small" min="1" max="20" value="5" required>
+            <div class="mb-4">
+              <label class="block text-sm font-bold text-teal-900 mb-2">
+                <i class="fas fa-list text-teal-700 mr-2"></i>Number of Options
+              </label>
+              <div class="flex items-center gap-4">
+                <input type="number" name="questions[${i}][option_count]" 
+                  class="w-24 px-4 py-2 border border-gray-300 rounded-lg focus:border-gray-900 focus:ring-2 focus:ring-teal-900/10 transition-all outline-none font-bold text-center" 
+                  min="2" max="6" value="4" onchange="generateOptions(${i}, this.value)" required>
+                <span class="text-sm text-teal-600 font-medium">Options (2-6)</span>
+              </div>
             </div>
 
-            <div id="questions-section">
-              {{-- Questions will be generated by JavaScript --}}
+            <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+              <p class="text-sm font-bold text-teal-900 mb-3 flex items-center gap-2">
+                <i class="fas fa-check-circle text-green-600"></i>
+                Answer Options (Select the correct one)
+              </p>
+              <div id="options-${i}" class="space-y-2">
+                <!-- Options will be generated here -->
+              </div>
             </div>
+          `;
+          container.appendChild(qDiv);
+          generateOptions(i, 4); // Default 4 options
+        }
+      }
 
-            <button type="submit" class="btn-primary">Create Quiz</button>
-          </form>
-          <a href="javascript:history.back()" class="back-link">
-            Back
+      function generateOptions(qIndex, count) {
+        const optContainer = document.getElementById(`options-${qIndex}`);
+        optContainer.innerHTML = '';
+
+        for (let j = 1; j <= count; j++) {
+          const optionDiv = document.createElement('div');
+          optionDiv.className = 'flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-300 hover:border-gray-900 transition-all group';
+          optionDiv.innerHTML = `
+            <span class="w-7 h-7 bg-gray-50 rounded-md flex items-center justify-center border border-gray-300 font-bold text-teal-700 text-sm flex-shrink-0 group-hover:border-gray-900 group-hover:text-teal-900 transition-all">${j}</span>
+            <input type="text" name="questions[${qIndex}][options][${j}][text]" 
+              class="flex-1 px-3 py-2 border-0 bg-transparent outline-none font-medium text-teal-900 placeholder-teal-400" 
+              placeholder="Option ${j} text..." required>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <input type="radio" name="questions[${qIndex}][correct]" value="${j}" 
+                class="w-4 h-4 text-teal-900 focus:ring-2 focus:ring-teal-900 cursor-pointer" required>
+              <label class="text-sm font-bold text-teal-700 cursor-pointer select-none">Correct</label>
+            </div>
+          `;
+          optContainer.appendChild(optionDiv);
+        }
+      }
+
+      // Initial load
+      generateQuestions();
+    </script>
+
+  @else
+    <!-- Not Logged In -->
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden max-w-md w-full">
+        <div class="p-12 text-center">
+          <div class="w-20 h-20 bg-red-50 rounded-xl flex items-center justify-center mx-auto mb-6 border border-red-200">
+            <i class="fas fa-lock text-3xl text-red-600"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-teal-900 mb-3">Access Denied</h2>
+          <p class="text-teal-600 mb-6">You need to be logged in to view this page.</p>
+          <a href="/" class="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-800 transition-all hover:shadow-lg">
+            <i class="fas fa-sign-in-alt"></i>
+            Go to Login
           </a>
-
         </div>
-
-        <script>
-          document.getElementById('question_count').addEventListener('change', generateQuestions);
-
-          function generateQuestions() {
-            const count = parseInt(document.getElementById('question_count').value);
-            const container = document.getElementById('questions-section');
-            container.innerHTML = '';
-
-            for (let i = 1; i <= count; i++) {
-              const qDiv = document.createElement('div');
-              qDiv.className = 'question-section';
-              qDiv.innerHTML = `
-                <h4 class="question-title">Question ${i}</h4>
-                <div class="form-group">
-                  <label class="form-label">Question Text:</label>
-                  <input type="text" name="questions[${i}][text]" class="form-input" required>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">Number of Options:</label>
-                  <input type="number" name="questions[${i}][option_count]" class="form-input form-input-small" min="2" max="6" value="4" onchange="generateOptions(${i}, this.value)" required>
-                </div>
-
-                <div id="options-${i}">
-                  <!-- Options will be generated here -->
-                </div>
-              `;
-              container.appendChild(qDiv);
-              generateOptions(i, 4); // Default 4 options
-            }
-          }
-
-          function generateOptions(qIndex, count) {
-            const optContainer = document.getElementById(`options-${qIndex}`);
-            optContainer.innerHTML = '';
-
-            for (let j = 1; j <= count; j++) {
-              const optionDiv = document.createElement('div');
-              optionDiv.className = 'option-group';
-              optionDiv.innerHTML = `
-                <input type="text" name="questions[${qIndex}][options][${j}][text]" class="option-input" placeholder="Option ${j}" required>
-                <input type="radio" name="questions[${qIndex}][correct]" value="${j}" class="radio-input" required>
-                <label class="radio-label">Correct</label>
-              `;
-              optContainer.appendChild(optionDiv);
-            }
-          }
-
-          // Initial load
-          generateQuestions();
-        </script>
-
-      @else
-        <p class="not-logged-in">You are not logged in. <a href="/" class="login-link">Go to Login</a></p>
-      @endauth
-    </section>
-  </div>
-
+      </div>
+    </div>
+  @endauth
 </body>
 </html>

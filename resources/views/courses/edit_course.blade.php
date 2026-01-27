@@ -16,13 +16,13 @@
       --body-background: #f9fafb;
       --card-background: #ffffff;
       --text-default: #333;
-      --text-gray-600: #4b5563;
-      --text-gray-700: #374151;
-      --text-gray-500: #6b7280;
+      --text-teal-600: #4b5563;
+      --text-teal-700: #374151;
+      --text-teal-500: #6b7280;
       --border-color: #e5e7eb;
       --danger-color: #ef4444;
       --muted-color: #64748b;
-      --gray-100: #f3f4f6;
+      --teal-100: #f3f4f6;
       --blue-50: #eff6ff;
       --red-50: #fef2f2;
     }
@@ -166,7 +166,7 @@
     .form-label {
       font-size: 16px;
       font-weight: 500;
-      color: var(--text-gray-700);
+      color: var(--text-teal-700);
     }
 
     .required {
@@ -179,8 +179,8 @@
       border: 1px solid var(--border-color);
       border-radius: 6px;
       font-size: 16px;
-      background-color: var(--gray-100);
-      color: var(--text-gray-700);
+      background-color: var(--teal-100);
+      color: var(--text-teal-700);
       outline: none;
       transition: all 0.2s;
     }
