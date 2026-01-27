@@ -62,7 +62,7 @@
                    :title="collapsed ? 'Dashboard' : ''"
                    class="group flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200
                    {{ request()->routeIs('instructor.dashboard')
-                        ? 'text-white bg-teal-600 font-semibold shadow-sm'
+                        ? 'text-white bg-teal-700 font-semibold shadow-sm'
                         : 'text-teal-700 hover:text-teal-900 hover:bg-teal-50 font-medium' }}">
                     <i class="fas fa-home text-base w-5 flex-shrink-0"></i>
                     <span class="text-sm truncate" x-show="!collapsed" x-transition>Dashboard</span>
@@ -74,7 +74,7 @@
                    :title="collapsed ? 'Manage Courses' : ''"
                    class="group flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200
                     {{ $isManageCoursesActive
-                            ? 'text-white bg-teal-600 font-semibold shadow-sm'
+                            ? 'text-white bg-teal-700 font-semibold shadow-sm'
                             : 'text-teal-700 hover:text-teal-900 hover:bg-teal-50 font-medium' }}">
                     <i class="fas fa-book text-base w-5 flex-shrink-0"></i>
                     <span class="text-sm truncate" x-show="!collapsed" x-transition>Manage Courses</span>
@@ -88,7 +88,7 @@
                    :title="collapsed ? 'Dashboard' : ''"
                    class="group flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200
                    {{ request()->routeIs('admin.dashboard')
-                        ? 'text-white bg-teal-600 font-semibold shadow-sm'
+                        ? 'text-white bg-teal-700 font-semibold shadow-sm'
                         : 'text-teal-700 hover:text-teal-900 hover:bg-teal-50 font-medium' }}">
                     <i class="fas fa-home text-base w-5 flex-shrink-0"></i>
                     <span class="text-sm truncate" x-show="!collapsed" x-transition>Dashboard</span>
@@ -100,7 +100,7 @@
                    :title="collapsed ? 'Manage Courses' : ''"
                    class="group flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200
                    {{ request()->routeIs('admin.courses*')
-                        ? 'text-white bg-teal-600 font-semibold shadow-sm'
+                        ? 'text-white bg-teal-700 font-semibold shadow-sm'
                         : 'text-teal-700 hover:text-teal-900 hover:bg-teal-50 font-medium' }}">
                     <i class="fas fa-book text-base w-5 flex-shrink-0"></i>
                     <span class="text-sm truncate" x-show="!collapsed" x-transition>Manage Courses</span>
@@ -112,7 +112,7 @@
                    :title="collapsed ? 'Manage Users' : ''"
                    class="group flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200
                    {{ request()->routeIs('admin.users*')
-                        ? 'text-white bg-teal-600 font-semibold shadow-sm'
+                        ? 'text-white bg-teal-700 font-semibold shadow-sm'
                         : 'text-teal-700 hover:text-teal-900 hover:bg-teal-50 font-medium' }}">
                     <i class="fas fa-users text-base w-5 flex-shrink-0"></i>
                     <span class="text-sm truncate" x-show="!collapsed" x-transition>Manage Users</span>
@@ -124,7 +124,7 @@
                    :title="collapsed ? 'Pending Courses' : ''"
                    class="group flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200
                    {{ request()->routeIs('admin.pending*')
-                        ? 'text-white bg-teal-600 font-semibold shadow-sm'
+                        ? 'text-white bg-teal-700 font-semibold shadow-sm'
                         : 'text-teal-700 hover:text-teal-900 hover:bg-teal-50 font-medium' }}">
                     <i class="fas fa-clock text-base w-5 flex-shrink-0"></i>
                     <span class="text-sm truncate" x-show="!collapsed" x-transition>

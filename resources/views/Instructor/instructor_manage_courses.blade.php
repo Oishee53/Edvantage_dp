@@ -54,7 +54,7 @@
       <x-instructor-header :title="$pageTitle ?? 'Manage Courses'" />
 
       <!-- Main Content -->
-      <main class="flex-1 pr-10">
+      <main class="flex-1 px-10">
         <!-- Page Content -->
         <div class="p-4 lg:p-6 max-w-7xl mx-auto">
           @auth
@@ -68,11 +68,10 @@
             </div>
 
             <!-- Approved Courses Section -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
               <div class="px-5 py-4 border-b border-gray-100 bg-gray-50">
                 <div class="flex items-center justify-between">
                   <h2 class="text-lg font-bold text-teal-900 flex items-center gap-2">
-                    <i class="fas fa-check-circle text-green-600"></i>
                     Approved Courses
                   </h2>
                   @if(isset($courses))
@@ -95,7 +94,7 @@
                 @else
                   <div class="space-y-3">
                     @foreach($courses as $course)
-                      <div class="course-card group flex items-start gap-4 p-4 border border-gray-200 rounded-lg hover:border-gray-900 hover:shadow-md transition-all duration-200 bg-white hover:bg-gray-50 opacity-0 animate-fade-in-up">
+                      <div class="course-card group relative flex items-start gap-4 p-4 border border-gray-200 rounded-lg hover:border-gray-900 hover:shadow-md transition-all duration-200 bg-white hover:bg-gray-50 opacity-0 animate-fade-in-up">
                         <!-- Course Image -->
                         @if($course->image)
                           <img src="{{ asset('storage/' . $course->image) }}" alt="{{ $course->title }}" class="w-32 h-24 object-cover rounded-lg border border-gray-200 flex-shrink-0 group-hover:border-gray-900 transition-colors">
@@ -111,68 +110,73 @@
                           
                           <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
                             <div class="flex items-center gap-2">
-                              <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-tag text-blue-600 text-xs"></i>
-                              </div>
-                              <div class="min-w-0">
-                                <p class="text-xs text-gray-500">Category</p>
-                                <p class="text-sm font-semibold text-teal-900 truncate">{{ $course->category }}</p>
+                              <div class="min-w-0 space-y-2">
+                                <p class="text-sm font-medium text-teal-900 truncate">Category</p>
+                                <p class="text-xs text-gray-500">{{ $course->category }}</p>
                               </div>
                             </div>
                             
                             <div class="flex items-center gap-2">
-                              <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-video text-purple-600 text-xs"></i>
-                              </div>
-                              <div class="min-w-0">
-                                <p class="text-xs text-gray-500">Videos</p>
-                                <p class="text-sm font-semibold text-teal-900">{{ $course->video_count }}</p>
+                              <div class="min-w-0 space-y-1">
+                                <p class="text-sm font-medium text-teal-900">Videos</p>
+                                <p class="text-xs text-gray-500">{{ $course->video_count }}</p>
                               </div>
                             </div>
                             
                             <div class="flex items-center gap-2">
-                              <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-clock text-orange-600 text-xs"></i>
-                              </div>
-                              <div class="min-w-0">
-                                <p class="text-xs text-gray-500">Duration</p>
-                                <p class="text-sm font-semibold text-teal-900">{{ $course->total_duration }} hrs</p>
+                              <div class="min-w-0 space-y-1">
+                                <p class="text-sm font-medium text-teal-900">Duration</p>
+                                <p class="text-xs text-gray-500">{{ $course->total_duration }} hrs</p>
                               </div>
                             </div>
                             
                             <div class="flex items-center gap-2">
-                              <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-bangladeshi-taka-sign text-green-600 text-xs"></i>
-                              </div>
-                              <div class="min-w-0">
-                                <p class="text-xs text-gray-500">Price</p>
-                                <p class="text-sm font-semibold text-teal-900">৳{{ $course->price }}</p>
+                              <div class="min-w-0 space-y-1">
+                                <p class="text-sm font-medium text-teal-900">Price</p>
+                                <p class="text-xs text-gray-500">৳{{ $course->price }}</p>
                               </div>
                             </div>
                           </div>
+                            <!-- Action Dropdown (TOP RIGHT) -->
+                            <div class="absolute top-4 right-4">
+                                <button 
+                                    type="button"
+                                    class="p-2 rounded-lg hover:bg-gray-100 text-gray-600"
+                                    onclick="this.nextElementSibling.classList.toggle('hidden')"
+                                >
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
 
-                          <!-- Action Buttons -->
-                          <div class="flex flex-wrap gap-2">
-                            <a href="{{ url("/admin_panel/manage_resources/{$course->id}/modules") }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-800 transition-all text-xs">
-                              <i class="fas fa-folder-open"></i>
-                              Manage Modules
-                            </a>
-                            
-                            @php
-                              $finalExam = \App\Models\FinalExam::where('course_id', $course->id)->first();
-                            @endphp
-                            @if($finalExam)
-                              <a href="{{ route('instructor.final-exams.show', $finalExam->id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all text-xs">
-                                <i class="fas fa-file-alt"></i>
-                                View Final Exam
-                              </a>
-                            @else
-                              <a href="{{ route('instructor.final-exams.create') }}?course_id={{ $course->id }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-all text-xs">
-                                <i class="fas fa-plus-circle"></i>
-                                Create Final Exam
-                              </a>
-                            @endif
-                          </div>
+                                <div class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                                    <a 
+                                        href="{{ url("/admin_panel/manage_resources/{$course->id}/modules") }}"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    >
+                                        Manage Modules
+                                    </a>
+
+                                    @php
+                                        $finalExam = \App\Models\FinalExam::where('course_id', $course->id)->first();
+                                    @endphp
+
+                                    @if($finalExam)
+                                        <a 
+                                            href="{{ route('instructor.final-exams.show', $finalExam->id) }}"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            View Final Exam
+                                        </a>
+                                    @else
+                                        <a 
+                                            href="{{ route('instructor.final-exams.create') }}?course_id={{ $course->id }}"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Create Final Exam
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+
                         </div>
                       </div>
                     @endforeach
@@ -240,7 +244,7 @@
                               <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                 <i class="fas fa-tag text-blue-600 text-xs"></i>
                               </div>
-                              <div class="min-w-0">
+                              <div class="min-w-0 space-y-3">
                                 <p class="text-xs text-gray-500">Category</p>
                                 <p class="text-sm font-semibold text-teal-900 truncate">{{ $course->category }}</p>
                               </div>
@@ -250,17 +254,18 @@
                               <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                 <i class="fas fa-video text-purple-600 text-xs"></i>
                               </div>
-                              <div class="min-w-0">
+                              <div class="min-w-0 space-y-1">
                                 <p class="text-xs text-gray-500">Videos</p>
                                 <p class="text-sm font-semibold text-teal-900">{{ $course->video_count }}</p>
                               </div>
+
                             </div>
                             
                             <div class="flex items-center gap-2">
                               <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                 <i class="fas fa-clock text-orange-600 text-xs"></i>
                               </div>
-                              <div class="min-w-0">
+                              <div class="min-w-0 space-y-1">
                                 <p class="text-xs text-gray-500">Duration</p>
                                 <p class="text-sm font-semibold text-teal-900">{{ $course->total_duration }} hrs</p>
                               </div>
@@ -270,7 +275,7 @@
                               <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                 <i class="fas fa-bangladeshi-taka-sign text-green-600 text-xs"></i>
                               </div>
-                              <div class="min-w-0">
+                              <div class="min-w-0 space-y-1">
                                 <p class="text-xs text-gray-500">Price</p>
                                 <p class="text-sm font-semibold text-teal-900">৳{{ $course->price }}</p>
                               </div>

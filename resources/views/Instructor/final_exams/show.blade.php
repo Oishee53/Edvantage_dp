@@ -56,7 +56,7 @@
                             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                                 <h2 class="text-xl font-bold text-teal-900 flex items-center justify-between">
                                     <span>Exam Questions</span>
-                                    <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-bold">
+                                    <span class="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-bold">
                                         {{ $exam->questions()->count() }} Questions
                                     </span>
                                 </h2>
@@ -68,7 +68,7 @@
                                         <div class="bg-gray-50 border border-gray-200 rounded-xl p-5">
                                             <div class="flex items-start justify-between mb-3">
                                                 <h3 class="text-base font-bold text-teal-900">Question {{ $question->question_number }}</h3>
-                                                <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-lg text-sm font-bold">
+                                                <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-sm font-bold">
                                                     {{ $question->marks }} marks
                                                 </span>
                                             </div>
@@ -99,7 +99,6 @@
                             <div class="p-6 space-y-3">
                                 <a href="{{ route('instructor.final-exams.submissions', $exam->id) }}" 
                                     class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 text-white rounded-xl font-semibold hover:bg-teal-700 transition-all">
-                                    <i class="fas fa-eye"></i>
                                     <span>View Submissions</span>
                                     @if($pendingGrading > 0)
                                         <span class="ml-auto px-2 py-1 bg-red-500 text-white rounded-full text-xs font-bold">

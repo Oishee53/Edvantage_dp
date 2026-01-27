@@ -8,7 +8,7 @@
             buttonText: 'Sign up now',
             buttonLink: '/register',
             decorativeType: 'circles',
-            image: '/image/hero3.png',
+            image: '/image/hero3.jpg',
            
         },
         {

@@ -57,87 +57,8 @@
         <div class="flex-1 flex flex-col min-h-screen transition-all duration-300 "
              :class="sidebarCollapsed && window.innerWidth >= 1024 ? 'lg:ml-20' : 'lg:ml-72'">
             
-            <!-- Sticky Header -->
-            <header class="bg-white sticky top-0 z-40 border-b border-gray-200 shadow-sm">
-                <div class="px-4 lg:px-6 py-3">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <!-- Mobile Toggle Button -->
-                            <button 
-                                @click="sidebarOpen = !sidebarOpen" 
-                                class="lg:hidden p-2 hover:bg-teal-100 rounded-lg transition-colors">
-                                <i class="fas fa-bars text-lg text-teal-700"></i>
-                            </button>
-                            
-                            <div>
-                                <h1 class="text-xl lg:text-2xl font-bold text-teal-900">
-                                    {{ $pageTitle ?? 'Dashboard' }}
-                                </h1>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-2">
-                            <!-- Notifications -->
-                            <div class="relative" x-data="{ notifOpen: false }">
-                                <button @click="notifOpen = !notifOpen" 
-                                        class="relative w-10 h-10 flex items-center justify-center hover:bg-teal-100 rounded-lg transition-all duration-200">
-                                    <i class="fa fa-bell text-lg text-teal-700"></i>
-                                    @if(auth()->user()->unreadNotifications->count() > 0)
-                                        <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white text-[10px] px-1">
-                                            {{ auth()->user()->unreadNotifications->count() }}
-                                        </span>
-                                    @endif
-                                </button>
-
-                                <div x-show="notifOpen" 
-                                     @click.away="notifOpen = false"
-                                     x-transition:enter="transition ease-out duration-200"
-                                     x-transition:enter-start="opacity-0 scale-95"
-                                     x-transition:enter-end="opacity-100 scale-100"
-                                     x-transition:leave="transition ease-in duration-150"
-                                     x-transition:leave-start="opacity-100 scale-100"
-                                     x-transition:leave-end="opacity-0 scale-95"
-                                     class="absolute right-0 top-full mt-2 w-80 lg:w-96 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden"
-                                     style="display: none;">
-                                    <div class="px-4 py-3 border-b border-gray-200 bg-teal-50">
-                                        <h3 class="font-semibold text-teal-900 text-sm">Notifications</h3>
-                                    </div>
-                                    <div class="max-h-96 overflow-y-auto">
-                                        @forelse(auth()->user()->unreadNotifications as $notification)
-                                            <a href="#" class="block px-4 py-3 hover:bg-teal-50 transition-colors border-b border-gray-100 last:border-b-0">
-                                                <p class="text-sm font-medium text-teal-900 mb-1">Notification</p>
-                                                <p class="text-xs text-teal-500">{{ $notification->created_at->diffForHumans() }}</p>
-                                            </a>
-                                        @empty
-                                            <div class="px-4 py-10 text-center">
-                                                <div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                                                    <i class="fas fa-bell-slash text-2xl text-teal-400"></i>
-                                                </div>
-                                                <p class="text-sm text-teal-600 font-medium">No new notifications</p>
-                                            </div>
-                                        @endforelse
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Student View Link -->
-                            <a href="/homepage" class="flex items-center gap-2 px-3 lg:px-4 py-2 bg-teal-600 text-white rounded-lg font-medium text-sm hover:bg-teal-800 transition-all duration-200 hover:shadow-md">
-                                <i class="fas fa-user-graduate text-xs"></i>
-                                <span class="hidden sm:inline">Student View</span>
-                            </a>
-
-                            <!-- Logout -->
-                            <form action="/logout" method="POST" class="m-0">
-                                @csrf
-                                <button class="px-3 lg:px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium text-sm shadow-sm hover:shadow-md transition-all duration-200">
-                                    <i class="fas fa-sign-out-alt text-xs mr-1.5"></i>
-                                    <span class="hidden sm:inline">Logout</span>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </header>
+            <!-- Header -->
+            @include('components.instructor-header', ['title' => 'Dashboard'])
 
             <!-- Main Content -->
             <main class="flex-1 pr-10">
@@ -151,44 +72,32 @@
                     
 
                     <!-- Statistics Grid - Compact -->
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
                         <!-- Approved Courses -->
                         <div onclick="window.location='/instructor/manage_courses'" 
                              class="stat-card cursor-pointer bg-white rounded-lg p-4 shadow-sm hover:shadow-md border border-gray-200 hover:border-gray-900 transition-all duration-200 group opacity-0 animate-fade-in-up">
-                            <div class="flex items-start justify-between mb-2">
-                                <i class="fas fa-arrow-right text-teal-400 group-hover:text-teal-900 group-hover:translate-x-0.5 transition-all text-xs"></i>
-                            </div>
                             <div class="text-2xl font-semibold text-teal-900 mb-0.5">{{ isset($approvedCourses) ? count($approvedCourses) : 0 }}</div>
-                            <div class="text-xs font-medium text-teal-500 uppercase tracking-wide">Approved</div>
+                            <div class="text-xs font-medium text-teal-600 uppercase tracking-wide">Approved</div>
                         </div>
 
                         <!-- Pending Courses -->
                         <div onclick="window.location='/instructor/manage_courses'" 
                              class="stat-card cursor-pointer bg-white rounded-lg p-4 shadow-sm hover:shadow-md border border-gray-200 hover:border-gray-900 transition-all duration-200 group opacity-0 animate-fade-in-up">
-                            <div class="flex items-start justify-between mb-2">
-                                <i class="fas fa-arrow-right text-teal-400 group-hover:text-teal-900 group-hover:translate-x-0.5 transition-all text-xs"></i>
-                            </div>
                             <div class="text-2xl font-semibold text-teal-900 mb-0.5">{{ isset($pendingCourses) ? count($pendingCourses) : 0 }}</div>
-                            <div class="text-xs font-medium text-teal-500 uppercase tracking-wide">Pending</div>
+                            <div class="text-xs font-medium text-teal-600 uppercase tracking-wide">Pending</div>
                         </div>
 
                         <!-- Rejected Courses -->
                         <div onclick="window.location='{{ route('rejected.course.show') }}'" 
                              class="stat-card cursor-pointer bg-white rounded-lg p-4 shadow-sm hover:shadow-md border border-gray-200 hover:border-gray-900 transition-all duration-200 group opacity-0 animate-fade-in-up">
-                            <div class="flex items-start justify-between mb-2">
-                                <i class="fas fa-arrow-right text-teal-400 group-hover:text-teal-900 group-hover:translate-x-0.5 transition-all text-xs"></i>
-                            </div>
                             <div class="text-2xl font-semibold text-teal-900 mb-0.5">{{ isset($rejectedCourses) ? count($rejectedCourses) : 0 }}</div>
-                            <div class="text-xs font-medium text-teal-500 uppercase tracking-wide">Rejected</div>
+                            <div class="text-xs font-medium text-teal-600 uppercase tracking-wide">Rejected</div>
                         </div>
 
                         <!-- Total Earnings -->
                         <div class="stat-card bg-white rounded-lg p-4 shadow-sm hover:shadow-md border border-gray-200 hover:border-gray-900 transition-all duration-200 group opacity-0 animate-fade-in-up">
-                            <div class="flex items-start justify-between mb-2">
-                                <i class="fas fa-trending-up text-green-500 text-xs"></i>
-                            </div>
                             <div class="text-2xl font-semibold text-teal-900 mb-0.5">৳{{ number_format($totalEarnings ?? 0, 2) }}</div>
-                            <div class="text-xs font-medium text-teal-500 uppercase tracking-wide">Total Earnings</div>
+                            <div class="text-xs font-medium text-teal-600 uppercase tracking-wide">Total Earnings</div>
                         </div>
                     </div>
 
@@ -201,7 +110,7 @@
                                     My Courses
                                 </h3>
                                 @if(isset($coursesWithStudents) && count($coursesWithStudents) > 0)
-                                <span class="text-xs text-teal-500 font-medium">{{ count($coursesWithStudents) }} course{{ count($coursesWithStudents) !== 1 ? 's' : '' }}</span>
+                                <span class="text-xs text-teal-600 font-medium">{{ count($coursesWithStudents) }} course{{ count($coursesWithStudents) !== 1 ? 's' : '' }}</span>
                                 @endif
                             </div>
                         </div>
@@ -213,7 +122,7 @@
                                              class="group flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-gray-900 hover:shadow-sm transition-all duration-200 cursor-pointer bg-white hover:bg-teal-50">
                                             <div class="flex-1 min-w-0 pr-3">
                                                 <h4 class="text-sm font-medium text-teal-900 mb-0.5 truncate">{{ $course->title }}</h4>
-                                                <p class="text-xs text-teal-500 line-clamp-1">{{ Str::limit($course->description, 60) }}</p>
+                                                <p class="text-xs text-teal-600 line-clamp-1">{{ Str::limit($course->description, 60) }}</p>
                                             </div>
                                             <div class="flex items-center gap-2 flex-shrink-0">
                                                 <div class="flex items-center gap-1.5 px-2.5 py-1 bg-teal-600 text-white rounded-md text-xs font-medium group-hover:bg-teal-800 transition-colors">
@@ -231,7 +140,7 @@
                                         <i class="fas fa-book-open text-xl text-teal-400"></i>
                                     </div>
                                     <h4 class="text-base font-semibold text-teal-900 mb-1">No Courses Yet</h4>
-                                    <p class="text-sm text-teal-500 mb-4 max-w-md mx-auto">Start by creating your first course and share your knowledge with students!</p>
+                                    <p class="text-sm text-teal-600 mb-4 max-w-md mx-auto">Start by creating your first course and share your knowledge with students!</p>
                                     <a href="/instructor/manage_courses" 
                                        class="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium shadow-sm hover:bg-teal-800 transition-all hover:shadow-md">
                                         <i class="fas fa-plus" style="font-size: 10px;"></i>
@@ -299,7 +208,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <h4 class="text-sm font-medium text-teal-900 truncate">${student.name}</h4>
-                                <p class="text-xs text-teal-500 truncate mb-0.5">${student.email}</p>
+                                <p class="text-xs text-teal-600 truncate mb-0.5">${student.email}</p>
                                 <p class="text-xs text-teal-400 flex items-center gap-1">
                                     <i class="fas fa-calendar-alt" style="font-size: 9px;"></i>
                                     ${enrollDate}
@@ -315,7 +224,7 @@
                         <div class="w-14 h-14 bg-teal-100 rounded-lg flex items-center justify-center mx-auto mb-3">
                             <i class="fas fa-users text-xl text-teal-400"></i>
                         </div>
-                        <p class="text-sm text-teal-500 font-medium">No students enrolled yet</p>
+                        <p class="text-sm text-teal-600 font-medium">No students enrolled yet</p>
                     </div>
                 `;
             }
