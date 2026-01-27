@@ -4,22 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $course->title }} - Lectures</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        i[class^="fa-"], i[class*=" fa-"] {
+            font-family: "Font Awesome 6 Free" !important;
+            font-style: normal;
+            font-weight: 900 !important;
         }
 
         body {
-            font-family: 'Montserrat', sans-serif;
             background-color: #f9fafb;
             color: #333;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 550px;
             margin: 0 auto;
             padding: 2rem 1rem;
         }
@@ -28,16 +37,16 @@
         .course-header {
             background: white;
             border-radius: 8px;
-            padding: 2rem;
+            padding: 1.5rem;
             margin-bottom: 2rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             border: 1px solid #e5e7eb;
         }
 
         .course-title {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            color: #0E1B33;
+            color: #1f2937;
             margin-bottom: 0.5rem;
         }
 
@@ -64,8 +73,8 @@
         .module-card {
             background: white;
             border-radius: 8px;
-            padding: 1.25rem 1.5rem;
-            margin-bottom: 0.75rem;
+            padding: 0.875rem 1rem;
+            margin-bottom: 0.65rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             border: 1px solid #e5e7eb;
             transition: all 0.2s ease;
@@ -77,45 +86,45 @@
         }
 
         .module-card:hover {
-            border-color: #0E1B33;
-            box-shadow: 0 4px 8px rgba(14, 27, 51, 0.1);
+            border-color: #0d7377;
+            box-shadow: 0 4px 8px rgba(13, 115, 119, 0.1);
             transform: translateY(-1px);
         }
 
         .module-left {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .module-number {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             background: #f3f4f6;
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            color: #0E1B33;
-            font-size: 0.95rem;
+            color: #0d7377;
+            font-size: 0.85rem;
             transition: all 0.2s;
         }
 
         .module-card:hover .module-number {
-            background: #0E1B33;
+            background: #0d7377;
             color: white;
         }
 
         .module-info h3 {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
-            color: #0E1B33;
-            margin-bottom: 0.25rem;
+            color: #1f2937;
+            margin-bottom: 0.2rem;
         }
 
         .module-info p {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #6b7280;
         }
 
@@ -125,7 +134,7 @@
         }
 
         .module-card:hover .module-arrow {
-            color: #0E1B33;
+            color: #0d7377;
             transform: translateX(4px);
         }
 
@@ -154,7 +163,7 @@
         .empty-state h3 {
             font-size: 1.1rem;
             font-weight: 600;
-            color: #0E1B33;
+            color: #1f2937;
             margin-bottom: 0.5rem;
         }
 
@@ -189,7 +198,7 @@
         .final-exam-card {
             background: white;
             border-radius: 8px;
-            padding: 1.5rem;
+            padding: 1.25rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             border: 2px solid #e5e7eb;
         }
@@ -198,37 +207,37 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
+            margin-bottom: 0.875rem;
+            padding-bottom: 0.875rem;
             border-bottom: 1px solid #f3f4f6;
         }
 
         .exam-title-section {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.625rem;
         }
 
         .exam-icon {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             background: #f3f4f6;
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #0E1B33;
+            color: #0d7377;
         }
 
         .exam-title {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
-            color: #0E1B33;
+            color: #1f2937;
             margin: 0;
         }
 
         .exam-subtitle {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #6b7280;
             margin-top: 0.1rem;
         }
@@ -293,7 +302,7 @@
         .stat-value {
             font-size: 1.1rem;
             font-weight: 700;
-            color: #0E1B33;
+            color: #1f2937;
         }
 
         /* Exam Actions - Compact */
@@ -316,26 +325,26 @@
         }
 
         .btn-primary {
-            background: #0E1B33;
+            background: #0d7377;
             color: white;
-            border: 2px solid #0E1B33;
+            border: 2px solid #0d7377;
         }
 
         .btn-primary:hover {
-            background: #1a2645;
-            border-color: #1a2645;
+            background: #0a5c5f;
+            border-color: #0a5c5f;
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(14, 27, 51, 0.15);
+            box-shadow: 0 4px 8px rgba(13, 115, 119, 0.2);
         }
 
         .btn-secondary {
             background: white;
-            color: #0E1B33;
+            color: #0d7377;
             border: 2px solid #e5e7eb;
         }
 
         .btn-secondary:hover {
-            border-color: #0E1B33;
+            border-color: #0d7377;
             background: #f9fafb;
         }
 
@@ -354,7 +363,7 @@
         /* Notice Box - Compact */
         .notice-box {
             background: #f9fafb;
-            border-left: 3px solid #0E1B33;
+            border-left: 3px solid #0d7377;
             padding: 0.75rem;
             border-radius: 4px;
             margin-top: 0.75rem;
@@ -367,7 +376,7 @@
         }
 
         .notice-box strong {
-            color: #0E1B33;
+            color: #0d7377;
         }
 
         /* Submitted Info - Compact */
@@ -386,7 +395,7 @@
         }
 
         .submitted-info strong {
-            color: #0E1B33;
+            color: #1f2937;
             font-size: 0.8rem;
         }
 
@@ -412,10 +421,13 @@
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <!-- Course Header -->
-        <div class="course-header">
+<body class="px-20 pt-5">
+    @include('layouts.header')
+
+    <div class="pt-24">
+        <div class="container">
+            <!-- Course Header -->
+            <div class="course-header">
             <h1 class="course-title">{{ $course->title }}</h1>
             <p class="course-subtitle">Course Lectures</p>
             
@@ -569,6 +581,7 @@
                 @endif
             </div>
         @endif
+        </div>
     </div>
 </body>
 </html>
