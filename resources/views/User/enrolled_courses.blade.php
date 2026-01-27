@@ -17,121 +17,169 @@
             font-style: normal;
             font-weight: 900 !important;
         }
+        
+        .course-card {
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .course-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .course-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%);
+        }
+        
+        .progress-ring {
+            transition: stroke-dashoffset 0.5s ease;
+        }
     </style>
 </head>
 <body class="bg-gray-50 px-20 pt-5">
     @include('layouts.header')
 
-    <main class="pt-24 pb-12">
+    <main class="pt-24 pb-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
-            <!-- Page Header -->
-            <div class="mb-12">
-                <h1 class="text-4xl md:text-4xl font-bold text-gray-900 mb-3">My Courses</h1>
-                <p class="text-lg text-gray-600">Continue your learning journey</p>
+            <!-- Recent Activity Section (Only courses with progress > 0) -->
+            @php
+                $recentCourses = collect($enrolledCourses)->filter(function($course) use ($courseProgress) {
+                    $progress = $courseProgress[$course->id] ?? ['completion_percentage' => 0];
+                    return $progress['completion_percentage'] > 0;
+                });
+            @endphp
+
+            @if($recentCourses->count() > 0)
+            <div class="mb-16">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-8">Recent activity</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach ($recentCourses as $course)
+                        @php
+                            $progress = $courseProgress[$course->id] ?? ['completed_videos' => 0, 'total_videos' => 0, 'completion_percentage' => 0];
+                        @endphp
+
+                        <a href="{{ route('user.course.modules', $course->id) }}" class="course-card block rounded-2xl overflow-hidden shadow-md hover:shadow-xl group">
+                            <!-- Course Image with Overlay -->
+                            <div class="relative h-72">
+                                <img src="{{ asset('storage/' . $course->image) }}" 
+                                     alt="{{ $course->title }}" 
+                                     class="w-full h-full object-cover">
+                                
+                                <!-- Gradient Overlay -->
+                                <div class="course-overlay absolute inset-0"></div>
+                                
+                                <!-- Content Overlay -->
+                                <div class="absolute inset-0 p-6 flex flex-col justify-between">
+                                    <!-- Top Section -->
+                                    <div class="flex items-start justify-between">
+                                        <!-- Progress Badge -->
+                                        @if($progress['completion_percentage'] == 100)
+                                        <div class="flex items-center gap-2 bg-green-500/90 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                                            <i class="fas fa-check text-white text-xs"></i>
+                                            
+                                        </div>
+                                        @else
+                                        <div class="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                                            <span class="text-xs font-semibold text-gray-700">Continue Course</span>
+                                        </div>
+                                        @endif
+                                        
+                                        <!-- Play Button -->
+                                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                                            <i class="fas fa-play text-white text-sm ml-0.5"></i>
+                                        </div>
+                                    </div>
+
+                                    <!-- Bottom Section -->
+                                    <div>
+                                        <h3 class="text-white font-semibold text-lg mb-2 line-clamp-2 leading-snug">
+                                            {{ $course->title }}
+                                        </h3>
+                                        
+                                        <!-- Progress Info -->
+                                        <div class="flex items-center justify-between text-white/90 text-xs mb-2">
+                                            <span>Completed {{ $progress['completed_videos'] ?? 0 }}/{{ $progress['total_videos'] ?? 0 }}</span>
+                                        </div>
+                                        
+                                        <!-- Progress Bar -->
+                                        <div class="h-1 bg-white/20 rounded-full overflow-hidden">
+                                            <div class="h-full bg-white rounded-full transition-all duration-1000" 
+                                                 style="width: {{ $progress['completion_percentage'] ?? 0 }}%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
             </div>
+            @endif
 
-            <!-- Courses Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                @forelse ($enrolledCourses as $course)
-                    @php
-                        $progress = $courseProgress[$course->id] ?? ['completed_videos' => 0, 'total_videos' => 0, 'completion_percentage' => 0];
-                    @endphp
+            <!-- All Courses Section -->
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-900 mb-8">All</h2>
 
-                    <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg hover:border-teal-500 transition-all group">
-                        <!-- Course Image -->
-                        <div class="relative overflow-hidden h-48">
-                            <img src="{{ asset('storage/' . $course->image) }}" 
-                                 alt="{{ $course->title }}" 
-                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            
-                            <!-- Progress Badge -->
-                            @if($progress['completion_percentage'] == 100)
-                            <div class="absolute top-3 right-3">
-                                <div class="w-10 h-10 rounded-full bg-green-500 border-2 border-white flex items-center justify-center shadow-lg">
-                                    <i class="fas fa-check text-white text-sm"></i>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    @forelse ($enrolledCourses as $course)
+                        @php
+                            $progress = $courseProgress[$course->id] ?? ['completed_videos' => 0, 'total_videos' => 0, 'completion_percentage' => 0];
+                        @endphp
+                        
+                        <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                            <a href="{{ route('user.course.modules', $course->id) }}" class="block">
+                                <!-- Course Thumbnail -->
+                                <div class="relative h-40">
+                                    <img src="{{ asset('storage/' . $course->image) }}" 
+                                         alt="{{ $course->title }}" 
+                                         class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                                    
+                                    <!-- Play Button -->
+                                    <div class="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center">
+                                        <i class="fas fa-play text-gray-700 text-xs ml-0.5"></i>
+                                    </div>
+                                    
+                                    <!-- Step Info -->
+                                    <div class="absolute bottom-2 left-2 text-white text-xs font-medium">
+                                        Step {{ $progress['completed_videos'] ?? 0 }}/{{ $progress['total_videos'] ?? 0 }}
+                                    </div>
                                 </div>
-                            </div>
-                            @else
-                            <div class="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full shadow-md">
-                                <span class="text-sm font-bold text-teal-600">{{ $progress['completion_percentage'] }}%</span>
-                            </div>
-                            @endif
-                        </div>
-
-                        <!-- Course Content -->
-                        <div class="p-6 space-y-4">
-                            <!-- Course Title -->
-                            <a href="{{ route('user.course.modules', $course->id) }}" 
-                               class="block text-xl font-bold text-gray-900 hover:text-teal-600 transition-colors line-clamp-2 min-h-[2rem]">
-                                {{ $course->title }}
-                            </a>
-
-                            <!-- Instructor -->
-                            <div class="flex items-center gap-2 text-sm text-gray-600">
-                                <i class="fas fa-chalkboard-teacher text-teal-600"></i>
-                                <span class="font-medium">{{ $course->instructor->name ?? 'Instructor' }}</span>
-                            </div>
-
-                            <!-- Description -->
-                            <p class="text-sm text-gray-600 line-clamp-2">{{ $course->description }}</p>
-
-                            <!-- Progress Bar -->
-                            <div class="space-y-2">
-                                <div class="flex items-center justify-between text-sm">
-                                    <span class="text-gray-600 font-medium">
-                                        {{ $progress['completed_videos'] ?? 0 }} / {{ $progress['total_videos'] ?? 0 }} videos
-                                    </span>
-                                    <span class="font-bold text-teal-600">{{ $progress['completion_percentage'] ?? 0 }}%</span>
+                                
+                                <!-- Course Info -->
+                                <div class="p-4">
+                                    <h3 class="font-semibold text-gray-900 text-sm mb-2 line-clamp-2 leading-tight">
+                                        {{ $course->title }}
+                                    </h3>
+                                    <p class="text-xs text-gray-500">
+                                        Course, {{ $course->total_duration ?? '0' }} hours
+                                    </p>
                                 </div>
-                                <div class="h-2.5 bg-gray-200 rounded-full overflow-hidden">
-                                    <div class="h-full bg-teal-600 rounded-full transition-all duration-1000" 
-                                         style="width: {{ $progress['completion_percentage'] ?? 0 }}%"></div>
-                                </div>
-                            </div>
-
-                            <!-- Course Stats -->
-                            <div class="flex items-center justify-between text-sm text-gray-600 pt-2 border-t border-gray-200">
-                                <div class="flex items-center gap-1.5">
-                                    <i class="fas fa-play-circle text-teal-600"></i>
-                                    <span>{{ $course->video_count ?? 0 }} lectures</span>
-                                </div>
-                                <div class="flex items-center gap-1.5">
-                                    <i class="fas fa-clock text-teal-600"></i>
-                                    <span>{{ $course->total_duration ?? '0' }}h</span>
-                                </div>
-                            </div>
-
-                            <!-- Continue Button -->
-                            <a href="{{ route('user.course.modules', $course->id) }}" 
-                               class="block w-full py-3 bg-teal-600 hover:bg-teal-700 text-white text-center font-semibold rounded-lg transition-colors shadow-md mt-4">
-                                <i class="fas fa-play mr-2"></i>
-                                Continue Learning
                             </a>
                         </div>
-                    </div>
 
-                @empty
-                    <!-- Empty State -->
-                    <div class="col-span-full bg-white rounded-xl shadow-md border border-gray-200 p-12">
-                        <div class="text-center max-w-md mx-auto">
-                            <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-teal-100 flex items-center justify-center">
-                                <i class="fas fa-book-open text-5xl text-teal-600"></i>
+                    @empty
+                        <!-- Empty State -->
+                        <div class="col-span-full bg-white rounded-2xl shadow-md p-16">
+                            <div class="text-center max-w-md mx-auto">
+                                <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 flex items-center justify-center">
+                                    <i class="fas fa-book-open text-4xl text-gray-300"></i>
+                                </div>
+                                
+                                <h3 class="text-2xl font-semibold text-gray-900 mb-3">No courses yet</h3>
+                                <p class="text-gray-500 mb-8 text-sm">
+                                    Start your learning journey by enrolling in a course
+                                </p>
+                                
+                                <a href="/homepage" 
+                                   class="inline-block px-8 py-3 bg-teal-600 text-white text-sm font-medium rounded-xl hover:bg-teal-700 transition-colors">
+                                    Browse Courses
+                                </a>
                             </div>
-                            
-                            <h3 class="text-2xl font-bold text-gray-900 mb-3">Begin Your Learning Journey</h3>
-                            <p class="text-gray-600 mb-8 leading-relaxed">
-                                Explore our comprehensive course catalog to advance your skills
-                            </p>
-                            
-                            <a href="/homepage" 
-                               class="inline-block px-8 py-3 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 transition-colors shadow-md">
-                                Browse Courses
-                            </a>
                         </div>
-                    </div>
-                @endforelse
+                    @endforelse
+                </div>
             </div>
         </div>
     </main>
@@ -139,7 +187,7 @@
     <script>
         // Smooth progress bar animation on load
         window.addEventListener('load', function() {
-            const progressBars = document.querySelectorAll('.bg-teal-600.rounded-full');
+            const progressBars = document.querySelectorAll('.bg-white.rounded-full');
             progressBars.forEach(bar => {
                 const width = bar.style.width;
                 bar.style.width = '0%';
