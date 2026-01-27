@@ -17,7 +17,7 @@
             </div>
             <button 
                 onclick="toggleNewThread()" 
-                class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
                 <i class="fas fa-plus"></i>
                 <span>New Thread</span>
             </button>
