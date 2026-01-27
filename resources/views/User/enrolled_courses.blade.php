@@ -32,7 +32,7 @@
             </div>
 
             <!-- Courses Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-15">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                 @forelse ($enrolledCourses as $course)
                     @php
                         $progress = $courseProgress[$course->id] ?? ['completed_videos' => 0, 'total_videos' => 0, 'completion_percentage' => 0];

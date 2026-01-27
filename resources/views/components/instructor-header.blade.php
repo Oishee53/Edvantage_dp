@@ -23,7 +23,7 @@
             <div class="flex items-center gap-2">
                 <!-- Notifications -->
                 <div class="relative notifications">
-                    <button onclick="toggleNotifications()" class="relative w-10 h-10 flex items-center justify-center hover:bg-teal-100 rounded-lg transition-all duration-200">
+                    <button type="button" onclick="toggleNotifications()" class="relative w-10 h-10 flex items-center justify-center hover:bg-teal-100 rounded-lg transition-all duration-200">
                         <i class="fa fa-bell text-lg text-teal-700"></i>
                         @if(auth()->user()->unreadNotifications->count() > 0)
                             <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white text-[10px] px-1">
@@ -32,7 +32,7 @@
                         @endif
                     </button>
 
-                    <div id="notifDropdown" class="notif-dropdown absolute right-0 top-full mt-2 w-80 lg:w-96 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
+                    <div id="notifDropdown" class="notif-dropdown hidden absolute right-0 top-full mt-2 w-80 lg:w-96 bg-white rounded-xl shadow-xl border border-gray-200 z-50">
                         <div class="px-4 py-3 border-b border-gray-200 bg-teal-50">
                             <h3 class="font-semibold text-teal-900 text-sm">Notifications</h3>
                         </div>
@@ -116,7 +116,7 @@
                 <!-- Logout -->
                 <form action="/logout" method="POST" class="m-0">
                     @csrf
-                    <button class="px-3 lg:px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium text-sm shadow-sm hover:shadow-md transition-all duration-200">
+                    <button type="submit" class="px-3 lg:px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium text-sm shadow-sm hover:shadow-md transition-all duration-200">
                         <i class="fas fa-sign-out-alt text-xs mr-1.5"></i>
                         <span class="hidden sm:inline">Logout</span>
                     </button>
@@ -126,23 +126,10 @@
     </div>
 </header>
 
-<style>
-    .notif-dropdown {
-        max-height: 0;
-        opacity: 0;
-        overflow: hidden;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .notif-dropdown.show {
-        max-height: 400px;
-        opacity: 1;
-    }
-</style>
-
 <script>
     function toggleNotifications() {
         const dropdown = document.getElementById('notifDropdown');
-        dropdown.classList.toggle('show');
+        dropdown.classList.toggle('hidden');
     }
 
     // Close dropdown when clicking outside
@@ -151,7 +138,7 @@
         const dropdown = document.getElementById('notifDropdown');
         
         if (notifContainer && !notifContainer.contains(event.target)) {
-            dropdown.classList.remove('show');
+            dropdown.classList.add('hidden');
         }
     });
 </script>

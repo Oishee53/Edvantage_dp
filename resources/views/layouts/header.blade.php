@@ -102,7 +102,12 @@
                     
                     <!-- Notification Button -->
                     <div class="relative" x-data="{ open: false }">
-                        <button @mouseenter="open = true" @mouseleave="open = false" class="w-11 h-11 flex items-center justify-center rounded-full border border-gray-300 hover:border-teal-500 hover:bg-teal-50 transition-all relative" title="Notifications">
+                        <button 
+                            type="button"
+                            @mouseenter="open = true" 
+                            @mouseleave="open = false" 
+                            class="w-11 h-11 flex items-center justify-center rounded-full border border-gray-300 hover:border-teal-500 hover:bg-teal-50 transition-all relative" 
+                            title="Notifications">
                             <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                             </svg>
@@ -125,74 +130,87 @@
                         </button>
                         
                         <!-- Notification Dropdown -->
-                        <div x-show="open" 
-                             @mouseenter="open = true" 
-                             @mouseleave="open = false"
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0 scale-95"
-                             x-transition:enter-end="opacity-100 scale-100"
-                             x-transition:leave="transition ease-in duration-150"
-                             x-transition:leave-start="opacity-100 scale-100"
-                             x-transition:leave-end="opacity-0 scale-95"
-                             class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden"
-                             style="display: none;">
+                        <div 
+                            x-show="open" 
+                            @mouseenter="open = true" 
+                            @mouseleave="open = false"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 scale-95"
+                            x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 scale-100"
+                            x-transition:leave-end="opacity-0 scale-95"
+                            class="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50"
+                            style="display: none;">
                             
-                            <div class="px-5 py-4 bg-gray-50 border-b border-gray-200">
-                                <h4 class="font-semibold text-gray-900">Notifications</h4>
+                            <div class="px-4 py-3 bg-teal-50 border-b border-gray-200">
+                                <h4 class="font-semibold text-teal-900 text-sm">Notifications</h4>
                             </div>
                             
                             <div class="max-h-96 overflow-y-auto">
                                 @if($relevantCount > 0)
                                     @foreach($relevantNotifications as $notification)
                                         @if($notification->type === \App\Notifications\QuestionRejectedNotification::class)
-                                            <div class="px-5 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors border-l-4 border-l-red-600">
-                                                <div class="font-semibold text-gray-900 text-sm mb-1">Question Rejected</div>
-                                                <div class="text-gray-600 text-sm mb-2 leading-relaxed">{{ $notification->data['content'] }}</div>
-                                                <div class="text-gray-500 text-xs italic mb-2">Instructor: {{ $notification->data['instructor_name'] }}</div>
-                                                <a href="{{ url('/student/questions/' . $notification->data['question_id']) }}" class="inline-block px-3 py-1 bg-teal-600 text-white text-xs font-medium rounded hover:bg-teal-700 transition-colors">
-                                                    View Question
-                                                </a>
-                                            </div>
+                                            <a href="{{ url('/student/questions/' . $notification->data['question_id']) }}" class="block px-4 py-3 hover:bg-red-50 transition-colors border-b border-gray-100 border-l-4 border-l-red-500">
+                                                <div class="flex items-start gap-3">
+                                                    <div class="w-9 h-9 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                                                        <i class="fas fa-times-circle text-red-600 text-sm"></i>
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-sm font-semibold text-gray-900 mb-1">Question Rejected</p>
+                                                        <p class="text-sm text-gray-600 mb-1 line-clamp-2">{{ $notification->data['content'] }}</p>
+                                                        <p class="text-xs text-gray-500 italic mb-1">Instructor: {{ $notification->data['instructor_name'] }}</p>
+                                                        <p class="text-xs text-teal-500">{{ $notification->created_at->diffForHumans() }}</p>
+                                                    </div>
+                                                </div>
+                                            </a>
                                         @endif
                                         
                                         @if($notification->type === \App\Notifications\QuestionAnsweredNotification::class)
-                                            <div class="px-5 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors border-l-4 border-l-green-600">
-                                                <div class="font-semibold text-gray-900 text-sm mb-1">Question Answered</div>
-                                                <div class="text-gray-600 text-sm mb-2 leading-relaxed">{{ $notification->data['content'] }}</div>
-                                                <div class="text-gray-500 text-xs italic mb-2">Instructor: {{ $notification->data['instructor_name'] }}</div>
-                                                <a href="{{ url('/student/questions/' . $notification->data['question_id']) }}" class="inline-block px-3 py-1 bg-teal-600 text-white text-xs font-medium rounded hover:bg-teal-700 transition-colors">
-                                                    View Answer
-                                                </a>
-                                            </div>
+                                            <a href="{{ url('/student/questions/' . $notification->data['question_id']) }}" class="block px-4 py-3 hover:bg-green-50 transition-colors border-b border-gray-100 border-l-4 border-l-green-500">
+                                                <div class="flex items-start gap-3">
+                                                    <div class="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                                                        <i class="fas fa-check-circle text-green-600 text-sm"></i>
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-sm font-semibold text-gray-900 mb-1">Question Answered</p>
+                                                        <p class="text-sm text-gray-600 mb-1 line-clamp-2">{{ $notification->data['content'] }}</p>
+                                                        <p class="text-xs text-gray-500 italic mb-1">Instructor: {{ $notification->data['instructor_name'] }}</p>
+                                                        <p class="text-xs text-teal-500">{{ $notification->created_at->diffForHumans() }}</p>
+                                                    </div>
+                                                </div>
+                                            </a>
                                         @endif
 
                                         @if($notification->type === \App\Notifications\FinalExamGradedNotification::class)
-                                            <div class="notification-item">
-                                                <strong>Final Exam Graded</strong>
-                                                <p>Course: {{ $notification->data['course_title'] }}</p>
-                                                <p>{{ $notification->data['exam_title'] }}</p>
-                                                <p>Score: {{ $notification->data['total_score'] }}/{{ $notification->data['total_marks'] }} 
-                                                ({{ $notification->data['percentage'] }}%)</p>
-                                                <span class="badge badge-{{ $notification->data['passed'] ? 'success' : 'danger' }}">
-                                                    {{ $notification->data['passed'] ? 'Passed' : 'Failed' }}
-                                                </span>
-                                                <a href="{{ route('notifications.markAsReadAndRedirect', [
-                                                        'notification' => $notification->id,
-                                                        'redirect' => route('student.final-exam.result', $notification->data['submission_id'])
-                                                    ]) }}" 
-                                                class="btn btn-primary btn-sm">
-                                                    View Marks
-                                                </a>
-                                            </div>
+                                            <a href="{{ route('notifications.markAsReadAndRedirect', ['notification' => $notification->id, 'redirect' => route('student.final-exam.result', $notification->data['submission_id'])]) }}" class="block px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-100 border-l-4 border-l-blue-500">
+                                                <div class="flex items-start gap-3">
+                                                    <div class="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                                        <i class="fas fa-graduation-cap text-blue-600 text-sm"></i>
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-sm font-semibold text-gray-900 mb-1">Final Exam Graded</p>
+                                                        <p class="text-sm text-gray-600 mb-1">Course: {{ $notification->data['course_title'] }}</p>
+                                                        <p class="text-sm text-gray-600 mb-1">{{ $notification->data['exam_title'] }}</p>
+                                                        <p class="text-sm font-medium text-gray-900 mb-1">
+                                                            Score: {{ $notification->data['total_score'] }}/{{ $notification->data['total_marks'] }} 
+                                                            ({{ $notification->data['percentage'] }}%)
+                                                        </p>
+                                                        <span class="inline-block px-2 py-0.5 rounded text-xs font-semibold {{ $notification->data['passed'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                                            {{ $notification->data['passed'] ? 'Passed' : 'Failed' }}
+                                                        </span>
+                                                        <p class="text-xs text-teal-500 mt-1">{{ $notification->created_at->diffForHumans() }}</p>
+                                                    </div>
+                                                </div>
+                                            </a>
                                         @endif
                                     @endforeach
                                 @else
-                                    <div class="py-10 text-center text-gray-400">
-                                        <svg class="w-8 h-8 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13.5v-8A2.5 2.5 0 0017.5 3h-11A2.5 2.5 0 004 5.5v8A2.5 2.5 0 006.5 16h11a2.5 2.5 0 002.5-2.5z"></path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 8l6 5 6-5"></path>
-                                        </svg>
-                                        <div class="text-sm">No new notifications</div>
+                                    <div class="px-4 py-10 text-center">
+                                        <div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                            <i class="fas fa-bell-slash text-2xl text-teal-400"></i>
+                                        </div>
+                                        <p class="text-sm text-teal-600 font-medium">No new notifications</p>
                                     </div>
                                 @endif
                             </div>
@@ -201,7 +219,7 @@
                     
                     <!-- User Dropdown -->
                     <div class="relative" x-data="{ open: false }" @click.away="open = false">
-                        <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
+                        <button type="button" @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
                             <div class="w-11 h-11 flex items-center justify-center rounded-full bg-teal-600 text-white hover:bg-teal-700 transition-colors">
                                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
@@ -221,7 +239,7 @@
                              x-transition:leave="transition ease-in duration-150"
                              x-transition:leave-start="opacity-100 scale-100"
                              x-transition:leave-end="opacity-0 scale-95"
-                             class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2"
+                             class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50"
                              style="display: none;">
                             
                             <a href="/profile" class="flex items-center px-4 py-2.5 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors">
@@ -287,11 +305,11 @@
             </div>
 
             <!-- Mobile Menu Button -->
-            <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 rounded-md hover:bg-gray-100">
+            <button type="button" @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 rounded-md hover:bg-gray-100">
                 <svg x-show="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
-                <svg x-show="mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg x-show="mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
@@ -335,7 +353,7 @@
         </div>
 
         <!-- Mobile Menu -->
-        <div x-show="mobileMenuOpen" x-transition class="md:hidden border-t border-gray-200 py-4 space-y-3">
+        <div x-show="mobileMenuOpen" x-transition class="md:hidden border-t border-gray-200 py-4 space-y-3" style="display: none;">
             @guest    
             <a href="#about" class="block py-2 text-gray-700 hover:text-teal-600 font-medium">About Us</a>
             <a href="#contact" class="block py-2 text-gray-700 hover:text-teal-600 font-medium">Contact Us</a>
@@ -368,7 +386,8 @@
                         @php
                             $mobileRelevantNotifications = auth()->user()->unreadNotifications->filter(function ($notification) {
                                 return $notification->type === \App\Notifications\QuestionRejectedNotification::class || 
-                                       $notification->type === \App\Notifications\QuestionAnsweredNotification::class;
+                                       $notification->type === \App\Notifications\QuestionAnsweredNotification::class ||
+                                       $notification->type === \App\Notifications\FinalExamGradedNotification::class;
                             });
                             $mobileRelevantCount = $mobileRelevantNotifications->count();
                         @endphp
@@ -471,4 +490,3 @@
         </div>
     </div>
 </header>
-                        

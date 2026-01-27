@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -46,40 +47,30 @@
         .question-card:nth-child(3) { animation-delay: 0.2s; }
         .question-card:nth-child(4) { animation-delay: 0.25s; }
         .question-card:nth-child(5) { animation-delay: 0.3s; }
-        
-        .notif-dropdown {
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .notif-dropdown.show {
-            max-height: 400px;
-            opacity: 1;
-        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-teal-50 via-blue-50/30 to-indigo-50/20 min-h-screen font-sans antialiased">
+<body class="bg-gray-50 min-h-screen font-sans antialiased">
 
-    <div class="flex min-h-screen">
+    <div x-data="{ sidebarOpen: window.innerWidth >= 1024, sidebarCollapsed: false }" 
+         @resize.window="if (window.innerWidth >= 1024) sidebarOpen = true; else if (window.innerWidth < 1024) sidebarCollapsed = false"
+         class="flex min-h-screen">
         <!-- Sidebar -->
         @include('layouts.sidebar')
 
         <!-- Main Content -->
-        <main class="flex-1 lg:ml-0">
-            <!-- Header -->
-            <x-instructor-header 
-                :title="'Create Final Exam'" 
-            />
+        <main class="flex-1 transition-all duration-300"
+              :class="sidebarCollapsed && window.innerWidth >= 1024 ? 'lg:ml-20' : 'lg:ml-72'">
+            
+            <x-instructor-header :title="$pageTitle ?? 'Create Final Exam'" />
 
             <!-- Page Content -->
-            <div class="p-6 lg:p-8 max-w-7xl mx-auto">
+            <div class="p-6 lg:p-8 max-w-4xl mx-auto">
                 @auth
                     <!-- Info Box -->
-                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl shadow-lg border-2 border-blue-200 overflow-hidden mb-6 opacity-0 animate-slide-in">
+                    <div class="bg-teal-50 rounded-2xl shadow-sm border border-gray-200 overflow-hidden mb-6 opacity-0 animate-slide-in">
                         <div class="p-6">
                             <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <div class="w-12 h-12 bg-teal-600 rounded-xl flex items-center justify-center flex-shrink-0">
                                     <i class="fas fa-info-circle text-white text-xl"></i>
                                 </div>
                                 <div>
@@ -113,27 +104,24 @@
                     @endif
 
                     <!-- Form Card -->
-                    <div class="bg-white rounded-3xl shadow-xl border border-teal-100 overflow-hidden opacity-0 animate-slide-in" style="animation-delay: 0.15s;">
-                        <div class="px-8 py-6 border-b border-teal-200 bg-gradient-to-r from-teal-50 to-white">
-                            <h2 class="text-2xl font-bold text-teal-900 flex items-center gap-3">
-                                <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center">
-                                    <i class="fas fa-file-alt text-white"></i>
-                                </div>
+                    <div class="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden opacity-0 animate-slide-in" style="animation-delay: 0.15s;">
+                        <div class="px-12 py-6 border-b border-gray-200 bg-gray-50">
+                            <h2 class="text-2xl font-bold text-teal-800 flex items-center gap-3">
                                 Exam Details
                             </h2>
                         </div>
                         
-                        <div class="p-8">
+                        <div class="p-12">
                             <form action="{{ route('instructor.final-exams.store') }}" method="POST" id="examForm">
                                 @csrf
 
                                 <!-- Course Selection -->
                                 <div class="mb-6">
                                     <label for="course_id" class="block text-sm font-bold text-teal-900 mb-2">
-                                        <i class="fas fa-book text-primary-700 mr-2"></i>Select Course <span class="text-red-600">*</span>
+                                        Select Course <span class="text-gray-600">*</span>
                                     </label>
                                     <select name="course_id" id="course_id" 
-                                        class="w-full px-4 py-3 border-2 border-teal-200 rounded-xl focus:border-primary-600 focus:ring-4 focus:ring-primary-100 transition-all outline-none font-medium bg-white" 
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium bg-white" 
                                         required>
                                         <option value="">-- Select Course --</option>
                                         @foreach($courses as $course)
@@ -147,21 +135,21 @@
                                 <!-- Exam Title -->
                                 <div class="mb-6">
                                     <label for="title" class="block text-sm font-bold text-teal-900 mb-2">
-                                        <i class="fas fa-heading text-primary-700 mr-2"></i>Exam Title <span class="text-red-600">*</span>
+                                        Exam Title <span class="text-gray-600">*</span>
                                     </label>
                                     <input type="text" name="title" id="title" value="{{ old('title') }}" 
-                                        class="w-full px-4 py-3 border-2 border-teal-200 rounded-xl focus:border-primary-600 focus:ring-4 focus:ring-primary-100 transition-all outline-none font-medium" 
-                                        placeholder="e.g., Final Written Examination"
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium" 
+                                        placeholder="Final Written Examination"
                                         required>
                                 </div>
 
                                 <!-- Description -->
                                 <div class="mb-6">
                                     <label for="description" class="block text-sm font-bold text-teal-900 mb-2">
-                                        <i class="fas fa-align-left text-primary-700 mr-2"></i>Description / Instructions
+                                        Description / Instructions
                                     </label>
                                     <textarea name="description" id="description" rows="4"
-                                        class="w-full px-4 py-3 border-2 border-teal-200 rounded-xl focus:border-primary-600 focus:ring-4 focus:ring-primary-100 transition-all outline-none font-medium resize-none" 
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium resize-none" 
                                         placeholder="Provide instructions or overview for students">{{ old('description') }}</textarea>
                                 </div>
 
@@ -169,37 +157,36 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     <div>
                                         <label for="total_marks" class="block text-sm font-bold text-teal-900 mb-2">
-                                            <i class="fas fa-star text-primary-700 mr-2"></i>Total Marks <span class="text-red-600">*</span>
+                                            Total Marks <span class="text-gray-600">*</span>
                                         </label>
                                         <input type="number" name="total_marks" id="total_marks" 
                                             value="{{ old('total_marks', 100) }}" min="1"
-                                            class="w-full px-4 py-3 border-2 border-teal-200 rounded-xl focus:border-primary-600 focus:ring-4 focus:ring-primary-100 transition-all outline-none font-medium" 
+                                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium" 
                                             required>
                                         <p class="text-sm text-teal-600 mt-1">Must match sum of question marks</p>
                                     </div>
 
                                     <div>
                                         <label for="duration_minutes" class="block text-sm font-bold text-teal-900 mb-2">
-                                            <i class="fas fa-clock text-primary-700 mr-2"></i>Duration (minutes) <span class="text-red-600">*</span>
+                                            Duration (minutes) <span class="text-gray-600">*</span>
                                         </label>
                                         <input type="number" name="duration_minutes" id="duration_minutes" 
                                             value="{{ old('duration_minutes', 180) }}" min="30" max="480"
-                                            class="w-full px-4 py-3 border-2 border-teal-200 rounded-xl focus:border-primary-600 focus:ring-4 focus:ring-primary-100 transition-all outline-none font-medium" 
+                                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium" 
                                             required>
                                         <p class="text-sm text-teal-600 mt-1">Default: 180 minutes (3 hours)</p>
                                     </div>
                                 </div>
 
-                                <hr class="my-8 border-teal-200">
+                                <hr class="my-8 border-gray-200">
 
                                 <!-- Questions Section Header -->
                                 <div class="flex items-center justify-between mb-6">
                                     <h3 class="text-xl font-bold text-teal-900 flex items-center gap-2">
-                                        <i class="fas fa-clipboard-question text-purple-600"></i>
                                         Exam Questions
                                     </h3>
                                     <button type="button" onclick="addQuestion()" 
-                                        class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-700 to-primary-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 text-sm">
+                                        class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 text-sm">
                                         <i class="fas fa-plus"></i>
                                         Add Question
                                     </button>
@@ -211,22 +198,21 @@
                                 </div>
 
                                 <!-- Total Marks Display -->
-                                <div id="totalMarksCheck" class="bg-amber-50 border-2 border-amber-200 rounded-xl p-6 text-center mb-6">
+                                <div id="totalMarksCheck" class="bg-amber-50 rounded-xl p-6 text-center mb-6">
                                     <div class="flex items-center justify-center gap-3">
-                                        <i class="fas fa-calculator text-amber-600 text-xl"></i>
-                                        <p class="text-lg font-bold text-teal-900">
+                                        <p class="text-lg font-semibold text-teal-900">
                                             Total Question Marks: <span id="sumDisplay" class="text-amber-700">0</span> / <span id="targetMarks" class="text-amber-700">100</span>
                                         </p>
                                     </div>
                                 </div>
 
                                 <!-- Publish Option -->
-                                <div class="bg-teal-50 rounded-xl border-2 border-teal-200 p-6 mb-6">
+                                <div class="bg-teal-50 rounded-xl border-1 border-teal-200 p-6 mb-6">
                                     <label class="flex items-start gap-3 cursor-pointer group">
                                         <input type="checkbox" name="publish_now" value="1" 
-                                            class="w-5 h-5 text-primary-600 rounded focus:ring-2 focus:ring-primary-500 mt-0.5 cursor-pointer">
+                                            class="w-5 h-5 text-teal-600 rounded focus:ring-2 focus:ring-teal-500 mt-0.5 cursor-pointer">
                                         <div>
-                                            <span class="text-sm font-bold text-teal-900 group-hover:text-primary-700 transition-colors">
+                                            <span class="text-sm font-bold text-teal-900 group-hover:text-teal-700 transition-colors">
                                                 <i class="fas fa-globe text-green-600 mr-2"></i>Publish immediately (make available to students now)
                                             </span>
                                             <p class="text-sm text-teal-600 mt-1">
@@ -237,15 +223,14 @@
                                 </div>
 
                                 <!-- Action Buttons -->
-                                <div class="flex items-center gap-4 pt-6 border-t border-teal-200">
+                                <div class="flex items-center gap-4 pt-6 border-t border-gray-200">
                                     <button type="submit" 
-                                        class="flex-1 inline-flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
-                                        <i class="fas fa-check-circle"></i>
+                                        class="flex-1 inline-flex items-center justify-center gap-2 px-8 py-3 bg-teal-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
                                         <span>Create Final Exam</span>
                                     </button>
                                     
                                     <a href="javascript:history.back()" 
-                                        class="inline-flex items-center gap-2 px-8 py-3 bg-white text-primary-700 border-2 border-primary-700 rounded-xl font-semibold hover:bg-primary-700 hover:text-white transition-all">
+                                        class="inline-flex items-center gap-2 px-8 py-3 bg-white text-teal-700 border-2 border-teal-700 rounded-xl font-semibold hover:bg-teal-700 hover:text-white transition-all">
                                         <i class="fas fa-arrow-left"></i>
                                         <span>Cancel</span>
                                     </a>
@@ -256,14 +241,14 @@
 
                 @else
                     <!-- Not Logged In -->
-                    <div class="bg-white rounded-3xl shadow-xl border border-teal-100 overflow-hidden">
+                    <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
                         <div class="p-16 text-center">
                             <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <i class="fas fa-lock text-4xl text-red-600"></i>
                             </div>
                             <h2 class="text-2xl font-bold text-teal-900 mb-3">Access Denied</h2>
                             <p class="text-teal-600 mb-6">You need to be logged in to view this page.</p>
-                            <a href="/" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-700 to-primary-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
+                            <a href="/" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
                                 <i class="fas fa-sign-in-alt"></i>
                                 Go to Login
                             </a>
@@ -291,13 +276,10 @@
             const container = document.getElementById('questions-container');
             
             const questionCard = document.createElement('div');
-            questionCard.className = 'question-card bg-gradient-to-r from-white to-teal-50 border-2 border-teal-200 rounded-2xl p-6 hover:border-primary-300 hover:shadow-lg transition-all duration-200 opacity-0 animate-slide-in';
+            questionCard.className = 'question-card bg-gray-50 border-2 border-gray-200 rounded-2xl p-6 hover:border-gray-300 hover:shadow-lg transition-all duration-200 opacity-0 animate-slide-in';
             questionCard.innerHTML = `
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <span class="text-white font-bold">${questionCount}</span>
-                        </div>
                         <h4 class="text-xl font-bold text-teal-900">Question ${questionCount}</h4>
                     </div>
                     <button type="button" onclick="removeQuestion(this)" 
@@ -309,10 +291,10 @@
 
                 <div class="mb-5">
                     <label class="block text-sm font-bold text-teal-900 mb-2">
-                        <i class="fas fa-question-circle text-blue-600 mr-2"></i>Question Text <span class="text-red-600">*</span>
+                       Question Text <span class="text-gray-600">*</span>
                     </label>
                     <textarea name="questions[${questionCount-1}][question_text]" 
-                        class="w-full px-4 py-3 border-2 border-teal-200 rounded-xl focus:border-primary-600 focus:ring-4 focus:ring-primary-100 transition-all outline-none font-medium resize-none" 
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium resize-none" 
                         rows="3"
                         placeholder="Enter the question..."
                         required></textarea>
@@ -320,19 +302,19 @@
 
                 <div class="mb-5">
                     <label class="block text-sm font-bold text-teal-900 mb-2">
-                        <i class="fas fa-star text-amber-600 mr-2"></i>Marks for this Question <span class="text-red-600">*</span>
+                        Marks for this Question <span class="text-gray-600">*</span>
                     </label>
                     <input type="number" name="questions[${questionCount-1}][marks]" 
-                        class="w-full md:w-48 px-4 py-3 border-2 border-teal-200 rounded-xl focus:border-primary-600 focus:ring-4 focus:ring-primary-100 transition-all outline-none font-medium" 
+                        class="w-full md:w-48 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium" 
                         min="1" value="20" onchange="updateTotalMarks()" required>
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold text-teal-900 mb-2">
-                        <i class="fas fa-list-check text-purple-600 mr-2"></i>Marking Criteria (Optional)
+                        Marking Criteria (Optional)
                     </label>
                     <textarea name="questions[${questionCount-1}][marking_criteria]" 
-                        class="w-full px-4 py-3 border-2 border-teal-200 rounded-xl focus:border-primary-600 focus:ring-4 focus:ring-primary-100 transition-all outline-none font-medium resize-none" 
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium resize-none" 
                         rows="2"
                         placeholder="Guidelines for grading this question..."></textarea>
                 </div>
@@ -404,42 +386,6 @@
             if (sum !== targetMarks) {
                 e.preventDefault();
                 alert(`Sum of question marks (${sum}) must equal total marks (${targetMarks})`);
-            }
-        });
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('-translate-x-full');
-        }
-
-        function toggleNotifications() {
-            document.getElementById('notifDropdown').classList.toggle('show');
-        }
-
-        document.addEventListener('click', function(event) {
-            const notifDropdown = document.getElementById('notifDropdown');
-            if (notifDropdown && !event.target.closest('.notifications')) {
-                notifDropdown.classList.remove('show');
-            }
-        });
-
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                const notifDropdown = document.getElementById('notifDropdown');
-                if (notifDropdown) notifDropdown.classList.remove('show');
-            }
-        });
-
-        // Close sidebar on outside click (mobile)
-        document.addEventListener('click', function(event) {
-            const sidebar = document.getElementById('sidebar');
-            if (!sidebar) return;
-            
-            const isClickInsideSidebar = sidebar.contains(event.target);
-            const isClickOnMenuButton = event.target.closest('button')?.onclick?.toString().includes('toggleSidebar');
-            
-            if (!isClickInsideSidebar && !isClickOnMenuButton && window.innerWidth < 1024) {
-                sidebar.classList.add('-translate-x-full');
             }
         });
     </script>

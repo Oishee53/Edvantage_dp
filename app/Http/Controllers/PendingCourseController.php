@@ -49,7 +49,7 @@ public function store(Request $request)
         'title' => $request->title,
         'description' => $request->description,
         'category' => $request->category,
-        'level' => 'required|in:beginner,intermediate,advanced',
+        'level' => $request->level,
         'video_count' => $request->video_count,
         'approx_video_length' => $request->approx_video_length,
         'total_duration' => $request->total_duration,
