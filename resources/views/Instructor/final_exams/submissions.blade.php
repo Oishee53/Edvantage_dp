@@ -36,52 +36,40 @@
                 :title="'Exam Submissions - ' . $exam->title"
             />
 
-            <div class="p-6 lg:p-8 max-w-7xl mx-auto">
+            <div class="p-6 lg:p-8 max-w-7xl mx-auto mr-6">
                 <!-- Stats Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
                         <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-users text-white text-xl"></i>
-                            </div>
-                            <span class="text-3xl font-bold text-teal-900">{{ $submissions->count() }}</span>
+                            <span class="text-3xl font-semibold text-teal-900">{{ $submissions->count() }}</span>
                         </div>
-                        <p class="text-sm font-semibold text-teal-600 uppercase tracking-wide">Total Submissions</p>
+                        <p class="text-sm font-semibold text-teal-700 uppercase tracking-wide">Total Submissions</p>
                     </div>
 
                     <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
                         <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-clock text-white text-xl"></i>
-                            </div>
-                            <span class="text-3xl font-bold text-teal-900">{{ $submissions->where('status', 'submitted')->count() }}</span>
+                            <span class="text-3xl font-semibold text-teal-900">{{ $submissions->where('status', 'submitted')->count() }}</span>
                         </div>
-                        <p class="text-sm font-semibold text-teal-600 uppercase tracking-wide">Pending Grading</p>
+                        <p class="text-sm font-semibold text-teal-700 uppercase tracking-wide">Pending Grading</p>
                     </div>
 
                     <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
                         <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-check-circle text-white text-xl"></i>
-                            </div>
-                            <span class="text-3xl font-bold text-teal-900">{{ $submissions->where('status', 'graded')->count() }}</span>
+                            <span class="text-3xl font-semibold text-teal-900">{{ $submissions->where('status', 'graded')->count() }}</span>
                         </div>
-                        <p class="text-sm font-semibold text-teal-600 uppercase tracking-wide">Graded</p>
+                        <p class="text-sm font-semibold text-teal-700 uppercase tracking-wide">Graded</p>
                     </div>
 
                     <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
                         <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-trophy text-white text-xl"></i>
-                            </div>
                             @php
                                 $graded = $submissions->where('status', 'graded')->count();
                                 $passed = $submissions->where('status', 'graded')->where('percentage', '>=', 70)->count();
                                 $passRate = $graded > 0 ? round(($passed / $graded) * 100) : 0;
                             @endphp
-                            <span class="text-3xl font-bold text-teal-900">{{ $passRate }}%</span>
+                            <span class="text-3xl font-semibold text-teal-900">{{ $passRate }}%</span>
                         </div>
-                        <p class="text-sm font-semibold text-teal-600 uppercase tracking-wide">Pass Rate</p>
+                        <p class="text-sm font-semibold text-teal-700 uppercase tracking-wide">Pass Rate</p>
                     </div>
                 </div>
 
@@ -90,7 +78,7 @@
                     <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
                         <h2 class="text-xl font-bold text-teal-900 flex items-center gap-3">
                             All Submissions
-                            <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
+                            <span class="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-bold">
                                 {{ $submissions->count() }}
                             </span>
                         </h2>
@@ -105,11 +93,11 @@
                         <table class="w-full">
                             <thead class="bg-gray-50 border-b border-gray-200">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-teal-600 uppercase tracking-wider">Student</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-teal-600 uppercase tracking-wider">Submitted At</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-teal-600 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-teal-600 uppercase tracking-wider">Score</th>
-                                    <th class="px-6 py-3 text-right text-xs font-bold text-teal-600 uppercase tracking-wider">Actions</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Student</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Submitted At</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Score</th>
+                                    <th class="px-6 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">
@@ -122,7 +110,7 @@
                                                 </div>
                                                 <div>
                                                     <div class="font-bold text-teal-900">{{ $submission->user->name }}</div>
-                                                    <div class="text-sm text-teal-600">{{ $submission->user->email }}</div>
+                                                    <div class="text-sm text-teal-700">{{ $submission->user->email }}</div>
                                                 </div>
                                             </div>
                                         </td>
@@ -131,7 +119,7 @@
                                                 {{ $submission->submitted_at ? $submission->submitted_at->format('M d, Y') : 'Not submitted' }}
                                             </div>
                                             @if($submission->submitted_at)
-                                                <div class="text-sm text-teal-600">{{ $submission->submitted_at->format('g:i A') }}</div>
+                                                <div class="text-sm text-teal-700">{{ $submission->submitted_at->format('g:i A') }}</div>
                                             @endif
                                         </td>
                                         <td class="px-6 py-4">
@@ -174,7 +162,6 @@
                                             @elseif($submission->status === 'graded')
                                                 <a href="{{ route('instructor.final-exams.grade-submission', $submission->id) }}" 
                                                    class="inline-flex items-center gap-2 px-4 py-2 bg-white text-teal-700 border-2 border-teal-700 rounded-lg font-semibold hover:bg-teal-700 hover:text-white transition-all text-sm">
-                                                    <i class="fas fa-eye"></i>
                                                     View Grading
                                                 </a>
                                             @endif
@@ -188,7 +175,7 @@
                                                     <i class="fas fa-inbox text-4xl text-gray-400"></i>
                                                 </div>
                                                 <h3 class="text-lg font-bold text-teal-900 mb-2">No Submissions Yet</h3>
-                                                <p class="text-teal-600">Student submissions will appear here once they submit the exam.</p>
+                                                <p class="text-teal-700">Student submissions will appear here once they submit the exam.</p>
                                             </div>
                                         </td>
                                     </tr>

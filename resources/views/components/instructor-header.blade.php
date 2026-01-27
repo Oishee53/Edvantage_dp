@@ -1,6 +1,6 @@
 @props(['title' => 'Dashboard', 'subtitle' => 'Manage your courses and students'])
 
-<header class="bg-white sticky top-0 z-40 border-b border-gray-200 shadow-sm ">
+<header class="bg-white sticky top-0 z-40 border-b border-gray-200 shadow-sm pr-4">
     <div class="px-4 lg:px-6 py-3 ">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -14,13 +14,19 @@
                 
                 
                 <div>
-                    <h1 class="text-xl lg:text-2xl font-bold text-teal-600">
+                    <h1 class="pl-5 text-xl lg:text-2xl font-semibold text-teal-700">
                         {{ $title }}
                     </h1>
                 </div>
             </div>
 
             <div class="flex items-center gap-2">
+
+                <!-- Student View Link -->
+                <a href="/homepage" class="flex items-center gap-2 py-2 text-teal-700 font-medium text-sm transition-all duration-200 hover:text-teal-800">
+                    <span class="hidden sm:inline">Student</span>
+                </a>
+
                 <!-- Notifications -->
                 <div class="relative notifications">
                     <button type="button" onclick="toggleNotifications()" class="relative w-10 h-10 flex items-center justify-center hover:bg-teal-100 rounded-lg transition-all duration-200">
@@ -107,17 +113,12 @@
                     </div>
                 </div>
 
-                <!-- Student View Link -->
-                <a href="/homepage" class="flex items-center gap-2 px-3 lg:px-4 py-2 bg-teal-600 text-white rounded-lg font-medium text-sm hover:bg-teal-800 transition-all duration-200 hover:shadow-md">
-                    <i class="fas fa-user-graduate text-xs"></i>
-                    <span class="hidden sm:inline">Student View</span>
-                </a>
+                
 
                 <!-- Logout -->
                 <form action="/logout" method="POST" class="m-0">
                     @csrf
                     <button type="submit" class="px-3 lg:px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium text-sm shadow-sm hover:shadow-md transition-all duration-200">
-                        <i class="fas fa-sign-out-alt text-xs mr-1.5"></i>
                         <span class="hidden sm:inline">Logout</span>
                     </button>
                 </form>

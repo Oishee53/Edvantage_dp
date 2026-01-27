@@ -54,100 +54,6 @@
             line-height: 1.5;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1.5rem;
-        }
-
-        /* Header */
-        .page-header {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.25rem;
-        }
-
-        .page-subtitle {
-            font-size: 0.875rem;
-            color: var(--text-tertiary);
-        }
-
-        .student-info {
-            text-align: right;
-        }
-
-        .student-label {
-            font-size: 0.75rem;
-            color: var(--text-tertiary);
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-        }
-
-        .student-name {
-            font-size: 0.9375rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-top: 0.125rem;
-        }
-
-        .student-email {
-            font-size: 0.75rem;
-            color: var(--text-tertiary);
-            margin-top: 0.125rem;
-        }
-
-        /* Info Grid */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.75rem;
-        }
-
-        .info-box {
-            padding: 0.75rem;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-light);
-            border-radius: 4px;
-        }
-
-        .info-label {
-            font-size: 0.6875rem;
-            color: var(--text-tertiary);
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-            margin-bottom: 0.25rem;
-        }
-
-        .info-value {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .info-subtext {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: 0.125rem;
-        }
-
         /* Question Card */
         .question-card {
             background: var(--bg-primary);
@@ -520,33 +426,12 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .info-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
             .recordings-grid {
                 grid-template-columns: 1fr;
             }
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-
-            .header-top {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .student-info {
-                text-align: left;
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-
             .images-grid {
                 grid-template-columns: 1fr;
             }
@@ -580,111 +465,101 @@
          @resize.window="if (window.innerWidth >= 1024) sidebarOpen = true; else if (window.innerWidth < 1024) sidebarCollapsed = false"
          class="flex min-h-screen">
         
+        {{-- Import Sidebar Component --}}
         @include('layouts.sidebar')
 
         <main class="flex-1 transition-all duration-300"
               :class="sidebarCollapsed && window.innerWidth >= 1024 ? 'lg:ml-20' : 'lg:ml-72'">
             
+            {{-- Import Header Component --}}
             <x-instructor-header 
                 :title="'Grade Submission - ' . $submission->exam->title"
             />
 
-            <!-- Proctoring Recordings Section -->
-            @if($submission->webcam_playback_id || $submission->screen_recording_playback_id)
+            <div class="container mx-auto px-6 py-6 max-w-5xl">
+
+                <!-- Exam Info Card -->
                 <div class="question-card">
-                    <div class="question-header">
-                        <div style="flex: 1;">
-                            <h3 class="question-title">🎥 Proctoring Recordings</h3>
-                            <p class="question-text">Review the student's webcam and screen recordings during the exam</p>
-                        </div>
-                    </div>
-
-                    <div class="question-body">
-                        <div class="recordings-grid">
-                            @if($submission->webcam_playback_id)
-                                <div class="recording-box">
-                                    <div class="section-label">📹 Webcam Recording</div>
-                                    <div class="video-container">
-                                        <video controls controlsList="nodownload" class="recording-video">
-                                            <source src="https://stream.mux.com/{{ $submission->webcam_playback_id }}.m3u8" type="application/x-mpegURL">
-                                            Your browser doesn't support HLS playback.
-                                        </video>
-                                    </div>
-                                    <div class="recording-info">
-                                        <small>Watch for: Face visibility, eye movement, suspicious behavior</small>
-                                    </div>
-                                </div>
-                            @endif
-
-                            @if($submission->screen_recording_playback_id)
-                                <div class="recording-box">
-                                    <div class="section-label">🖥️ Screen Recording</div>
-                                    <div class="video-container">
-                                        <video controls controlsList="nodownload" class="recording-video">
-                                            <source src="https://stream.mux.com/{{ $submission->screen_recording_playback_id }}.m3u8" type="application/x-mpegURL">
-                                            Your browser doesn't support HLS playback.
-                                        </video>
-                                    </div>
-                                    <div class="recording-info">
-                                        <small>Watch for: Tab switching, external resources, screen sharing</small>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-
-                        <div class="proctoring-notes">
-                            <div class="section-label">⚠️ Proctoring Notes</div>
-                            <div class="form-group">
-                                <textarea name="proctoring_notes" 
-                                          class="form-input"
-                                          style="min-height: 80px;"
-                                          placeholder="Note any suspicious activity or violations observed in the recordings...">{{ $submission->proctoring_notes ?? '' }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
-
-            <!-- Questions -->
-            @foreach($submission->answers as $answer)
-                <div class="question-card">
-                    <div class="question-header">
-                        <div style="flex: 1;">
-                            <h3 class="question-title">Question {{ $answer->question->question_number }}</h3>
-                            <p class="question-text">{{ $answer->question->question_text }}</p>
-                            
-                            @if($answer->question->marking_criteria)
-                                <div class="criteria-box">
-                                    <div class="criteria-label">Marking Criteria</div>
-                                    <div class="criteria-text">{{ $answer->question->marking_criteria }}</div>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                    
                     <div class="p-6">
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div class="bg-blue-50 rounded-lg p-4 border border-blue-200 text-center">
-                                <div class="text-2xl font-bold text-blue-700">{{ $submission->exam->questions()->count() }}</div>
-                                <div class="text-xs text-blue-600 font-semibold uppercase tracking-wide mt-1">Questions</div>
+                            <div class="bg-blue-50 rounded-lg p-4 border border-gray-200 text-center">
+                                <div class="text-2xl font-bold text-gray-700">{{ $submission->exam->questions()->count() }}</div>
+                                <div class="text-xs text-gray-600 font-semibold uppercase tracking-wide mt-1">Questions</div>
                             </div>
-                            <div class="bg-purple-50 rounded-lg p-4 border border-purple-200 text-center">
-                                <div class="text-2xl font-bold text-purple-700">{{ $submission->exam->total_marks }}</div>
-                                <div class="text-xs text-purple-600 font-semibold uppercase tracking-wide mt-1">Total Marks</div>
+                            <div class="bg-blue-50 rounded-lg p-4 border border-gray-200 text-center">
+                                <div class="text-2xl font-bold text-gray-700">{{ $submission->exam->total_marks }}</div>
+                                <div class="text-xs text-gray-600 font-semibold uppercase tracking-wide mt-1">Total Marks</div>
                             </div>
-                            <div class="bg-green-50 rounded-lg p-4 border border-green-200 text-center">
-                                <div class="text-lg font-bold text-green-700">{{ $submission->submitted_at->format('M d, Y') }}</div>
-                                <div class="text-xs text-green-600 font-semibold uppercase tracking-wide mt-1">Submitted</div>
-                                <div class="text-xs text-teal-600 mt-1">{{ $submission->submitted_at->format('g:i A') }}</div>
+                            <div class="bg-blue-50 rounded-lg p-4 border border-gray-200 text-center">
+                                <div class="text-lg font-bold text-gray-700">{{ $submission->submitted_at->format('M d, Y') }}</div>
+                                <div class="text-xs text-gray-600 font-semibold uppercase tracking-wide mt-1">Submitted</div>
+                                <div class="text-xs text-gray-600 mt-1">{{ $submission->submitted_at->format('g:i A') }}</div>
                             </div>
-                            <div class="bg-amber-50 rounded-lg p-4 border border-amber-200 text-center">
-                                <div class="text-2xl font-bold text-amber-700" id="total-score">0</div>
-                                <div class="text-xs text-amber-600 font-semibold uppercase tracking-wide mt-1">Current Score</div>
+                            <div class="bg-blue-50 rounded-lg p-4 border border-gray-200 text-center">
+                                <div class="text-2xl font-bold text-gray-700" id="total-score">0</div>
+                                <div class="text-xs text-gray-600 font-semibold uppercase tracking-wide mt-1">Current Score</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Proctoring Recordings Section -->
+                @if($submission->webcam_playback_id || $submission->screen_recording_playback_id)
+                    <div class="question-card">
+                        <div class="question-header">
+                            <div style="flex: 1;">
+                                <h3 class="question-title">🎥 Proctoring Recordings</h3>
+                                <p class="question-text">Review the student's webcam and screen recordings during the exam</p>
+                            </div>
+                        </div>
+
+                        <div class="question-body">
+                            <div class="recordings-grid">
+                                @if($submission->webcam_playback_id)
+                                    <div class="recording-box">
+                                        <div class="section-label">📹 Webcam Recording</div>
+                                        <div class="video-container">
+                                            <video controls controlsList="nodownload" class="recording-video">
+                                                <source src="https://stream.mux.com/{{ $submission->webcam_playback_id }}.m3u8" type="application/x-mpegURL">
+                                                Your browser doesn't support HLS playback.
+                                            </video>
+                                        </div>
+                                        <div class="recording-info">
+                                            <small>Watch for: Face visibility, eye movement, suspicious behavior</small>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                @if($submission->screen_recording_playback_id)
+                                    <div class="recording-box">
+                                        <div class="section-label">🖥️ Screen Recording</div>
+                                        <div class="video-container">
+                                            <video controls controlsList="nodownload" class="recording-video">
+                                                <source src="https://stream.mux.com/{{ $submission->screen_recording_playback_id }}.m3u8" type="application/x-mpegURL">
+                                                Your browser doesn't support HLS playback.
+                                            </video>
+                                        </div>
+                                        <div class="recording-info">
+                                            <small>Watch for: Tab switching, external resources, screen sharing</small>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="proctoring-notes">
+                                <div class="section-label">⚠️ Proctoring Notes</div>
+                                <div class="form-group">
+                                    <textarea name="proctoring_notes" 
+                                              class="form-input"
+                                              style="min-height: 80px;"
+                                              placeholder="Note any suspicious activity or violations observed in the recordings...">{{ $submission->proctoring_notes ?? '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Grading Form -->
                 <form action="{{ route('instructor.final-exams.save-grades', $submission->id) }}" method="POST" id="grading-form">
                     @csrf
 
@@ -775,21 +650,6 @@
                         </div>
                     @endforeach
 
-                    @if($submission->webcam_playback_id)
-                        <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mb-6">
-                            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-                                <h3 class="text-lg font-bold text-teal-900 flex items-center gap-2">
-                                    <i class="fas fa-video text-red-600"></i>Webcam Recording
-                                </h3>
-                            </div>
-                            <div class="p-6">
-                                <video controls class="w-full max-w-2xl mx-auto rounded-lg border-2 border-gray-200">
-                                    <source src="https://stream.mux.com/{{ $submission->webcam_playback_id }}.m3u8" type="application/x-mpegURL">
-                                </video>
-                            </div>
-                        </div>
-                    @endif
-
                     <!-- Summary -->
                     <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
@@ -842,61 +702,15 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            @endforeach
+                </form>
 
-            <!-- Summary -->
-            <div class="summary-card">
-                <h3 class="summary-title">Overall Feedback & Summary</h3>
-                
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label class="form-label">Overall Feedback</label>
-                    <textarea name="overall_feedback" 
-                              class="form-input"
-                              style="min-height: 100px;"
-                              placeholder="Write overall feedback for the student...">{{ $submission->instructor_feedback ?? '' }}</textarea>
-                </div>
-
-                <div class="score-display">
-                    <div class="score-item">
-                        <div class="score-label">Total Score</div>
-                        <div class="score-value" id="total-score">0</div>
-                    </div>
-                    <div class="score-item">
-                        <div class="score-label">Out of</div>
-                        <div class="score-value">{{ $submission->exam->total_marks }}</div>
-                    </div>
-                    <div class="score-item">
-                        <div class="score-label">Percentage</div>
-                        <div class="score-value" id="percentage">0%</div>
-                    </div>
-                    <div class="score-item">
-                        <div class="score-label">Result</div>
-                        <div id="result-badge" style="margin-top: 0.25rem;">
-                            <span class="result-badge badge-pending">Not Graded</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="btn-group">
-                    <button type="submit" class="btn btn-primary">
-                        @if($submission->status === 'graded')
-                            Update Grading & Notify Student
-                        @else
-                            Submit Grading & Notify Student
-                        @endif
-                    </button>
-                    <a href="{{ route('instructor.final-exams.submissions', $submission->exam->id) }}" class="btn">
-                        Cancel
-                    </a>
-                </div>
             </div>
         </main>
     </div>
 
     <!-- Image Modal -->
     <div id="image-modal" class="modal" onclick="closeModal()">
-        <button class="absolute top-4 right-4 w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl font-bold hover:bg-gray-200 transition-colors" onclick="closeModal()">×</button>
+        <button class="modal-close" onclick="closeModal()">×</button>
         <img id="modal-image" src="" onclick="event.stopPropagation()">
     </div>
 
@@ -917,6 +731,9 @@
                     video.src = source.src;
                 }
             });
+
+            // Calculate total on page load
+            calculateTotal();
         });
 
         function calculateTotal() {
@@ -968,8 +785,6 @@
 
             return confirm('Are you sure you want to submit this grading? The student will be notified.');
         });
-
-        calculateTotal();
     </script>
 </body>
 </html>

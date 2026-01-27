@@ -92,7 +92,8 @@ class RecommendationService
 
         // 5️⃣ Cold start fallback: popular courses
         if ($recommendations->isEmpty()) {
-            $popular = Courses::withCount('enrollments')
+            $popular = Courses::whereNotIn('id', $enrolledCourseIds)
+                ->withCount('enrollments')  
                 ->orderByDesc('enrollments_count')
                 ->take($limit)
                 ->withCount('quizzes') // ✅ load quizzes_count

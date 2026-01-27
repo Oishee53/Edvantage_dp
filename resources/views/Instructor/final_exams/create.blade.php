@@ -121,7 +121,7 @@
                                         Select Course <span class="text-gray-600">*</span>
                                     </label>
                                     <select name="course_id" id="course_id" 
-                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium bg-white" 
+                                        class="w-full px-4 py-3 border-2 border-gray-200 focus:border-gray-600 transition-all rounded-xl outline-none font-medium bg-white" 
                                         required>
                                         <option value="">-- Select Course --</option>
                                         @foreach($courses as $course)
@@ -138,7 +138,7 @@
                                         Exam Title <span class="text-gray-600">*</span>
                                     </label>
                                     <input type="text" name="title" id="title" value="{{ old('title') }}" 
-                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium" 
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-600 transition-all outline-none font-medium" 
                                         placeholder="Final Written Examination"
                                         required>
                                 </div>
@@ -149,7 +149,7 @@
                                         Description / Instructions
                                     </label>
                                     <textarea name="description" id="description" rows="4"
-                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium resize-none" 
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-600 transition-all outline-none font-medium resize-none" 
                                         placeholder="Provide instructions or overview for students">{{ old('description') }}</textarea>
                                 </div>
 
@@ -161,9 +161,9 @@
                                         </label>
                                         <input type="number" name="total_marks" id="total_marks" 
                                             value="{{ old('total_marks', 100) }}" min="1"
-                                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium" 
+                                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-600 transition-all outline-none font-medium" 
                                             required>
-                                        <p class="text-sm text-teal-600 mt-1">Must match sum of question marks</p>
+                                        <p class="text-sm text-gray-600 mt-1 pl-2">Must match sum of question marks</p>
                                     </div>
 
                                     <div>
@@ -172,9 +172,9 @@
                                         </label>
                                         <input type="number" name="duration_minutes" id="duration_minutes" 
                                             value="{{ old('duration_minutes', 180) }}" min="30" max="480"
-                                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium" 
+                                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-600 transition-all outline-none font-medium" 
                                             required>
-                                        <p class="text-sm text-teal-600 mt-1">Default: 180 minutes (3 hours)</p>
+                                        <p class="text-sm text-gray-600 mt-1 pl-2">Default: 180 minutes (3 hours)</p>
                                     </div>
                                 </div>
 
@@ -186,8 +186,7 @@
                                         Exam Questions
                                     </h3>
                                     <button type="button" onclick="addQuestion()" 
-                                        class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 text-sm">
-                                        <i class="fas fa-plus"></i>
+                                        class="inline-flex items-center gap-2 px-4 py-2 bg-teal-700 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 text-sm">
                                         Add Question
                                     </button>
                                 </div>
@@ -207,10 +206,10 @@
                                 </div>
 
                                 <!-- Publish Option -->
-                                <div class="bg-teal-50 rounded-xl border-1 border-teal-200 p-6 mb-6">
+                                <div class="bg-teal-50 rounded-xl border-1 border-teal-200 p-6 mb-6 shadow-md">
                                     <label class="flex items-start gap-3 cursor-pointer group">
                                         <input type="checkbox" name="publish_now" value="1" 
-                                            class="w-5 h-5 text-teal-600 rounded focus:ring-2 focus:ring-teal-500 mt-0.5 cursor-pointer">
+                                            class="w-5 h-5 text-teal-600 rounded focus:border-gray-600 transition-all mt-0.5 cursor-pointer">
                                         <div>
                                             <span class="text-sm font-bold text-teal-900 group-hover:text-teal-700 transition-colors">
                                                 <i class="fas fa-globe text-green-600 mr-2"></i>Publish immediately (make available to students now)
@@ -294,7 +293,7 @@
                        Question Text <span class="text-gray-600">*</span>
                     </label>
                     <textarea name="questions[${questionCount-1}][question_text]" 
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium resize-none" 
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-600 transition-all outline-none font-medium resize-none" 
                         rows="3"
                         placeholder="Enter the question..."
                         required></textarea>
@@ -305,7 +304,7 @@
                         Marks for this Question <span class="text-gray-600">*</span>
                     </label>
                     <input type="number" name="questions[${questionCount-1}][marks]" 
-                        class="w-full md:w-48 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium" 
+                        class="w-full md:w-48 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-600 transition-all outline-none font-medium" 
                         min="1" value="20" onchange="updateTotalMarks()" required>
                 </div>
 
@@ -314,7 +313,7 @@
                         Marking Criteria (Optional)
                     </label>
                     <textarea name="questions[${questionCount-1}][marking_criteria]" 
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:ring-4 focus:ring-teal-100 transition-all outline-none font-medium resize-none" 
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-600 transition-all outline-none font-medium resize-none" 
                         rows="2"
                         placeholder="Guidelines for grading this question..."></textarea>
                 </div>
@@ -366,7 +365,7 @@
                 display.querySelector('#sumDisplay').className = 'text-green-700';
                 display.querySelector('#targetMarks').className = 'text-green-700';
             } else {
-                display.className = 'bg-amber-50 border-2 border-amber-200 rounded-xl p-6 text-center mb-6';
+                display.className = 'bg-amber-50 border-1 shadow-md border-amber-200 rounded-xl p-6 text-center mb-6';
                 display.querySelector('.fa-check-circle, .fa-calculator').className = 'fas fa-calculator text-amber-600 text-xl';
                 display.querySelector('#sumDisplay').className = 'text-amber-700';
                 display.querySelector('#targetMarks').className = 'text-amber-700';
