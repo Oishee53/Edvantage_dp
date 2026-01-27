@@ -12,9 +12,9 @@
             --body-background: #f9fafb;
             --card-background: #ffffff;
             --text-default: #333;
-            --text-gray-600: #4b5563;
-            --text-gray-700: #374151;
-            --text-gray-500: #6b7280;
+            --text-teal-600: #4b5563;
+            --text-teal-700: #374151;
+            --text-teal-500: #6b7280;
             --border-color: #e5e7eb;
             --success-color: #10b981;
             --success-bg: #d1fae5;
@@ -171,7 +171,7 @@
         .table td {
             padding: 1rem;
             border-bottom: 1px solid var(--border-color);
-            color: var(--text-gray-700);
+            color: var(--text-teal-700);
         }
 
         .table tbody tr:hover {
@@ -216,7 +216,7 @@
         .empty-state {
             text-align: center;
             padding: 3rem;
-            color: var(--text-gray-500);
+            color: var(--text-teal-500);
             font-style: italic;
         }
 

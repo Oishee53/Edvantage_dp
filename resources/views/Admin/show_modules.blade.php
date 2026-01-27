@@ -14,9 +14,9 @@
       --body-background: #f9fafb;
       --card-background: #ffffff;
       --text-default: #333;
-      --text-gray-600: #4b5563;
-      --text-gray-700: #374151;
-      --text-gray-500: #6b7280;
+      --text-teal-600: #4b5563;
+      --text-teal-700: #374151;
+      --text-teal-500: #6b7280;
       --border-color: #e5e7eb;
       --success-bg: #F0FDF4;
       --success-color: #059669;
@@ -233,7 +233,7 @@
 
     .module-description {
       font-size: 0.875rem;
-      color: var(--text-gray-600);
+      color: var(--text-teal-600);
     }
 
     /* Action Buttons Section */
@@ -297,7 +297,7 @@
     }
 
     .btn-cancel {
-      background-color: var(--text-gray-500);
+      background-color: var(--text-teal-500);
       color: white;
       border: none;
       padding: 0.75rem 1.5rem;
@@ -360,7 +360,7 @@
       border: none;
       font-size: 1.5rem;
       cursor: pointer;
-      color: var(--text-gray-500);
+      color: var(--text-teal-500);
       padding: 0;
       width: 2rem;
       height: 2rem;
@@ -447,7 +447,7 @@
 
     .not-logged-in {
       text-align: center;
-      color: var(--text-gray-700);
+      color: var(--text-teal-700);
     }
 
     .login-link {
@@ -464,7 +464,7 @@
     .empty-state {
       text-align: center;
       padding: 3rem;
-      color: var(--text-gray-500);
+      color: var(--text-teal-500);
     }
 
     .empty-state-icon {
@@ -517,7 +517,7 @@
         <div class="course-info-card">
           <h2 class="course-title">{{ $course->title ?? 'Sample Course Title' }}</h2>
           <span class="course-status">Pending Review</span>
-          <div style="margin-top: 1rem; color: var(--text-gray-600);">
+          <div style="margin-top: 1rem; color: var(--text-teal-600);">
             <p><strong>Instructor:</strong> {{ $course->instructor->name ?? 'John Doe' }}</p>
             <p><strong>Category:</strong> {{ $course->category ?? 'Programming' }}</p>
             <p><strong>Price:</strong> ${{ number_format($course->price ?? 99.99, 2) }}</p>
@@ -536,7 +536,7 @@
                     <div class="module-number">Lecture {{ $index }}</div>
                     <div class="module-description">Click to view lecture content and materials</div>
                   </div>
-                  <div style="color: var(--text-gray-500);">→</div>
+                  <div style="color: var(--text-teal-500);">→</div>
                 </a>
               @endforeach
             </div>

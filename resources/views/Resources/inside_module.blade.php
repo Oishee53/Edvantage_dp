@@ -7,13 +7,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-teal-100 min-h-screen">
     <div class="container mx-auto px-6 py-8 max-w-5xl">
         {{-- Header --}}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
-            <h1 class="text-2xl font-semibold text-gray-900 mb-3">{{ $course->name }}</h1>
-            <div class="flex items-center text-gray-600">
-                <i class="fas fa-book-open mr-3 text-gray-400"></i>
+        <div class="bg-white rounded-xl shadow-sm border border-teal-200 p-8 mb-8">
+            <h1 class="text-2xl font-semibold text-teal-900 mb-3">{{ $course->name }}</h1>
+            <div class="flex items-center text-teal-600">
+                <i class="fas fa-book-open mr-3 text-teal-400"></i>
                 <span class="text-base">Lecture {{ $moduleNumber }}</span>
             </div>
         </div>
@@ -37,22 +37,22 @@
             @auth
                 {{-- Video Section --}}
                 @if($resource->videos)
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div class="border-b border-gray-200 p-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-teal-200 overflow-hidden">
+                        <div class="border-b border-teal-200 p-6">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-4">
-                                        <i class="fas fa-play text-gray-600"></i>
+                                    <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center mr-4">
+                                        <i class="fas fa-play text-teal-600"></i>
                                     </div>
                                     <div>
-                                        <h2 class="text-lg font-semibold text-gray-900">Video Content</h2>
-                                        <p class="text-sm text-gray-500">Watch the lecture video</p>
+                                        <h2 class="text-lg font-semibold text-teal-900">Video Content</h2>
+                                        <p class="text-sm text-teal-500">Watch the lecture video</p>
                                     </div>
                                 </div>
                                 <button 
                                     onclick="toggleVideo()" 
                                     id="videoToggleBtn"
-                                    class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                                    class="bg-teal-600 hover:bg-teal-800 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
                                     <i class="fas fa-eye" id="videoToggleIcon"></i>
                                     <span id="videoToggleText">View Video</span>
                                 </button>
@@ -69,7 +69,7 @@
                                     class="w-full aspect-video">
                                 </mux-player>
                             </div>
-                            <div class="mt-4 text-sm text-gray-500 flex items-center bg-gray-50 p-3 rounded-lg">
+                            <div class="mt-4 text-sm text-teal-500 flex items-center bg-teal-50 p-3 rounded-lg">
                                 <i class="fas fa-info-circle mr-2"></i>
                                 Your progress is automatically saved as you watch
                             </div>
@@ -79,22 +79,22 @@
 
                 {{-- PDF Section --}}
                 @if($resource->pdf)
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div class="border-b border-gray-200 p-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-teal-200 overflow-hidden">
+                        <div class="border-b border-teal-200 p-6">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-4">
-                                        <i class="fas fa-file-pdf text-gray-600"></i>
+                                    <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center mr-4">
+                                        <i class="fas fa-file-pdf text-teal-600"></i>
                                     </div>
                                     <div>
-                                        <h2 class="text-lg font-semibold text-gray-900">PDF Document</h2>
-                                        <p class="text-sm text-gray-500">Download or view the lecture PDF</p>
+                                        <h2 class="text-lg font-semibold text-teal-900">PDF Document</h2>
+                                        <p class="text-sm text-teal-500">Download or view the lecture PDF</p>
                                     </div>
                                 </div>
                                 <a href="{{ route('secure.pdf.view', ['id' => $resource->id]) }}" 
                                    target="_blank" 
                                    rel="noopener noreferrer"
-                                   class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                                   class="bg-teal-600 hover:bg-teal-800 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
                                     <i class="fas fa-external-link-alt"></i>
                                     <span>View PDF</span>
                                 </a>
@@ -104,31 +104,31 @@
                 @endif
             @else
                 {{-- Guest message --}}
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-lock text-gray-400 text-xl"></i>
+                <div class="bg-white rounded-xl shadow-sm border border-teal-200 p-8 text-center">
+                    <div class="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-lock text-teal-400 text-xl"></i>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Authentication Required</h3>
-                    <p class="text-gray-600">Please log in to access the video content and resources.</p>
+                    <h3 class="text-lg font-semibold text-teal-900 mb-2">Authentication Required</h3>
+                    <p class="text-teal-600">Please log in to access the video content and resources.</p>
                 </div>
             @endauth
 
             {{-- Quiz Section --}}
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="border-b border-gray-200 p-6">
+            <div class="bg-white rounded-xl shadow-sm border border-teal-200 overflow-hidden">
+                <div class="border-b border-teal-200 p-6">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-4">
-                                <i class="fas fa-question-circle text-gray-600"></i>
+                            <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-question-circle text-teal-600"></i>
                             </div>
                             <div>
-                                <h2 class="text-lg font-semibold text-gray-900">Lecture Quiz</h2>
-                                <p class="text-sm text-gray-500">Test your knowledge</p>
+                                <h2 class="text-lg font-semibold text-teal-900">Lecture Quiz</h2>
+                                <p class="text-sm text-teal-500">Test your knowledge</p>
                             </div>
                         </div>
                         @if($quiz)
                             <a href="{{ route('user.quiz.start', ['course' => $course->id, 'module' => $moduleNumber]) }}"
-                               class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                               class="bg-teal-600 hover:bg-teal-800 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
                                 <i class="fas fa-play"></i>
                                 <span>Take Quiz</span>
                             </a>
@@ -137,7 +137,7 @@
                 </div>
                 
                 @if(!$quiz)
-                    <div class="p-6 text-gray-500 text-center bg-gray-50">
+                    <div class="p-6 text-teal-500 text-center bg-teal-50">
                         <i class="fas fa-info-circle mr-2"></i>
                         No quiz available for this lecture.
                     </div>
@@ -148,28 +148,28 @@
             @if($forum)
                 <x-discussion-forum :forum="$forum" :course="$course" />
             @else
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-comments text-gray-400 text-xl"></i>
+                <div class="bg-white rounded-xl shadow-sm border border-teal-200 p-8 text-center">
+                    <div class="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-comments text-teal-400 text-xl"></i>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Discussion Forum Not Available</h3>
-                    <p class="text-gray-600">The discussion forum for this lecture is not yet set up.</p>
+                    <h3 class="text-lg font-semibold text-teal-900 mb-2">Discussion Forum Not Available</h3>
+                    <p class="text-teal-600">The discussion forum for this lecture is not yet set up.</p>
                 </div>
             @endif
 
             {{-- Ask Questions Form --}}
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="bg-white rounded-xl shadow-sm border border-teal-200 p-6">
                 <form action="{{ route('questions.store') }}" method="POST">
                     @csrf
-                    <label for="question" class="block text-gray-700 font-medium mb-2">Ask a Question</label>
+                    <label for="question" class="block text-teal-700 font-medium mb-2">Ask a Question</label>
                     <input type="text" id="question" name="question"
-                           class="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4 focus:ring-2 focus:ring-gray-900 focus:outline-none">
+                           class="w-full border border-teal-300 rounded-lg px-4 py-2 mb-4 focus:ring-2 focus:ring-teal-900 focus:outline-none">
 
                     {{-- Hidden fields --}}
                     <input type="hidden" name="course_id" value="{{ $course->id }}">
                     <input type="hidden" name="module_number" value="{{ $moduleNumber }}">
 
-                    <button type="submit" class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg">
+                    <button type="submit" class="bg-teal-600 hover:bg-teal-800 text-white px-4 py-2 rounded-lg">
                         Post
                     </button>
                 </form>

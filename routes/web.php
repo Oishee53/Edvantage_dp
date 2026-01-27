@@ -35,20 +35,11 @@ Route::post('/logout', function () {
     return redirect('/');
 })->name('logout');
 
-
-
-
-
-
-
-
 // ----------------------------- Forget Password --------------------------//
 Route::controller(ForgotPasswordController::class)->group(function () {
     Route::post('forget-password', 'sendResetLinkEmail')->name('password.email');
     Route::get('/password/reset', 'showLinkRequestForm');
 });
-
-
 
 // ---------------------------- Reset Password ----------------------------//
 Route::controller(ResetPasswordController::class)->group(function () {
@@ -79,8 +70,6 @@ Route::get('/homepage', [UserController::class, 'homepage'])
 
 Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 
-
-
 Route::get('/courses/enrolled', function () {
     return 'Enrolled courses page coming soon!';
 });
@@ -89,15 +78,11 @@ Route::get('/browse',[CourseController::class, 'viewCourses'])->name('courses.al
 
 Route::get('/search', [CourseController::class, 'logged_in_search'])->name('courses.search');
 
-
-
 Route::get('/wishlist', [WishlistController::class, 'showWishlist'])->name('wishlist.all');
 Route::post('/wishlist/{id}', [WishlistController::class, 'addToWishlist'])->name('wishlist.add');
 
 Route::delete('/cart/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
 Route::delete('/wishlist/{id}', [WishlistController::class, 'removeFromWishlist'])->name('wishlist.remove');
-
-
 
 Route::get('/checkout', [PaymentController::class, 'checkout'])->name('checkout');
 
@@ -111,29 +96,11 @@ Route::get('/my-courses/{courseId}', [EnrollmentController::class, 'viewCourseMo
 Route::get('/my-courses/{courseId}/module/{moduleId}', [EnrollmentController::class, 'viewModuleResource'])->name('user.module.resource');
 Route::get('/inside-module/{courseId}/{moduleNumber}', [EnrollmentController::class, 'showInsideModule'])->name('inside.module');
 
-
-
-
 // Show quiz start page for a module
 Route::get('/user/courses/{course}/modules/{module}/quiz', [UserQuizController::class, 'startQuiz'])->name('user.quiz.start');
 
-
-
-
 Route::post('/quiz/submit/{course}/{moduleNumber}', [UserQuizController::class, 'submitQuiz'])->name('user.quiz.submit');
 Route::get('/quiz/result/{course}/{moduleNumber}', [UserQuizController::class, 'result'])->name('user.quiz.result');
-
-
-
-
-
-
-
-
-
-
-
-
 
 Route::get('/courses/{courseId}/final-exam', [StudentFinalExamController::class, 'show'])
         ->name('student.final-exam.show');
@@ -171,28 +138,6 @@ Route::get('/courses/{courseId}/final-exam', [StudentFinalExamController::class,
         [StudentFinalExamController::class, 'getRemainingTime'])
         ->name('student.final-exam.remaining-time');
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Route::post('/video-progress/save', [VideoProgressController::class, 'save'])->name('video.progress.save');
 
 Route::get('/my-progress', [UserProgressController::class, 'index'])->name('user.progress');
@@ -208,37 +153,9 @@ Route::post('/post_question', [QuestionController::class, 'store'])->name('quest
 Route::get('/student/questions/{id}', [NotificationController::class, 'show'])
     ->name('student.questions.show');
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Route::get('/notifications/{notification}/mark-read-redirect', 
+    [NotificationController::class, 'markAsReadAndRedirect'])
+    ->name('notifications.markAsReadAndRedirect');
 });
 
 Route::get('/certificate/{userId}/{courseId}', [CertificateController::class, 'generate'])

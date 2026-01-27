@@ -165,6 +165,26 @@
                                                 </a>
                                             </div>
                                         @endif
+
+                                        @if($notification->type === \App\Notifications\FinalExamGradedNotification::class)
+                                            <div class="notification-item">
+                                                <strong>Final Exam Graded</strong>
+                                                <p>Course: {{ $notification->data['course_title'] }}</p>
+                                                <p>{{ $notification->data['exam_title'] }}</p>
+                                                <p>Score: {{ $notification->data['total_score'] }}/{{ $notification->data['total_marks'] }} 
+                                                ({{ $notification->data['percentage'] }}%)</p>
+                                                <span class="badge badge-{{ $notification->data['passed'] ? 'success' : 'danger' }}">
+                                                    {{ $notification->data['passed'] ? 'Passed' : 'Failed' }}
+                                                </span>
+                                                <a href="{{ route('notifications.markAsReadAndRedirect', [
+                                                        'notification' => $notification->id,
+                                                        'redirect' => route('student.final-exam.result', $notification->data['submission_id'])
+                                                    ]) }}" 
+                                                class="btn btn-primary btn-sm">
+                                                    View Marks
+                                                </a>
+                                            </div>
+                                        @endif
                                     @endforeach
                                 @else
                                     <div class="py-10 text-center text-gray-400">

@@ -145,24 +145,27 @@ Route::middleware(['auth'])->prefix('instructor')->group(function () {
 
 // Other Instructor Routes (without prefix)
 Route::get('/instructor_homepage', [InstructorController::class, 'viewInstructorHomepage'])
-    ->middleware('auth');
-Route::post('/instructor/manage_courses/create', [PendingCourseController::class, 'store']);
-Route::get('/instructor/manage_resources/{course_id}/modules', [PendingCourseController::class, 'showModules']);
-Route::get('/instructor/manage_resources/{course_id}/modules/{module_id}/edit', [PendingCourseController::class, 'editModule']);
-Route::get('/instructor/manage_courses', function () {
-    $instructorId = auth()->user()->id;
-    $courses = Courses::where('instructor_id', $instructorId)->get();
-    $pendingCourses = PendingCourses::where('instructor_id', $instructorId)->get();
-    return view('Instructor.instructor_manage_courses', compact('courses','pendingCourses','instructorId'));
-});
-Route::post('/instructor/resources/{course_id}/modules/{module_id}/upload', [PendingCourseController::class, 'handleUpload'])->name('upload.instructor.resources');
-Route::get('/instructor/courses/{course}/modules/{module}/module/create', [PendingCourseController::class, 'addModule'])->name('module.instructor.create');
+        ->name('instructor.dashboard');
+Route::prefix('instructor')->group(function () {
+    Route::get('/manage_courses', function () {
+        $instructorId = auth()->user()->id;
+        $courses = Courses::where('instructor_id', $instructorId)->get();
+        $pendingCourses = PendingCourses::where('instructor_id', $instructorId)->get();
+        return view('Instructor.instructor_manage_courses', compact('courses','pendingCourses','instructorId'));
+    })->name('instructor.courses');
 
-Route::get('/instructor/manage_resources', function () {
-    return view('Instructor.instructor_manage_resources');
+    Route::post('/manage_courses/create', [PendingCourseController::class, 'store']);
+
+    Route::get('/manage_resources/{course_id}/modules', [PendingCourseController::class, 'showModules']);
+    Route::get('/manage_resources/{course_id}/modules/{module_id}/edit', [PendingCourseController::class, 'editModule']);
+    Route::post('/resources/{course_id}/modules/{module_id}/upload', [PendingCourseController::class, 'handleUpload'])
+        ->name('upload.instructor.resources');
+
+    Route::get('/courses/{course}/modules/{module}/module/create', [PendingCourseController::class, 'addModule'])
+        ->name('module.instructor.create');
+
 });
 
-Route::get('/instructor/manage_resources/add', [ResourceController::class,'viewCourses']);
 
 Route::get('/instructor/notifications/{id}', [NotificationController::class, 'viewNotification'])
     ->name('instructor.notifications.view')

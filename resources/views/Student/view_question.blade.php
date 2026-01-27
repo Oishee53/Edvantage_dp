@@ -18,30 +18,30 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen py-12">
+<body class="bg-teal-50 min-h-screen py-12">
     <div class="max-w-4xl mx-auto px-4">
         <!-- Header -->
         <div class="flex items-center gap-3 mb-8">
-            <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-                <i class="fa-solid fa-question text-gray-600 text-xl"></i>
+            <div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center">
+                <i class="fa-solid fa-question text-teal-600 text-xl"></i>
             </div>
             <div>
-                <h1 class="text-2xl font-semibold text-gray-900">Question Details</h1>
-                <p class="text-gray-600">Review the status and response from your instructor</p>
+                <h1 class="text-2xl font-semibold text-teal-900">Question Details</h1>
+                <p class="text-teal-600">Review the status and response from your instructor</p>
             </div>
         </div>
 
         <!-- Card -->
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-xl border border-teal-200 shadow-sm overflow-hidden">
             <!-- Question -->
-            <div class="px-6 py-5 border-b border-gray-200">
-                <h2 class="text-lg font-medium text-gray-900 mb-2">Your Question</h2>
-                <p class="text-gray-700">{{ $question->content }}</p>
+            <div class="px-6 py-5 border-b border-teal-200">
+                <h2 class="text-lg font-medium text-teal-900 mb-2">Your Question</h2>
+                <p class="text-teal-700">{{ $question->content }}</p>
             </div>
 
             <!-- Status -->
-            <div class="px-6 py-5 border-b border-gray-200">
-                <h2 class="text-lg font-medium text-gray-900 mb-3">Status</h2>
+            <div class="px-6 py-5 border-b border-teal-200">
+                <h2 class="text-lg font-medium text-teal-900 mb-3">Status</h2>
                 @if($question->status === 'answered')
                     <span class="inline-flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
                         <i class="fa-solid fa-check-circle"></i> Answered
@@ -60,8 +60,8 @@
             <!-- Answer / Message -->
             <div class="px-6 py-5">
                 @if($question->status === 'answered')
-                    <h2 class="text-lg font-medium text-gray-900 mb-2">Instructor’s Answer</h2>
-                    <p class="text-gray-700">{{ $question->answer }}</p>
+                    <h2 class="text-lg font-medium text-teal-900 mb-2">Instructor’s Answer</h2>
+                    <p class="text-teal-700">{{ $question->answer }}</p>
                 @elseif($question->status === 'rejected')
                     <div class="flex items-start gap-3">
                         <i class="fa-solid fa-circle-exclamation text-red-500 mt-1"></i>
@@ -76,8 +76,8 @@
             </div>
 
             <!-- Footer -->
-            <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end">
-                <a href="/homepage" class="inline-flex items-center gap-2 bg-gray-900 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 transition">
+            <div class="bg-teal-50 px-6 py-4 border-t border-teal-200 flex justify-end">
+                <a href="/homepage" class="inline-flex items-center gap-2 bg-teal-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-teal-800 transition">
                     <i class="fa-solid fa-arrow-left"></i> Back to homepage
                 </a>
             </div>

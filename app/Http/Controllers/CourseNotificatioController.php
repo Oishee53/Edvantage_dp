@@ -65,6 +65,7 @@ class CourseNotificatioController extends Controller
                 'title' =>  $pendingCourse->title,
                 'description' => $pendingCourse->description,
                 'category' => $pendingCourse->category,
+                'level' => $pendingCourse->level,
                 'video_count' => $pendingCourse->video_count,
                 'approx_video_length' => $pendingCourse->approx_video_length,
                 'total_duration' => $pendingCourse->total_duration,

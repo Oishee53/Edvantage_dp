@@ -26,7 +26,7 @@
             buttonText: 'Get started',
             buttonLink: '/register',
             decorativeType: 'waves',
-            image: '/image/hero1.png',
+            image: '/image/hero4.jpg',
             
         }
     ],

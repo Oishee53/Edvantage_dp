@@ -26,11 +26,13 @@ public function store(Request $request)
     'title' => 'required',
     'description' => 'nullable',
     'category' => 'required|string',
+    'level' => 'required|in:beginner,intermediate,advanced',
     'video_count' => 'required|integer',
     'approx_video_length' => 'required|integer',
     'total_duration' => 'required|numeric',
     'price' => 'required|numeric',
     'prerequisite' => 'nullable|string|max:255',
+    'level' => 'required|in:beginner,intermediate,advanced',
 ];
 
     $request->validate($rules);
@@ -47,6 +49,7 @@ public function store(Request $request)
         'title' => $request->title,
         'description' => $request->description,
         'category' => $request->category,
+        'level' => 'required|in:beginner,intermediate,advanced',
         'video_count' => $request->video_count,
         'approx_video_length' => $request->approx_video_length,
         'total_duration' => $request->total_duration,
