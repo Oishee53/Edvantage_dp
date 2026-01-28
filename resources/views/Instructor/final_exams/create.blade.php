@@ -187,6 +187,7 @@
                                     </h3>
                                     <button type="button" onclick="addQuestion()" 
                                         class="inline-flex items-center gap-2 px-4 py-2 bg-teal-700 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 text-sm">
+                                        <i class="fas fa-plus"></i>
                                         Add Question
                                     </button>
                                 </div>
@@ -197,19 +198,20 @@
                                 </div>
 
                                 <!-- Total Marks Display -->
-                                <div id="totalMarksCheck" class="bg-amber-50 rounded-xl p-6 text-center mb-6">
+                                <div id="totalMarksCheck" class="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center mb-6 shadow-md">
                                     <div class="flex items-center justify-center gap-3">
+                                        <i class="fas fa-calculator text-amber-600 text-xl"></i>
                                         <p class="text-lg font-semibold text-teal-900">
-                                            Total Question Marks: <span id="sumDisplay" class="text-amber-700">0</span> / <span id="targetMarks" class="text-amber-700">100</span>
+                                            Total Question Marks: <span id="sumDisplay" class="text-amber-700 font-bold">0</span> / <span id="targetMarks" class="text-amber-700 font-bold">100</span>
                                         </p>
                                     </div>
                                 </div>
 
                                 <!-- Publish Option -->
-                                <div class="bg-teal-50 rounded-xl border-1 border-teal-200 p-6 mb-6 shadow-md">
+                                <div class="bg-teal-50 rounded-xl border border-teal-200 p-6 mb-6 shadow-md">
                                     <label class="flex items-start gap-3 cursor-pointer group">
                                         <input type="checkbox" name="publish_now" value="1" 
-                                            class="w-5 h-5 text-teal-600 rounded focus:border-gray-600 transition-all mt-0.5 cursor-pointer">
+                                            class="w-5 h-5 text-teal-600 rounded focus:ring-teal-500 transition-all mt-0.5 cursor-pointer">
                                         <div>
                                             <span class="text-sm font-bold text-teal-900 group-hover:text-teal-700 transition-colors">
                                                 <i class="fas fa-globe text-green-600 mr-2"></i>Publish immediately (make available to students now)
@@ -225,12 +227,13 @@
                                 <div class="flex items-center gap-4 pt-6 border-t border-gray-200">
                                     <button type="submit" 
                                         class="flex-1 inline-flex items-center justify-center gap-2 px-8 py-3 bg-teal-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
+                                        <i class="fas fa-check-circle"></i>
                                         <span>Create Final Exam</span>
                                     </button>
                                     
                                     <a href="javascript:history.back()" 
                                         class="inline-flex items-center gap-2 px-8 py-3 bg-white text-teal-700 border-2 border-teal-700 rounded-xl font-semibold hover:bg-teal-700 hover:text-white transition-all">
-                                        <i class="fas fa-arrow-left"></i>
+                                        <i class="fas fa-times"></i>
                                         <span>Cancel</span>
                                     </a>
                                 </div>
@@ -261,13 +264,15 @@
     <script>
         let questionCount = 0;
 
-        // Add initial question
+        // Add initial question on page load
         document.addEventListener('DOMContentLoaded', function() {
             addQuestion();
             updateTotalMarks();
             
-            // Watch for changes in total_marks input
-            document.getElementById('total_marks').addEventListener('input', updateTotalMarks);
+            // Watch for changes in total_marks input to update the target
+            document.getElementById('total_marks').addEventListener('input', function() {
+                updateTotalMarks();
+            });
         });
 
         function addQuestion() {
@@ -276,9 +281,13 @@
             
             const questionCard = document.createElement('div');
             questionCard.className = 'question-card bg-gray-50 border-2 border-gray-200 rounded-2xl p-6 hover:border-gray-300 hover:shadow-lg transition-all duration-200 opacity-0 animate-slide-in';
+            questionCard.setAttribute('data-question-number', questionCount);
             questionCard.innerHTML = `
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-teal-700 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">${questionCount}</span>
+                        </div>
                         <h4 class="text-xl font-bold text-teal-900">Question ${questionCount}</h4>
                     </div>
                     <button type="button" onclick="removeQuestion(this)" 
@@ -304,8 +313,12 @@
                         Marks for this Question <span class="text-gray-600">*</span>
                     </label>
                     <input type="number" name="questions[${questionCount-1}][marks]" 
-                        class="w-full md:w-48 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-600 transition-all outline-none font-medium" 
-                        min="1" value="20" onchange="updateTotalMarks()" required>
+                        class="question-marks-input w-full md:w-48 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-gray-600 transition-all outline-none font-medium" 
+                        min="1" 
+                        step="0.5"
+                        value="20" 
+                        oninput="updateTotalMarks()" 
+                        required>
                 </div>
 
                 <div>
@@ -341,50 +354,58 @@
                 const titleText = card.querySelector('h4');
                 if (numberBadge) numberBadge.textContent = index + 1;
                 if (titleText) titleText.textContent = `Question ${index + 1}`;
+                card.setAttribute('data-question-number', index + 1);
             });
         }
 
         function updateTotalMarks() {
-            const marksInputs = document.querySelectorAll('input[name*="[marks]"]');
+            const marksInputs = document.querySelectorAll('.question-marks-input');
             let sum = 0;
             
             marksInputs.forEach(input => {
-                sum += parseInt(input.value) || 0;
+                const value = parseFloat(input.value) || 0;
+                sum += value;
             });
             
-            const targetMarks = parseInt(document.getElementById('total_marks').value) || 100;
+            const targetMarks = parseFloat(document.getElementById('total_marks').value) || 100;
             
-            document.getElementById('sumDisplay').textContent = sum;
-            document.getElementById('targetMarks').textContent = targetMarks;
+            document.getElementById('sumDisplay').textContent = sum.toFixed(1);
+            document.getElementById('targetMarks').textContent = targetMarks.toFixed(1);
             
-            // Visual feedback
+            // Visual feedback based on whether marks match
             const display = document.getElementById('totalMarksCheck');
+            const icon = display.querySelector('i');
+            const sumSpan = document.getElementById('sumDisplay');
+            const targetSpan = document.getElementById('targetMarks');
+            
             if (sum === targetMarks) {
-                display.className = 'bg-green-50 border-2 border-green-200 rounded-xl p-6 text-center mb-6';
-                display.querySelector('.fa-calculator').className = 'fas fa-check-circle text-green-600 text-xl';
-                display.querySelector('#sumDisplay').className = 'text-green-700';
-                display.querySelector('#targetMarks').className = 'text-green-700';
+                // Marks match - show green success state
+                display.className = 'bg-green-50 border-2 border-green-200 rounded-xl p-6 text-center mb-6 shadow-md';
+                icon.className = 'fas fa-check-circle text-green-600 text-xl';
+                sumSpan.className = 'text-green-700 font-bold';
+                targetSpan.className = 'text-green-700 font-bold';
             } else {
-                display.className = 'bg-amber-50 border-1 shadow-md border-amber-200 rounded-xl p-6 text-center mb-6';
-                display.querySelector('.fa-check-circle, .fa-calculator').className = 'fas fa-calculator text-amber-600 text-xl';
-                display.querySelector('#sumDisplay').className = 'text-amber-700';
-                display.querySelector('#targetMarks').className = 'text-amber-700';
+                // Marks don't match - show amber warning state
+                display.className = 'bg-amber-50 border border-amber-200 rounded-xl p-6 text-center mb-6 shadow-md';
+                icon.className = 'fas fa-calculator text-amber-600 text-xl';
+                sumSpan.className = 'text-amber-700 font-bold';
+                targetSpan.className = 'text-amber-700 font-bold';
             }
         }
 
         // Validate before submit
         document.getElementById('examForm').addEventListener('submit', function(e) {
-            const marksInputs = document.querySelectorAll('input[name*="[marks]"]');
+            const marksInputs = document.querySelectorAll('.question-marks-input');
             let sum = 0;
             marksInputs.forEach(input => {
-                sum += parseInt(input.value) || 0;
+                sum += parseFloat(input.value) || 0;
             });
             
-            const targetMarks = parseInt(document.getElementById('total_marks').value) || 100;
+            const targetMarks = parseFloat(document.getElementById('total_marks').value) || 100;
             
             if (sum !== targetMarks) {
                 e.preventDefault();
-                alert(`Sum of question marks (${sum}) must equal total marks (${targetMarks})`);
+                alert(`Sum of question marks (${sum.toFixed(1)}) must equal total marks (${targetMarks.toFixed(1)})`);
             }
         });
     </script>
