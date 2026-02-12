@@ -27,6 +27,7 @@ class PendingCourses extends Model
         'price',
         'prerequisite',
         'instructor_id',
+        'class_type',
     ];
 
     // Relationships
@@ -73,4 +74,9 @@ class PendingCourses extends Model
             }
         });
     }
+    public function liveClasses()
+{
+    return $this->hasMany(\App\Models\LiveClass::class,'course_id');
+}
+
 }

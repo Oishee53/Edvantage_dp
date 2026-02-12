@@ -521,8 +521,35 @@
             <p><strong>Instructor:</strong> {{ $course->instructor->name ?? 'John Doe' }}</p>
             <p><strong>Category:</strong> {{ $course->category ?? 'Programming' }}</p>
             <p><strong>Price:</strong> ${{ number_format($course->price ?? 99.99, 2) }}</p>
-          </div>
-        </div>
+           @if($course->class_type == 'live' || $course->class_type == 'both')
+
+    <h5>Live Class Schedule</h5>
+
+    @if($course->liveClasses && $course->liveClasses->count())
+
+        @foreach($course->liveClasses as $live)
+
+            <p>Date: {{ $live->live_date }}</p>
+            <p>Time: {{ $live->live_time }}</p>
+            <p>
+                Meet Link:
+                <a href="{{ $live->meet_link }}" target="_blank">
+                    Join Class
+                </a>
+            </p>
+
+            <hr>
+
+        @endforeach
+
+    @else
+
+        <p style="color:red;">Live class schedule not added.</p>
+
+    @endif
+
+@endif
+
 
         <!-- Modules Section -->
         <div class="modules-section">

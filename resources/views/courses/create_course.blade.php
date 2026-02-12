@@ -78,6 +78,15 @@
                                 <form action="/instructor/manage_courses/create" method="POST" enctype="multipart/form-data" class="space-y-6">
                                 @endif
                                     @csrf
+                                    <div class="mb-3">
+    <label>Class Type</label>
+    <select name="class_type" id="class_type" class="form-control">
+        <option value="recorded">Recorded</option>
+        <option value="live">Live</option>
+        <option value="both">Both</option>
+    </select>
+</div>
+
                                     
                                     <!-- Course Image -->
                                     <div>
@@ -143,6 +152,7 @@
                                             <option value="advanced">Advanced</option>
                                         </select>
                                     </div>
+                                    <div id="recordedFields">
 
                                     <!-- Grid for Number Fields -->
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -190,6 +200,29 @@
                                                 required>
                                         </div>
                                     </div>
+
+                                    </div>   <!-- recordedFields closed -->
+
+<div id="liveFields" style="display:none;">
+
+    <div class="mb-3">
+        <label>Live Date</label>
+        <input type="date" name="live_date" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Live Time</label>
+        <input type="time" name="live_time" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Meet Link</label>
+        <input type="text" name="meet_link" id="meet_link"
+               class="form-control">
+    </div>
+
+</div>
+
 
                                     <!-- Course Prerequisite -->
                                     <div>
@@ -241,5 +274,40 @@
             </div>
         </main>
     </div>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const classType = document.getElementById("class_type");
+    const liveFields = document.getElementById("liveFields");
+    const recordedFields = document.getElementById("recordedFields");
+
+    function toggleFields() {
+
+        if (classType.value === "live") {
+            liveFields.style.display = "block";
+            recordedFields.style.display = "none";
+            
+        }
+
+        else if (classType.value === "both") {
+            liveFields.style.display = "block";
+            recordedFields.style.display = "block";
+           
+        }
+
+        else {
+            liveFields.style.display = "none";
+            recordedFields.style.display = "block";
+        }
+    }
+
+    
+
+    classType.addEventListener("change", toggleFields);
+    toggleFields();
+
+});
+</script>
+
 </body>
 </html>

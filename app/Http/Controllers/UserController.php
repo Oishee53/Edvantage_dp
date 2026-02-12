@@ -27,7 +27,7 @@ public function homepage(RecommendationService $recommendationService)
 
     $uniqueCategories = $courses->pluck('category')->unique();
 
-    //  RECOMMENDED COURSES
+    // 🔥 RECOMMENDED COURSES
     $recommendedCourses = [];
 
     if ($user) {

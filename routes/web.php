@@ -188,3 +188,9 @@ Route::post('/course/rate', [CourseController::class, 'submitRating'])
 
 Route::get('/courses/{id}', [CourseController::class, 'show'])
     ->name('courses.details');
+    Route::get(
+    '/instructor/submit_course/{id}',
+    [App\Http\Controllers\CourseNotificatioController::class, 'sendNotification']
+    
+);
+
