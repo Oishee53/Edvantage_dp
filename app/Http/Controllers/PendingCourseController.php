@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\LiveClass;
 
 use App\Services\MuxService;
 use Illuminate\Http\Request;
@@ -28,18 +27,12 @@ public function store(Request $request)
     'description' => 'nullable',
     'category' => 'required|string',
     'level' => 'required|in:beginner,intermediate,advanced',
-    'video_count' => 'nullable|integer',
-'approx_video_length' => 'nullable|integer',
-'total_duration' => 'nullable|numeric',
-
+    'video_count' => 'required|integer',
+    'approx_video_length' => 'required|integer',
+    'total_duration' => 'required|numeric',
     'price' => 'required|numeric',
     'prerequisite' => 'nullable|string|max:255',
     'level' => 'required|in:beginner,intermediate,advanced',
-    'live_date' => 'nullable|date',
-'live_time' => 'nullable',
-'meet_link' => 'nullable|string',
-'class_type' => 'required|in:recorded,live,both',
-
 ];
 
     $request->validate($rules);
@@ -63,22 +56,7 @@ public function store(Request $request)
         'price' => $request->price,
         'instructor_id' => $instructorId,
         'prerequisite' => $request->prerequisite,
-        'class_type' => $request->class_type,
-        
-
     ]);
-    if ($request->class_type == 'both') {
-
-    LiveClass::create([
-        'course_id' => $course->id,
-        'live_date' => $request->live_date,
-        'live_time' => $request->live_time,
-        'meet_link' => $request->meet_link,
-    ]);
-
-
-}
-
     return redirect("/instructor/manage_resources/{$course->id}/modules")
            ->with('success', 'Course added successfully');
 }

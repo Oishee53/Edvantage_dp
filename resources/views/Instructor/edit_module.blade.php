@@ -299,7 +299,6 @@
     <!-- Main Content -->
     <section class="main-content">
       @auth
-      @if($course->class_type != 'live')
         <div class="upload-form-container">
           <h2 class="section-header">Upload Course Resources</h2>
           
@@ -325,7 +324,6 @@
           </a>
         </div>
       @else
-      @endif
         <p class="not-logged-in">You are not logged in. <a href="/" class="login-link">Go to Login</a></p>
       @endauth
     </section>

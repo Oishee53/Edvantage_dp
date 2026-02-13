@@ -83,6 +83,4 @@ class AdminController extends Controller
     return view('quiz.take_quiz', compact('course', 'quiz', 'questions', 'moduleNumber'));
 }
 
-
-
 }

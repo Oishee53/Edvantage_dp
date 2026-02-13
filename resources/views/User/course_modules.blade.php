@@ -468,28 +468,13 @@
 
                 <!-- Tab Content: Lectures -->
                 <div class="tab-content active" id="lectures-content">
-                    @if($course->class_type == 'live' || $course->class_type == 'both')
-
-    <div class="alert alert-info">
-
-        <h5>Live Class</h5>
-
-        @foreach($course->liveClasses as $live)
-
-            <p>Date: {{ $live->live_date }}</p>
-            <p>Time: {{ $live->live_time }}</p>
-
-            <a href="{{ $live->meet_link }}"
-               target="_blank"
-               class="btn btn-primary">
-               Join Live Class
-            </a>
-
-        @endforeach
-
+                    @foreach($course->liveClasses as $class)
+    <div>
+        <h4>{{ $class->title }}</h4>
+        <p>{{ $class->schedule_datetime }}</p>
+        <a href="{{ $class->meeting_link }}" target="_blank">Join Class</a>
     </div>
-
-@endif
+@endforeach
 
                     @forelse ($modules as $moduleNumber)
                         <a href="{{ route('inside.module', ['courseId' => $course->id, 'moduleNumber' => $moduleNumber]) }}" class="module-card">

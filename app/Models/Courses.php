@@ -79,7 +79,7 @@ public function averageRating()
 }
 public function liveClasses()
 {
-    return $this->hasMany(LiveClass::class,'course_id');
+    return $this->hasMany(LiveClass::class, 'course_id');
 }
 
 

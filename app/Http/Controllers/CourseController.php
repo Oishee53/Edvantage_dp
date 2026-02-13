@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\LiveClass;
 
 use App\Models\Courses;
 use App\Models\CourseRating;

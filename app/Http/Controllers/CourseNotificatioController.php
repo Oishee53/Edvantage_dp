@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\LiveClass;
+
 use App\Models\Courses;
 use App\Models\Resource;
 use Illuminate\Http\Request;
@@ -12,9 +12,6 @@ use Illuminate\Support\Facades\DB;
 use App\Notifications\rejectCourseNotification;
 use App\Notifications\approveCourseNotification;
 use App\Notifications\editCourseNotification;
-use App\Models\Enrollment;
-use App\Models\Notification;
-
 
 class CourseNotificatioController extends Controller
 {
@@ -61,24 +58,6 @@ class CourseNotificatioController extends Controller
     {
         DB::transaction(function () use ($course_id) {
             $pendingCourse = PendingCourses::findOrFail($course_id);
-            // 🔴 CHECK FOR BOTH TYPE REQUIREMENTS
-if ($pendingCourse->class_type == 'both') {
-
-    // Check recorded resources
-    $resourceCount = PendingResources::where('courseId', $course_id)->count();
-
-    if ($resourceCount == 0) {
-        return back()->withErrors('Recorded resources must be uploaded for BOTH class type.');
-    }
-
-    // Check live schedule
-    $liveExists = \App\Models\LiveClass::where('course_id', $course_id)->exists();
-
-    if (!$liveExists) {
-        return back()->withErrors('Live class schedule must be added for BOTH class type.');
-    }
-}
-
 
             // 1. Move pending course to courses table
             $course = Courses::create([
@@ -92,22 +71,8 @@ if ($pendingCourse->class_type == 'both') {
                 'total_duration' => $pendingCourse->total_duration,
                 'price' => $pendingCourse->price,
                 'instructor_id' => $pendingCourse->instructor_id,
-                'class_type' => $pendingCourse->class_type,
                 
             ]);
-
-            // ✅ MOVE LIVE CLASS DATA
-      $pendingLives = \App\Models\LiveClass::where('course_id', $pendingCourse->id)->get();
-
-foreach ($pendingLives as $live) {
-    \App\Models\LiveClass::create([
-        'course_id' => $course->id,
-        'live_date' => $live->live_date,
-        'live_time' => $live->live_time,
-        'meet_link' => $live->meet_link,
-    ]);
-}
-
 
             // 2. Move resources
             $pendingResources = PendingResources::where('courseId', $course_id)->get();
@@ -120,30 +85,6 @@ foreach ($pendingLives as $live) {
                     'pdf' => $res->pdf,
                 ]);
             }
-          
-
-if ($course->class_type == 'live' || $course->class_type == 'both') {
-
-    $live = $course->liveClasses()->first();
-
-    $students = Enrollment::where('course_id',$course->id)->get();
-
-    foreach ($students as $enroll) {
-
-        Notification::create([
-            'user_id' => $enroll->user_id,
-            'title' => 'Live Class Scheduled',
-            'message' =>
-                'Your live class is on ' .
-                $live->live_date . ' at ' .
-                $live->live_time .
-                '. Meet Link: ' .
-                $live->meet_link
-        ]);
-    }
-}
-
-            
 
             // 3. Remove from pending tables
             PendingResources::where('courseId', $course_id)->delete();

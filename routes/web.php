@@ -188,9 +188,7 @@ Route::post('/course/rate', [CourseController::class, 'submitRating'])
 
 Route::get('/courses/{id}', [CourseController::class, 'show'])
     ->name('courses.details');
-    Route::get(
-    '/instructor/submit_course/{id}',
-    [App\Http\Controllers\CourseNotificatioController::class, 'sendNotification']
-    
-);
+    Route::get('/instructor/live-class/{course_id}', [InstructorController::class, 'liveClassForm'])->name('live.class.form');
+
+Route::post('/instructor/live-class/store', [InstructorController::class, 'storeLiveClass'])->name('live.class.store');
 
