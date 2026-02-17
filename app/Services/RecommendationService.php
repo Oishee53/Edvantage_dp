@@ -13,7 +13,7 @@ class RecommendationService
 
     public function getRecommendedCourses(int $userId, int $limit = 6)
     {
-        // 1️⃣ Get user's enrolled course IDs
+        //  Get user's enrolled course IDs
         $enrolledCourseIds = Enrollment::where('user_id', $userId)
             ->pluck('course_id');
 
@@ -22,7 +22,7 @@ class RecommendationService
 
         $recommendations = collect();
 
-        // 2️⃣ Content + Level based progression
+        //  Content + Level based progression
         $lastCourse = $enrolledCourses->last();
         if ($lastCourse) {
             $targetLevel = $this->determineTargetLevel(
@@ -41,14 +41,14 @@ class RecommendationService
                           ->orWhere('category', 'LIKE', "%{$word}%");
                     }
                 })
-                ->withCount('quizzes') // ✅ load quizzes_count
+                ->withCount('quizzes') 
                 ->take($limit)
                 ->get();
 
             $recommendations = $recommendations->merge($contentBased);
         }
 
-        // 3️⃣ Co-enrollment: courses taken by users who took the same courses
+        //  Co-enrollment: courses taken by users who took the same courses
         if ($enrolledCourseIds->isNotEmpty()) {
             $similarUsers = Enrollment::whereIn('course_id', $enrolledCourseIds)
                 ->where('user_id', '!=', $userId)
@@ -60,7 +60,7 @@ class RecommendationService
 
             if ($coCourseIds->isNotEmpty()) {
                 $coCourses = Courses::whereIn('id', $coCourseIds)
-                    ->withCount('quizzes') // ✅ load quizzes_count
+                    ->withCount('quizzes') 
                     ->take($limit)
                     ->get();
 
@@ -68,7 +68,7 @@ class RecommendationService
             }
         }
 
-        // 4️⃣ Search intent matching
+        //  Search intent matching
         $keywords = UserSearch::where('user_id', $userId)
             ->latest()
             ->take(5)
@@ -83,20 +83,20 @@ class RecommendationService
                           ->orWhere('category', 'LIKE', "%{$keyword}%");
                     }
                 })
-                ->withCount('quizzes') // ✅ load quizzes_count
+                ->withCount('quizzes') 
                 ->take($limit)
                 ->get();
 
             $recommendations = $recommendations->merge($searchMatches);
         }
 
-        // 5️⃣ Cold start fallback: popular courses
+        //  Cold start fallback: popular courses
         if ($recommendations->isEmpty()) {
             $popular = Courses::whereNotIn('id', $enrolledCourseIds)
                 ->withCount('enrollments')  
                 ->orderByDesc('enrollments_count')
                 ->take($limit)
-                ->withCount('quizzes') // ✅ load quizzes_count
+                ->withCount('quizzes') 
                 ->get();
 
             $recommendations = $recommendations->merge($popular);
@@ -108,7 +108,6 @@ class RecommendationService
             ->take($limit);
     }
 
-    // -------------------------
     // Extract keywords from a course
     private function extractKeywords(Courses $course): array
     {
@@ -127,7 +126,7 @@ class RecommendationService
             ->toArray();
     }
 
-    // -------------------------
+    
     // Determine next level for a category
     private function determineTargetLevel(string $category, $enrolledCourseIds): string
     {
