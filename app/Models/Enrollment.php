@@ -20,5 +20,3 @@ class Enrollment extends Model
 
 
 }
-
-

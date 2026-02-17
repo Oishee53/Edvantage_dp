@@ -6,14 +6,20 @@
     <title>{{ $course->title }} - Lectures</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .heading-font {
+            font-family: 'Playfair Display', Georgia, serif;
         }
 
         i[class^="fa-"], i[class*=" fa-"] {
@@ -25,57 +31,112 @@
         body {
             background-color: #f9fafb;
             color: #333;
+            letter-spacing: -0.01em;
         }
 
         .container {
-            max-width: 550px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 2rem 1.5rem;
         }
 
         /* Course Header */
         .course-header {
             background: white;
-            border-radius: 8px;
-            padding: 1.5rem;
+            border-radius: 12px;
+            padding: 2rem;
             margin-bottom: 2rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             border: 1px solid #e5e7eb;
         }
 
         .course-title {
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: 700;
-            color: #1f2937;
+            color: #111827;
             margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
         }
 
         .course-subtitle {
             color: #6b7280;
-            font-size: 0.95rem;
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
         }
 
         .course-meta {
             display: flex;
-            gap: 1.5rem;
-            margin-top: 1rem;
-            font-size: 0.875rem;
+            gap: 2rem;
+            margin-top: 1.25rem;
+            font-size: 0.9rem;
             color: #6b7280;
         }
 
         .meta-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.625rem;
+            font-weight: 500;
         }
 
-        /* Module Card */
-        .module-card {
+        /* Tabs */
+        .tabs-container {
             background: white;
-            border-radius: 8px;
-            padding: 0.875rem 1rem;
-            margin-bottom: 0.65rem;
+            border-radius: 12px;
+            padding: 1.5rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            border-bottom: 2px solid #f3f4f6;
+            margin-bottom: 2rem;
+        }
+
+        .tab {
+            padding: 0.875rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #6b7280;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            letter-spacing: -0.01em;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            color: #0d7377;
+            border-bottom-color: #0d7377;
+        }
+
+        .tab:hover {
+            color: #0d7377;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Module Card - NO NUMBERS */
+        .module-card {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
             border: 1px solid #e5e7eb;
             transition: all 0.2s ease;
             cursor: pointer;
@@ -87,45 +148,23 @@
 
         .module-card:hover {
             border-color: #0d7377;
-            box-shadow: 0 4px 8px rgba(13, 115, 119, 0.1);
-            transform: translateY(-1px);
-        }
-
-        .module-left {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .module-number {
-            width: 32px;
-            height: 32px;
-            background: #f3f4f6;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: #0d7377;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-
-        .module-card:hover .module-number {
-            background: #0d7377;
-            color: white;
+            background: white;
+            box-shadow: 0 4px 12px rgba(13, 115, 119, 0.12);
+            transform: translateY(-2px);
         }
 
         .module-info h3 {
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 600;
             color: #1f2937;
-            margin-bottom: 0.2rem;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.01em;
         }
 
         .module-info p {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: #6b7280;
+            font-weight: 500;
         }
 
         .module-arrow {
@@ -140,115 +179,101 @@
 
         /* Empty State */
         .empty-state {
-            background: white;
-            border-radius: 8px;
-            padding: 3rem 2rem;
             text-align: center;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e5e7eb;
+            padding: 4rem 2rem;
         }
 
         .empty-icon {
-            width: 48px;
-            height: 48px;
+            width: 56px;
+            height: 56px;
             background: #f3f4f6;
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.25rem;
             color: #9ca3af;
         }
 
         .empty-state h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 1.25rem;
+            font-weight: 700;
             color: #1f2937;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.625rem;
+            letter-spacing: -0.02em;
         }
 
         .empty-state p {
             color: #6b7280;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            font-weight: 500;
         }
 
-        /* Section Divider */
-        .section-divider {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin: 2.5rem 0 1.5rem 0;
-        }
-
-        .divider-line {
-            flex: 1;
-            height: 1px;
-            background: #e5e7eb;
-        }
-
-        .divider-text {
-            color: #6b7280;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 600;
-        }
-
-        /* Final Exam Card - COMPACT & ELEGANT */
+        /* Final Exam Card - NO STATS */
         .final-exam-card {
-            background: white;
-            border-radius: 8px;
-            padding: 1.25rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            border: 2px solid #e5e7eb;
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 1.75rem;
+            border: 1px solid #e5e7eb;
         }
 
         .exam-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 0.875rem;
-            padding-bottom: 0.875rem;
-            border-bottom: 1px solid #f3f4f6;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
         }
 
         .exam-title-section {
             display: flex;
             align-items: center;
-            gap: 0.625rem;
+            gap: 0.875rem;
         }
 
         .exam-icon {
-            width: 32px;
-            height: 32px;
-            background: #f3f4f6;
-            border-radius: 6px;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #0d7377;
+            border: 1px solid #e5e7eb;
         }
 
         .exam-title {
-            font-size: 1rem;
+            font-size: 1.125rem;
             font-weight: 700;
             color: #1f2937;
             margin: 0;
+            letter-spacing: -0.01em;
         }
 
         .exam-subtitle {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: #6b7280;
-            margin-top: 0.1rem;
+            margin-top: 0.2rem;
+            font-weight: 500;
+        }
+
+        /* Button and Status in top right */
+        .exam-actions-top {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
 
         .status-badge {
-            padding: 0.375rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
             font-weight: 600;
             white-space: nowrap;
             border: 1px solid;
+            letter-spacing: -0.01em;
         }
 
         .status-not-started {
@@ -275,148 +300,128 @@
             border-color: #fecaca;
         }
 
-        /* Exam Stats - Compact Grid */
-        .exam-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .stat-box {
-            background: #f9fafb;
-            padding: 0.625rem;
-            border-radius: 6px;
-            text-align: center;
-            border: 1px solid #f3f4f6;
-        }
-
-        .stat-label {
-            font-size: 0.65rem;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            margin-bottom: 0.25rem;
-        }
-
-        .stat-value {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #1f2937;
-        }
-
-        /* Exam Actions - Compact */
-        .exam-actions {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 0.75rem 1rem;
+        /* Small Button in Top Right */
+        .btn-small {
+            padding: 0.5rem 1rem;
             border-radius: 6px;
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             text-align: center;
             text-decoration: none;
             transition: all 0.2s;
-            border: none;
+            border: 2px solid;
             cursor: pointer;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
         }
 
-        .btn-primary {
+        .btn-small.btn-primary {
             background: #0d7377;
             color: white;
-            border: 2px solid #0d7377;
+            border-color: #0d7377;
         }
 
-        .btn-primary:hover {
+        .btn-small.btn-primary:hover {
             background: #0a5c5f;
             border-color: #0a5c5f;
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(13, 115, 119, 0.2);
+            box-shadow: 0 2px 8px rgba(13, 115, 119, 0.25);
         }
 
-        .btn-secondary {
-            background: white;
-            color: #0d7377;
-            border: 2px solid #e5e7eb;
-        }
-
-        .btn-secondary:hover {
-            border-color: #0d7377;
-            background: #f9fafb;
-        }
-
-        .btn-disabled {
+        .btn-small.btn-disabled {
             background: #f3f4f6;
             color: #9ca3af;
             cursor: not-allowed;
-            border: 2px solid #e5e7eb;
+            border-color: #e5e7eb;
         }
 
-        .btn-disabled:hover {
+        .btn-small.btn-disabled:hover {
             transform: none;
             box-shadow: none;
         }
 
-        /* Notice Box - Compact */
+        /* Notice Box */
         .notice-box {
-            background: #f9fafb;
+            background: white;
             border-left: 3px solid #0d7377;
-            padding: 0.75rem;
-            border-radius: 4px;
-            margin-top: 0.75rem;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            border: 1px solid #e5e7eb;
+            border-left: 3px solid #0d7377;
         }
 
         .notice-box p {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: #4b5563;
-            line-height: 1.4;
+            line-height: 1.5;
+            font-weight: 500;
         }
 
         .notice-box strong {
             color: #0d7377;
+            font-weight: 600;
         }
 
-        /* Submitted Info - Compact */
+        /* Submitted Info */
         .submitted-info {
-            background: #f9fafb;
-            padding: 0.75rem;
-            border-radius: 6px;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
             margin-bottom: 1rem;
             text-align: center;
-            border: 1px solid #f3f4f6;
+            border: 1px solid #e5e7eb;
         }
 
         .submitted-info p {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: #6b7280;
+            font-weight: 500;
         }
 
         .submitted-info strong {
             color: #1f2937;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
+            font-weight: 600;
         }
 
         @media (max-width: 768px) {
-            .exam-stats {
-                grid-template-columns: repeat(2, 1fr);
+            .container {
+                padding: 1.5rem 1rem;
             }
 
-            .exam-actions {
-                flex-direction: column;
+            .course-header {
+                padding: 1.5rem;
+            }
+
+            .course-title {
+                font-size: 1.5rem;
+            }
+
+            .tabs-container {
+                padding: 1rem;
+            }
+
+            .tabs {
+                gap: 0.5rem;
+            }
+
+            .tab {
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
             }
 
             .course-meta {
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 0.625rem;
             }
 
             .exam-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.75rem;
+                flex-wrap: wrap;
+            }
+
+            .exam-actions-top {
+                flex-wrap: wrap;
             }
         }
     </style>
@@ -428,160 +433,191 @@
         <div class="container">
             <!-- Course Header -->
             <div class="course-header">
-            <h1 class="course-title">{{ $course->title }}</h1>
-            <p class="course-subtitle">Course Lectures</p>
-            
-            <div class="course-meta">
-                <div class="meta-item">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    <span>{{ count($modules) }} Lectures</span>
-                </div>
-                <div class="meta-item">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span>Self-paced</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modules List -->
-        @forelse ($modules as $moduleNumber)
-            <a href="{{ route('inside.module', ['courseId' => $course->id, 'moduleNumber' => $moduleNumber]) }}" class="module-card">
-                <div class="module-left">
-                    <div class="module-number">{{ $moduleNumber }}</div>
-                    <div class="module-info">
-                        <h3>Lecture {{ $moduleNumber }}</h3>
-                        <p>Click to access lecture content</p>
+                <h1 class="course-title heading-font">{{ $course->title }}</h1>
+                <p class="course-subtitle">Course Content</p>
+                
+                <div class="course-meta">
+                    <div class="meta-item">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span>{{ count($modules) }} Lectures</span>
+                    </div>
+                    <div class="meta-item">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Self-paced</span>
                     </div>
                 </div>
-                <svg class="module-arrow" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-            </a>
-        @empty
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
+            </div>
+
+            <!-- Tabs Container -->
+            <div class="tabs-container">
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab active" data-tab="lectures">
+                        <i class="fas fa-book-open" style="margin-right: 0.5rem;"></i>
+                        Lectures
+                    </button>
+                    <button class="tab" data-tab="final-exam">
+                        <i class="fas fa-file-alt" style="margin-right: 0.5rem;"></i>
+                        Final Exam
+                    </button>
                 </div>
-                <h3>No Lectures Available</h3>
-                <p>This course doesn't have any lectures yet.</p>
-            </div>
-        @endforelse
 
-        <!-- Final Exam Section -->
-        @php
-            $finalExam = \App\Models\FinalExam::where('course_id', $course->id)
-                ->where('status', 'published')
-                ->first();
-            
-            $submission = null;
-            if ($finalExam && auth()->check()) {
-                $submission = \App\Models\FinalExamSubmission::where('final_exam_id', $finalExam->id)
-                    ->where('user_id', auth()->id())
-                    ->first();
-            }
-        @endphp
+                <!-- Tab Content: Lectures -->
+                <div class="tab-content active" id="lectures-content">
+                    @foreach($course->liveClasses as $class)
+    <div>
+        <h4>{{ $class->title }}</h4>
+        <p>{{ $class->schedule_datetime }}</p>
+        <a href="{{ $class->meeting_link }}" target="_blank">Join Class</a>
+    </div>
+@endforeach
 
-        @if($finalExam)
-            <div class="section-divider">
-                <div class="divider-line"></div>
-                <span class="divider-text">Final Assessment</span>
-                <div class="divider-line"></div>
-            </div>
-
-            <div class="final-exam-card">
-                <div class="exam-header">
-                    <div class="exam-title-section">
-                        <div class="exam-icon">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    @forelse ($modules as $moduleNumber)
+                        <a href="{{ route('inside.module', ['courseId' => $course->id, 'moduleNumber' => $moduleNumber]) }}" class="module-card">
+                            <div class="module-info">
+                                <h3>Lecture {{ $moduleNumber }}</h3>
+                                <p>Click to access lecture content</p>
+                            </div>
+                            <svg class="module-arrow" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>
+                        </a>
+                    @empty
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="heading-font">No Lectures Available</h3>
+                            <p>This course doesn't have any lectures yet.</p>
                         </div>
-                        <div>
-                            <h3 class="exam-title">Final Exam</h3>
-                            <p class="exam-subtitle">{{ $finalExam->title }}</p>
-                        </div>
-                    </div>
+                    @endforelse
+                </div>
 
-                    @if($submission)
-                        @if($submission->status === 'not_started' || $submission->status === 'in_progress')
-                            <span class="status-badge status-not-started">Not Completed</span>
-                        @elseif($submission->status === 'submitted')
-                            <span class="status-badge status-pending">Awaiting Grading</span>
-                        @elseif($submission->status === 'graded')
-                            @if($submission->percentage >= 70)
-                                <span class="status-badge status-passed">Passed · {{ number_format($submission->percentage, 0) }}%</span>
-                            @else
-                                <span class="status-badge status-failed">Failed · {{ number_format($submission->percentage, 0) }}%</span>
+                <!-- Tab Content: Final Exam -->
+                <div class="tab-content" id="final-exam-content">
+                    @php
+                        $finalExam = \App\Models\FinalExam::where('course_id', $course->id)
+                            ->where('status', 'published')
+                            ->first();
+                        
+                        $submission = null;
+                        if ($finalExam && auth()->check()) {
+                            $submission = \App\Models\FinalExamSubmission::where('final_exam_id', $finalExam->id)
+                                ->where('user_id', auth()->id())
+                                ->first();
+                        }
+                    @endphp
+
+                    @if($finalExam)
+                        <div class="final-exam-card">
+                            <div class="exam-header">
+                                <div class="exam-title-section">
+                                    <div class="exam-icon">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="exam-title heading-font">Final Exam</h3>
+                                        <p class="exam-subtitle">{{ $finalExam->title }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="exam-actions-top">
+                                    @if($submission)
+                                        @if($submission->status === 'not_started' || $submission->status === 'in_progress')
+                                            <span class="status-badge status-not-started">Not Completed</span>
+                                        @elseif($submission->status === 'submitted')
+                                            <span class="status-badge status-pending">Awaiting Grading</span>
+                                        @elseif($submission->status === 'graded')
+                                            @if($submission->percentage >= 70)
+                                                <span class="status-badge status-passed">Passed · {{ number_format($submission->percentage, 0) }}%</span>
+                                            @else
+                                                <span class="status-badge status-failed">Failed · {{ number_format($submission->percentage, 0) }}%</span>
+                                            @endif
+                                        @endif
+                                    @else
+                                        <span class="status-badge status-not-started">Not Started</span>
+                                    @endif
+
+                                    @if(!$submission || $submission->status === 'not_started')
+                                        <a href="{{ route('student.final-exam.show', $course->id) }}" class="btn-small btn-primary">
+                                            Start Exam
+                                        </a>
+                                    @elseif($submission->status === 'in_progress')
+                                        <a href="{{ route('student.final-exam.start', $finalExam->id) }}" class="btn-small btn-primary">
+                                            Continue
+                                        </a>
+                                    @elseif($submission->status === 'submitted')
+                                        <button class="btn-small btn-disabled" disabled>
+                                            Pending
+                                        </button>
+                                    @elseif($submission->status === 'graded')
+                                        <a href="{{ route('student.final-exam.result', $submission->id) }}" class="btn-small btn-primary">
+                                            View Results
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+
+                            @if($submission && $submission->status === 'submitted')
+                                <div class="submitted-info">
+                                    <p>Submitted on <strong>{{ $submission->submitted_at->format('M d, Y - g:i A') }}</strong></p>
+                                </div>
                             @endif
-                        @endif
+
+                            @if(!$submission || $submission->status === 'not_started')
+                                <div class="notice-box">
+                                    <p><strong>Note:</strong> Complete all lectures before attempting the final exam. Upload photos of handwritten answers. Passing score: 70%.</p>
+                                </div>
+                            @endif
+                        </div>
                     @else
-                        <span class="status-badge status-not-started">Not Started</span>
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="heading-font">No Final Exam Available</h3>
+                            <p>The final exam has not been published yet.</p>
+                        </div>
                     @endif
                 </div>
-
-                <div class="exam-stats">
-                    <div class="stat-box">
-                        <div class="stat-label">Questions</div>
-                        <div class="stat-value">{{ $finalExam->questions()->count() }}</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-label">Marks</div>
-                        <div class="stat-value">{{ $finalExam->total_marks }}</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-label">Duration</div>
-                        <div class="stat-value">{{ $finalExam->duration_minutes }}m</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-label">Passing</div>
-                        <div class="stat-value">70%</div>
-                    </div>
-                </div>
-
-                @if($submission && $submission->status === 'submitted')
-                    <div class="submitted-info">
-                        <p>Submitted on <strong>{{ $submission->submitted_at->format('M d, Y - g:i A') }}</strong></p>
-                    </div>
-                @endif
-
-                <div class="exam-actions">
-                    @if(!$submission || $submission->status === 'not_started')
-                        <a href="{{ route('student.final-exam.show', $course->id) }}" class="btn btn-primary">
-                            Start Final Exam
-                        </a>
-                    @elseif($submission->status === 'in_progress')
-                        <a href="{{ route('student.final-exam.start', $finalExam->id) }}" class="btn btn-primary">
-                            Continue Exam
-                        </a>
-                    @elseif($submission->status === 'submitted')
-                        <button class="btn btn-disabled" disabled>
-                            Awaiting Grading
-                        </button>
-                    @elseif($submission->status === 'graded')
-                        <a href="{{ route('student.final-exam.result', $submission->id) }}" class="btn btn-primary">
-                            View Results
-                        </a>
-                    @endif
-
-                    <a href="{{ route('student.final-exam.show', $course->id) }}" class="btn btn-secondary">
-                        Details
-                    </a>
-                </div>
-
-                @if(!$submission || $submission->status === 'not_started')
-                    <div class="notice-box">
-                        <p><strong>Note:</strong> Complete all lectures before attempting the final exam. Upload photos of handwritten answers. Passing score: 70%.</p>
-                    </div>
-                @endif
             </div>
-        @endif
         </div>
     </div>
+
+    <script>
+        // Tab Switching Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+
+                    // Show corresponding content
+                    const tabName = this.getAttribute('data-tab');
+                    const targetContent = document.getElementById(tabName + '-content');
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

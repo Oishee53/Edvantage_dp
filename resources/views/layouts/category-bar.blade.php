@@ -1,4 +1,4 @@
-    <!-- Category Bar -->
+<!-- Category Bar -->
     <div class="fixed top-16 left-0 right-0 z-40 bg-teal-700 shadow-lg" x-data="{ 
         scrollContainer: null,
         showLeft: false,

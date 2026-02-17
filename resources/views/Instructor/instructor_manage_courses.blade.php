@@ -139,43 +139,46 @@
                           </div>
                             <!-- Action Dropdown (TOP RIGHT) -->
                             <div class="absolute top-4 right-4">
-                                <button 
-                                    type="button"
-                                    class="p-2 rounded-lg hover:bg-gray-100 text-gray-600"
-                                    onclick="this.nextElementSibling.classList.toggle('hidden')"
-                                >
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
+    <button 
+        type="button"
+        class="p-2 rounded-lg hover:bg-gray-100 text-gray-600"
+        onclick="this.nextElementSibling.classList.toggle('hidden')"
+    >
+        <i class="fas fa-ellipsis-v"></i>
+    </button>
 
-                                <div class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                                    <a 
-                                        href="{{ url("/admin_panel/manage_resources/{$course->id}/modules") }}"
-                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                    >
-                                        Manage Modules
-                                    </a>
+    <div class="hidden absolute right-0 -bottom-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[9999]">
 
-                                    @php
-                                        $finalExam = \App\Models\FinalExam::where('course_id', $course->id)->first();
-                                    @endphp
 
-                                    @if($finalExam)
-                                        <a 
-                                            href="{{ route('instructor.final-exams.show', $finalExam->id) }}"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        >
-                                            View Final Exam
-                                        </a>
-                                    @else
-                                        <a 
-                                            href="{{ route('instructor.final-exams.create') }}?course_id={{ $course->id }}"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        >
-                                            Create Final Exam
-                                        </a>
-                                    @endif
-                                </div>
-                            </div>
+        <a href="{{ url("/admin_panel/manage_resources/{$course->id}/modules") }}"
+           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+           Manage Modules
+        </a>
+
+        <a href="{{ route('live.class.form', $course->id) }}"
+           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+           Schedule Live Class
+        </a>
+
+        @php
+            $finalExam = \App\Models\FinalExam::where('course_id', $course->id)->first();
+        @endphp
+
+        @if($finalExam)
+            <a href="{{ route('instructor.final-exams.show', $finalExam->id) }}"
+               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+               Manage Final Exam
+            </a>
+        @else
+            <a href="{{ route('instructor.final-exams.create') }}?course_id={{ $course->id }}"
+               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+               Create Final Exam
+            </a>
+        @endif
+
+    </div>
+</div>
+
 
                         </div>
                       </div>

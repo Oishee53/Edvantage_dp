@@ -162,7 +162,6 @@ class StudentFinalExamController extends Controller
                 return response()->json(['error' => 'Maximum 5 images per question'], 400);
             }
 
-            // ✅ Upload to Cloudinary - SAME METHOD as your UploadController
             $uploadedFile = $request->file('image');
             
             $result = Cloudinary::uploadApi()->upload($uploadedFile->getRealPath(), [
@@ -286,9 +285,9 @@ class StudentFinalExamController extends Controller
             }
         }
 
-        // 🎥 HANDLE WEBCAM VIDEO
+        //  HANDLE WEBCAM VIDEO
         if ($request->hasFile('webcam_video')) {
-            // 1️⃣ Upload to Cloudinary
+            // Upload to Cloudinary
             $cloudinaryResult = Cloudinary::uploadApi()->upload(
                 $request->file('webcam_video')->getRealPath(),
                 [
@@ -299,7 +298,7 @@ class StudentFinalExamController extends Controller
 
             $cloudinaryUrl = $cloudinaryResult['secure_url'];
 
-            // 2️⃣ Send to Mux (USING YOUR EXISTING SERVICE)
+            //  Send to Mux (USING YOUR EXISTING SERVICE)
             $muxResult = $muxService->uploadVideo($cloudinaryUrl);
 
             if (isset($muxResult['playback_id'])) {
@@ -307,9 +306,9 @@ class StudentFinalExamController extends Controller
             }
         }
 
-        // 🖥️ HANDLE SCREEN RECORDING
+        //  HANDLE SCREEN RECORDING
         if ($request->hasFile('screen_recording')) {
-            // 1️⃣ Upload to Cloudinary
+            // 1️ Upload to Cloudinary
             $cloudinaryResult = Cloudinary::uploadApi()->upload(
                 $request->file('screen_recording')->getRealPath(),
                 [
@@ -320,7 +319,7 @@ class StudentFinalExamController extends Controller
 
             $cloudinaryUrl = $cloudinaryResult['secure_url'];
 
-            // 2️⃣ Send to Mux
+            //  Send to Mux
             $muxResult = $muxService->uploadVideo($cloudinaryUrl);
 
             if (isset($muxResult['playback_id'])) {
