@@ -27,6 +27,7 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\StudentFinalExamController;
 use App\Http\Controllers\DiscussionForumController;
+use App\Http\Controllers\NotebookController;
 
 Route::get('/', [LandingController::class, 'showLanding']);
 
@@ -191,4 +192,24 @@ Route::get('/courses/{id}', [CourseController::class, 'show'])
     Route::get('/instructor/live-class/{course_id}', [InstructorController::class, 'liveClassForm'])->name('live.class.form');
 
 Route::post('/instructor/live-class/store', [InstructorController::class, 'storeLiveClass'])->name('live.class.store');
+
+Route::middleware(['auth'])->prefix('courses/{courseId}/notebook')->group(function () {
+
+    // Main notebook page (per course)
+    Route::get('/', [NotebookController::class, 'index'])->name('notebook.index');
+
+    // Upload a document
+    Route::post('/upload', [NotebookController::class, 'upload'])->name('notebook.upload');
+
+    // Ask a question (RAG)
+    Route::post('/ask', [NotebookController::class, 'ask'])->name('notebook.ask');
+
+    // Delete a document
+    Route::delete('/documents/{documentId}', [NotebookController::class, 'deleteDocument'])->name('notebook.deleteDocument');
+
+    // Clear chat history
+    Route::delete('/history', [NotebookController::class, 'clearHistory'])->name('notebook.clearHistory');
+});
+
+
 
