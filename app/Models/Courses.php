@@ -81,6 +81,9 @@ public function liveClasses()
 {
     return $this->hasMany(LiveClass::class, 'course_id');
 }
-
+public function assignments()
+{
+    return $this->hasMany(Assignment::class, 'course_id', 'id');
+}
 
 }

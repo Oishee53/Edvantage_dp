@@ -14,6 +14,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use App\Models\Certificates;
+use App\Models\AssignmentSubmission;
 
 class CertificateController extends Controller
 {
@@ -118,7 +119,17 @@ public function generate($userId, $courseId)
         'average_percentage' => $averageScore,
         'old_wrong_average' => $quizSubmissions->avg('score')
     ]);
+$assignments = $course->assignments;
 
+foreach ($assignments as $assignment) {
+    $submitted = AssignmentSubmission::where('assignment_id', $assignment->id)
+        ->where('student_id', auth()->id())
+        ->exists();
+
+    if (!$submitted) {
+        return back()->with('error', 'Complete all assignments first');
+    }
+}
     //  Check eligibility -----
     if ($completionPercentage < 100 || $averageScore < 70) {
         return redirect()->back()->with('error', 
