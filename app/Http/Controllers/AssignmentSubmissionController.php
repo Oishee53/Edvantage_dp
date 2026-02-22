@@ -8,6 +8,8 @@ use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use Carbon\Carbon;
 use App\Models\AssignmentSubmissionFile;
+use App\Notifications\AssignmentSubmittedNotification;
+use App\Models\User;
 class AssignmentSubmissionController extends Controller
 {
   public function store(Request $request)
@@ -39,6 +41,17 @@ class AssignmentSubmissionController extends Controller
             'status' => 'submitted'
         ]);
     }
+    // 🔔 Notify instructor only when submission is first created
+if ($submission->wasRecentlyCreated) {
+
+    $instructor = $assignment->course->instructor;
+
+    if ($instructor) {
+        $instructor->notify(
+            new AssignmentSubmittedNotification($submission)
+        );
+    }
+}
 
     // Store multiple files
     foreach ($request->file('files') as $file) {

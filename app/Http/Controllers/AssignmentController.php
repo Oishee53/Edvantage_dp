@@ -87,6 +87,10 @@ public function grade(Request $request, $id)
         'status' => 'graded',
         'graded_at' => now()
     ]);
+    // 🔔 Notify the student who submitted
+    $submission->student->notify(
+        new \App\Notifications\AssignmentGradedNotification($submission)
+    );
 
     return redirect()->route('assignment.submissions',
         $submission->assignment_id)

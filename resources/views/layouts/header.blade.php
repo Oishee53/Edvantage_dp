@@ -119,7 +119,9 @@
                                            $notification->type === \App\Notifications\QuestionAnsweredNotification::class||
                                            $notification->type === \App\Notifications\FinalExamGradedNotification::class ||
                                            $notification->type === \App\Notifications\NewAssignmentNotification::class ||
-                                           $notification->type === \App\Notifications\AssignmentDeadlineUpdatedNotification::class;    
+                                           $notification->type === \App\Notifications\AssignmentDeadlineUpdatedNotification::class ||
+                                           $notification->type === \App\Notifications\AssignmentSubmittedNotification::class ||
+                                           $notification->type === \App\Notifications\AssignmentGradedNotification::class; 
                                         
                                 });
                                 $relevantCount = $relevantNotifications->count();
@@ -153,6 +155,54 @@
                             <div class="max-h-96 overflow-y-auto">
                                 @if($relevantCount > 0)
                                     @foreach($relevantNotifications as $notification)
+                                    @if($notification->type === \App\Notifications\AssignmentGradedNotification::class)
+    <a href="{{ route('assignment.show', $notification->data['assignment_id']) }}"
+       class="block px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-100 border-l-4 border-l-blue-500">
+        <div class="flex items-start gap-3">
+            <div class="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-check text-blue-600 text-sm"></i>
+            </div>
+            <div>
+                <p class="text-sm font-semibold text-gray-900 mb-1">
+                    Assignment Graded
+                </p>
+                <p class="text-sm text-gray-600">
+                    {{ $notification->data['assignment_title'] }}
+                </p>
+                <p class="text-sm font-medium text-gray-800">
+                    Score: {{ $notification->data['score'] }}/{{ $notification->data['total_marks'] }}
+                </p>
+                <p class="text-xs text-teal-500 mt-1">
+                    {{ $notification->created_at->diffForHumans() }}
+                </p>
+            </div>
+        </div>
+    </a>
+@endif
+                                    @if($notification->type === \App\Notifications\AssignmentSubmittedNotification::class)
+    <a href="{{ route('assignment.submissions', $notification->data['assignment_id']) }}"
+       class="block px-4 py-3 hover:bg-yellow-50 transition-colors border-b border-gray-100 border-l-4 border-l-yellow-500">
+        <div class="flex items-start gap-3">
+            <div class="w-9 h-9 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-file-upload text-yellow-600 text-sm"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-sm font-semibold text-gray-900 mb-1">
+                    New Assignment Submission
+                </p>
+                <p class="text-sm text-gray-600">
+                    {{ $notification->data['student_name'] }}
+                    submitted
+                    {{ $notification->data['assignment_title'] }}
+                </p>
+                <p class="text-xs text-teal-500 mt-1">
+                    {{ $notification->created_at->diffForHumans() }}
+                </p>
+            </div>
+        </div>
+    </a>
+@endif
+
                                     @if($notification->type === \App\Notifications\AssignmentDeadlineUpdatedNotification::class)
 <a href="{{ route('user.course.modules', $notification->data['course_id']) }}"
    class="block px-4 py-3 hover:bg-yellow-50 transition-colors border-b border-gray-100 border-l-4 border-l-yellow-500">
@@ -437,8 +487,9 @@
                                        $notification->type === \App\Notifications\QuestionAnsweredNotification::class ||
                                        $notification->type === \App\Notifications\FinalExamGradedNotification::class ||
                                          $notification->type === \App\Notifications\NewAssignmentNotification::class  ||
-                                         $notification->type === \App\Notifications\AssignmentDeadlineUpdatedNotification::class;
-
+                                         $notification->type === \App\Notifications\AssignmentDeadlineUpdatedNotification::class ||
+                                           $notification->type === \App\Notifications\AssignmentSubmittedNotification::class ||
+                                           $notification->type === \App\Notifications\AssignmentGradedNotification::class;
                             });
                             $mobileRelevantCount = $mobileRelevantNotifications->count();
                         @endphp

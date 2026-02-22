@@ -119,9 +119,20 @@
                         @csrf
 
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Score</label>
-                            <input type="number" name="score" required
-                                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-gray-800">
+                          <label class="block text-sm font-semibold text-gray-700 mb-1">
+    Score (Out of {{ $submission->assignment->marks }})
+</label>
+
+<input type="number"
+       name="score"
+       min="0"
+       max="{{ $submission->assignment->marks }}"
+       required
+       class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-gray-800">
+
+<p class="text-xs text-gray-500 mt-1">
+    Maximum marks: {{ $submission->assignment->marks }}
+</p>
                         </div>
 
                         <div class="pt-2 flex items-center gap-3">
