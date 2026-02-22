@@ -159,6 +159,10 @@
            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
            Schedule Live Class
         </a>
+        <a href="{{ route('instructor.assignments.index',$course->id) }}"
+   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+   Manage Assignments
+</a>
 
         @php
             $finalExam = \App\Models\FinalExam::where('course_id', $course->id)->first();
