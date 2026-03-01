@@ -2,635 +2,221 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course Lectures - {{ $course->title }}</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f2f9',
+                            100: '#e3e6f3',
+                            600: '#1a2d52',
+                            700: '#0E1B33',
+                            800: '#0a1426',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
-        /* Custom CSS Variables */
-        :root {
-            --primary-color: #0E1B33;
-            --primary-light-hover-bg: #E3E6F3;
-            --body-background: #f9fafb;
-            --card-background: #ffffff;
-            --text-default: #333;
-            --text-teal-600: #4b5563;
-            --text-teal-700: #374151;
-            --text-teal-500: #6b7280;
-            --border-color: #e5e7eb;
-            --edit-bg: #EDF2FC;
-            --edit-text: #0E1B33;
-            --delete-bg: #FEF2F2;
-            --delete-icon: #DC2626;
-            --green-600: #059669;
-            --warning-color: #f59e0b;
-            --success-color: #059669;
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--body-background);
-            margin: 0;
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Sidebar - Matching Dashboard Style */
-        .sidebar {
-            width: 17.5rem;
-            background-color: var(--card-background);
-            min-height: 100vh;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            position: fixed;
-            left: 0;
-            top: 0;
-        }
-
-        .sidebar-header {
-            padding: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--primary-color);
-            font-weight: 700;
-            font-size: 1.25rem;
-        }
-
-        .sidebar-header img {
-            height: 2.5rem;
-        }
-
-        .sidebar-nav {
-            margin-top: 2.5rem;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-nav a {
-            display: block;
-            padding: 0.75rem 1.5rem;
-            color: var(--primary-color);
-            font-weight: 500;
-            text-decoration: none;
-            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-        }
-
-        .sidebar-nav a:hover {
-            background-color: var(--primary-light-hover-bg);
-            color: var(--primary-color);
-        }
-
-        .sidebar-nav a.active {
-            background-color: var(--primary-light-hover-bg);
-            color: var(--primary-color);
-        }
-
-        /* Main Content Wrapper - Matching Dashboard Style */
-        .main-wrapper {
-            margin-left: 17.5rem;
-            flex: 1;
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 2rem;
-        }
-
-        /* Top bar - Matching Dashboard Style */
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .top-bar-title {
-            font-size: 1.5rem;
-            font-weight: 400;
-            color: var(--primary-color);
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .user-info span {
-            color: var(--primary-color);
-            font-weight: 500;
-        }
-
-        .logout-button {
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.25rem;
-            border: none;
-            cursor: pointer;
-            text-decoration: none;
-            font-weight: 500;
-            transition: opacity 0.2s ease-in-out;
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .logout-button:hover {
-            opacity: 0.9;
-        }
-
-        /* Course Header */
-        .course-header {
-            background-color: var(--card-background);
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .course-header h2 {
-            color: var(--primary-color);
-            font-size: 1.75rem;
-            font-weight: 600;
-            margin: 0 0 0.5rem 0;
-        }
-
-        .course-title {
-            color: var(--text-teal-600);
-            font-size: 1.125rem;
-            font-weight: 500;
-            margin-bottom: 1.5rem;
-        }
-
-        .progress-section {
-            margin-top: 1.5rem;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: var(--edit-bg);
-            border-radius: 5px;
-            margin: 1rem 0;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--success-color) 0%, #10b981 100%);
-            border-radius: 5px;
-            transition: width 0.5s ease;
-        }
-
-        .progress-text {
-            font-size: 0.875rem;
-            color: var(--text-teal-600);
-            margin-top: 0.5rem;
-            font-weight: 500;
-        }
-
-        /* Modules Section */
-        .modules-section {
-            background-color: var(--card-background);
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            overflow: hidden;
-            margin-bottom: 2rem;
-        }
-
-        .modules-section-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            background-color: var(--edit-bg);
-        }
-
-        .modules-section-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--primary-color);
-            margin: 0;
-        }
-
-        .modules-list {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .module-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            transition: background-color 0.2s ease-in-out;
-        }
-
-        .module-item:last-child {
-            border-bottom: none;
-        }
-
-        .module-item:hover {
-            background-color: var(--body-background);
-        }
-
-        .module-info {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            flex: 1;
-        }
-
-        .module-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 0.25rem;
-        }
-
-        .upload-status {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .status-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 12px;
-            flex-shrink: 0;
-        }
-
-        .status-uploaded {
-            background-color: var(--success-color);
-            color: white;
-        }
-
-        .status-pending {
-            background-color: var(--warning-color);
-            color: white;
-        }
-
-        .status-text {
-            font-size: 0.875rem;
-            color: var(--text-teal-600);
-            font-weight: 500;
-        }
-
-        /* Module Actions */
-        .module-actions {
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.625rem 1.25rem;
-            border-radius: 0.375rem;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.875rem;
-            transition: all 0.2s ease-in-out;
-            border: 2px solid transparent;
-            cursor: pointer;
-        }
-
-        .btn-view {
-            background-color: var(--success-color);
-            color: white;
-            border-color: var(--success-color);
-        }
-
-        .btn-view:hover {
-            background-color: #047857;
-            border-color: #047857;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        .btn-primary:hover {
-            background-color: #1a2645;
-            border-color: #1a2645;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(14, 27, 51, 0.2);
-        }
-
-        /* Actions Section */
-        .actions-section {
-            background-color: var(--card-background);
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            padding: 2rem;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .submit-btn {
-            background-color: var(--success-color);
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 0.375rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 1rem;
-        }
-
-        .submit-btn:hover:not(:disabled) {
-            opacity: 0.9;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
-        }
-
-        .submit-btn:disabled {
-            background-color: var(--text-teal-500);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        /* Back Link */
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.75rem 1.5rem;
-            border: 2px solid var(--primary-color);
-            border-radius: 0.375rem;
-            transition: all 0.2s ease-in-out;
-            font-size: 0.875rem;
-        }
-
-        .back-link:hover {
-            background-color: var(--primary-color);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(14, 27, 51, 0.2);
-        }
-
-        /* Not logged in state */
-        .not-logged-in-container {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background-color: var(--body-background);
-        }
-
-        .not-logged-in {
-            text-align: center;
-            color: var(--text-teal-700);
-            padding: 2rem;
-            background-color: var(--card-background);
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-
-        .login-link {
-            color: var(--primary-color);
-            text-decoration: none;
-            transition: text-decoration 0.2s ease-in-out;
-            font-weight: 500;
-        }
-
-        .login-link:hover {
-            text-decoration: underline;
-        }
-
-        /* Icons */
-        .icon {
-            width: 16px;
-            height: 16px;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .sidebar {
-                width: 16rem;
-            }
-            
-            .main-wrapper {
-                margin-left: 16rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                display: none;
-            }
-            
-            .main-wrapper {
-                margin-left: 0;
-            }
-            
-            .main-content {
-                padding: 1rem;
-            }
-
-            .module-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .module-info {
-                width: 100%;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .module-actions {
-                width: 100%;
-                justify-content: flex-start;
-            }
-
-            .course-header {
-                padding: 1.5rem;
-            }
-        }
+        .animate-slide-in { animation: slideIn 0.5s ease-out forwards; }
+        @media (min-width: 1024px) { aside { display: block !important; } }
     </style>
 </head>
-<body>
-    @auth
+<body class="bg-gray-50 min-h-screen font-sans antialiased">
+
+    <div x-data="{ sidebarOpen: window.innerWidth >= 1024, sidebarCollapsed: false }"
+         @resize.window="if (window.innerWidth >= 1024) sidebarOpen = true; else if (window.innerWidth < 1024) sidebarCollapsed = false"
+         class="flex min-h-screen">
+
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <img src="/image/Edvantage.png" alt="Edvantage Logo">
-                <span></span>
-            </div>
-            <nav class="sidebar-nav">
-                @if(auth()->user()->role === 2)
-                    <a href="/admin_panel">Dashboard</a>
-                    <a href="/admin_panel/manage_courses" class="active">Manage Courses</a>
-                    <a href="/admin_panel/manage_user">Manage Users</a>
-                @elseif(auth()->user()->role === 3)
-                   <a href="/instructor_homepage">Dashboard</a>
-                   <a href="/instructor/manage_courses" class="active">Manage Course</a>
-                @endif
-            </nav>
-        </aside>
+        @include('layouts.sidebar')
 
-        <!-- Main Content Wrapper -->
-        <div class="main-wrapper">
-            <!-- Main Content -->
-            <main class="main-content">
-                <!-- Top bar -->
-                <div class="top-bar">
-                    <div class="top-bar-title">Course Lectures</div>
-                    <div class="user-info">
-                        <span>{{ auth()->user()->name }}</span>
-                        <form action="/logout" method="POST" style="display: inline;">
-                            @csrf
-                            <button class="logout-button">Logout</button>
-                        </form>
-                    </div>
-                </div>
+        <!-- Main Content -->
+        <main class="flex-1 transition-all duration-300"
+              :class="sidebarCollapsed && window.innerWidth >= 1024 ? 'lg:ml-20' : 'lg:ml-72'">
 
-                <!-- Course Header -->
-                <div class="course-header">
-                    <h2>Course Lectures</h2>
-                    <div class="course-title">{{ $course->title }}</div>
-                    
-                    @php
-                        $uploadedCount = collect($modules)->where('uploaded', true)->count();
-                        $totalModules = count($modules);
-                        $progressPercentage = $totalModules > 0 ? ($uploadedCount / $totalModules) * 100 : 0;
-                    @endphp
-                    
-                    <div class="progress-section">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: {{ $progressPercentage }}%"></div>
+            <x-instructor-header :title="'Course Lectures'" />
+
+            <div class="p-4 lg:p-6 max-w-5xl mx-auto space-y-6">
+                @auth
+
+                    {{-- ── Course Info Card ── --}}
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 opacity-0 animate-slide-in">
+
+                        {{-- Course type badge --}}
+                        <div class="flex items-center gap-3 mb-3">
+                            @if($course->course_type === 'live')
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
+                                    <i class="fas fa-circle text-red-500 text-[8px]"></i> Live Course
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-teal-100 text-teal-700">
+                                    <i class="fas fa-video"></i> Recorded Course
+                                </span>
+                            @endif
                         </div>
-                        <div class="progress-text">
-                            {{ $uploadedCount }} of {{ $totalModules }} lectures completed ({{ number_format($progressPercentage, 1) }}%)
+
+                        <h2 class="text-xl font-bold text-primary-700 mb-4">{{ $course->title }}</h2>
+
+                        {{-- Progress bar --}}
+                        @php
+                            $uploadedCount = collect($modules)->where('uploaded', true)->count();
+                            $totalModules  = count($modules);
+                            $progressPct   = $totalModules > 0 ? ($uploadedCount / $totalModules) * 100 : 0;
+                        @endphp
+
+                        <div class="mb-1 flex justify-between text-xs font-medium text-gray-500">
+                            <span>Upload progress</span>
+                            <span>{{ $uploadedCount }} / {{ $totalModules }} lectures</span>
                         </div>
+                        <div class="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full rounded-full transition-all duration-500
+                                        {{ $course->course_type === 'live' ? 'bg-indigo-500' : 'bg-teal-500' }}"
+                                 style="width: {{ $progressPct }}%"></div>
+                        </div>
+                        <p class="mt-1.5 text-xs text-gray-400">{{ number_format($progressPct, 1) }}% complete</p>
                     </div>
-                </div>
 
-                <!-- Modules Section -->
-                <div class="modules-section">
-                    <div class="modules-section-header">
-                        <h3 class="modules-section-title">Lecture List</h3>
-                    </div>
-                    <div class="modules-list">
-                        @foreach ($modules as $module)
-                            @php
-                                $route = route('module.instructor.create', [
-                                    'course' => $course->id,
-                                    'module' => $module['id']
-                                ]);
-                            @endphp
+                    {{-- ── Lectures List ── --}}
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden opacity-0 animate-slide-in" style="animation-delay:0.1s">
 
-                            <div class="module-item">
-                                <div class="module-info">
-                                    <div>
-                                        <div class="module-title">Lecture {{ $module['id'] }}</div>
-                                    </div>
-                                    <div class="upload-status">
-                                        @if($module['uploaded'])
-                                            <div class="status-icon status-uploaded">✓</div>
-                                            <div class="status-text">Uploaded</div>
-                                        @else
-                                            <div class="status-icon status-pending">!</div>
-                                            <div class="status-text">Pending</div>
-                                        @endif
-                                    </div>
-                                </div>
-                                
-                                <div class="module-actions">
-                                    @if($module['uploaded'])
-                                        <a href="/view_pending_resources/{{$course->id}}/{{ $module['id'] }}" class="btn btn-view">
-                                            <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                <circle cx="12" cy="12" r="3"></circle>
-                                            </svg>
-                                            View Resources
-                                        </a>
-                                    @endif
-                                    
-                                    <a href="/instructor/manage_resources/{{ $course->id }}/modules/{{ $module['id'] }}/edit" 
-                                       class="btn btn-primary">
-                                        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                            <h3 class="text-sm font-bold text-primary-700 uppercase tracking-wide">Lecture List</h3>
+                        </div>
+
+                        <div class="divide-y divide-gray-100">
+                            @foreach ($modules as $module)
+                                <div class="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors">
+
+                                    {{-- Left: number + status --}}
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm
+                                                    {{ $module['uploaded']
+                                                        ? 'bg-teal-100 text-teal-700'
+                                                        : 'bg-gray-100 text-gray-500' }}">
+                                            {{ $module['id'] }}
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-semibold text-gray-800">Lecture {{ $module['id'] }}</p>
                                             @if($module['uploaded'])
-                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                                <p class="text-xs text-teal-600 font-medium mt-0.5">
+                                                    <i class="fas fa-check-circle mr-1"></i>Uploaded
+                                                </p>
                                             @else
-                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                                <polyline points="14,2 14,8 20,8"></polyline>
-                                                <line x1="12" y1="18" x2="12" y2="12"></line>
-                                                <line x1="9" y1="15" x2="15" y2="15"></line>
+                                                <p class="text-xs text-amber-500 font-medium mt-0.5">
+                                                    <i class="fas fa-clock mr-1"></i>Pending
+                                                </p>
                                             @endif
-                                        </svg>
-                                        {{ $module['uploaded'] ? 'Edit Lecture' : 'Upload Resources' }}
-                                    </a>
+                                        </div>
+                                    </div>
+
+                                    {{-- Right: action buttons --}}
+                                    <div class="flex items-center gap-2">
+
+                                        {{-- View button (only if uploaded) --}}
+                                        @if($module['uploaded'])
+                                            <a href="/view_pending_resources/{{ $course->id }}/{{ $module['id'] }}"
+                                               class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-teal-50 text-teal-700 hover:bg-teal-100 border border-teal-200 transition-all">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                        @endif
+
+                                        {{-- Upload / Edit button --}}
+                                        @if($course->course_type === 'recorded')
+                                            <a href="/instructor/manage_resources/{{ $course->id }}/modules/{{ $module['id'] }}/edit"
+                                               class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-primary-700 text-white hover:bg-primary-800 transition-all">
+                                                <i class="fas fa-{{ $module['uploaded'] ? 'pen' : 'upload' }}"></i>
+                                                {{ $module['uploaded'] ? 'Edit' : 'Upload' }}
+                                            </a>
+                                        @else
+                                            {{-- Live: redirect to session schedule/pdf page --}}
+                                            <a href="{{ route('instructor.live_session.edit', ['course' => $course->id, 'session' => $module['id']]) }}"
+                                               class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-all">
+                                                <i class="fas fa-{{ $module['uploaded'] ? 'pen' : 'calendar-plus' }}"></i>
+                                                {{ $module['uploaded'] ? 'Edit Session' : 'Schedule' }}
+                                            </a>
+                                        @endif
+
+                                    </div>
                                 </div>
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
                     </div>
-                </div>
 
-                <!-- Actions Section -->
-                <div class="actions-section">
-                    @if($allUploaded)
-                        <a href="{{ $alreadySubmitted ? '#' : route('instructor.manage_resources', ['course' => $course->id]) }}" 
-                        class="submit-btn" 
-                        id="submit-review-btn">
-                            Submit For Review
-                        </a>
-                    @else
-                        <button class="submit-btn" disabled>
-                            Submit For Review (Upload all lectures first)
-                        </button>
-                    @endif
-                </div>
+                    {{-- ── Submit / Back ── --}}
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 opacity-0 animate-slide-in" style="animation-delay:0.2s">
+                        <div class="flex flex-col sm:flex-row items-center gap-3">
 
-                <!-- Back Link -->
-                <a href="javascript:history.back()" class="back-link">
-                    Back
-                </a>
-            </main>
-        </div>
+                            @if($allUploaded)
+                                <a href="{{ $alreadySubmitted ? '#' : route('instructor.manage_resources', ['course' => $course->id]) }}"
+                                   id="submit-review-btn"
+                                   class="w-full sm:flex-1 inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-800 transition-all hover:shadow-md">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span>{{ $alreadySubmitted ? 'Already Submitted' : 'Submit For Review' }}</span>
+                                </a>
+                            @else
+                                <button disabled
+                                        class="w-full sm:flex-1 inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-gray-300 text-gray-500 rounded-lg font-medium cursor-not-allowed">
+                                    <i class="fas fa-lock"></i>
+                                    <span>Upload all lectures first</span>
+                                </button>
+                            @endif
 
-        <script>
+                            <a href="javascript:history.back()"
+                               class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-white text-teal-700 border border-gray-300 rounded-lg font-medium hover:bg-teal-50 hover:border-gray-900 transition-all">
+                                <i class="fas fa-arrow-left"></i>
+                                <span>Back</span>
+                            </a>
+
+                        </div>
+                    </div>
+
+                @else
+                    <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden max-w-md mx-auto">
+                        <div class="p-12 text-center">
+                            <div class="w-20 h-20 bg-red-50 rounded-xl flex items-center justify-center mx-auto mb-6 border border-red-200">
+                                <i class="fas fa-lock text-3xl text-red-600"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-teal-900 mb-3">Access Denied</h2>
+                            <p class="text-teal-600 mb-6">You need to be logged in to view this page.</p>
+                            <a href="/" class="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-800 transition-all hover:shadow-lg">
+                                <i class="fas fa-sign-in-alt"></i> Go to Login
+                            </a>
+                        </div>
+                    </div>
+                @endauth
+            </div>
+        </main>
+    </div>
+
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
             const submitBtn = document.getElementById('submit-review-btn');
-            
-            @if($alreadySubmitted)
-                submitBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    alert('This course has already been submitted for review!');
-                });
+            @if($alreadySubmitted ?? false)
+                if (submitBtn) {
+                    submitBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        alert('This course has already been submitted for review!');
+                    });
+                }
             @endif
         });
-        </script>
+    </script>
 
-    @else
-        <!-- Not logged in state -->
-        <div class="not-logged-in-container">
-            <div class="not-logged-in">
-                <p>You are not logged in. <a href="/" class="login-link">Go to Login</a></p>
-            </div>
-        </div>
-    @endauth
 </body>
 </html>

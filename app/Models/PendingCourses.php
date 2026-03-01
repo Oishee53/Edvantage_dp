@@ -16,6 +16,7 @@ class PendingCourses extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
+        'course_type',
         'image',
         'title',
         'description',
@@ -38,6 +39,11 @@ class PendingCourses extends Model
     public function pendingResources()
     {
         return $this->hasMany(PendingResources::class, 'courseId');
+    }
+
+    public function liveSessions()
+    {
+        return $this->hasMany(\App\Models\LiveSession::class, 'course_id');
     }
 
     // Boot method for cascading deletes and ID generation

@@ -22,6 +22,7 @@ public function store(Request $request)
 
     // Validation rules
     $rules = [
+    'course_type' => 'required|in:recorded,live',
     'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
     'title' => 'required',
     'description' => 'nullable',
@@ -45,6 +46,7 @@ public function store(Request $request)
 
     // Create the course
     $course = PendingCourses::create([
+        'course_type' => $request->course_type, // 'recorded' or 'live'
         'image' => $imagePath ?? null,
         'title' => $request->title,
         'description' => $request->description,
@@ -64,18 +66,27 @@ public function showModules($course_id)
 {
     $course = PendingCourses::findOrFail($course_id);
 
-    // Get all module IDs that have at least one resource for this course
-    $uploadedModuleIds = DB::table('pending_resources')
-        ->where('courseId', $course_id)
-        ->pluck('moduleId')       
-        ->unique()                 
-        ->map(fn ($id) => (int) $id)
-        ->values()
-        ->all();
+    $alreadySubmitted = \App\Models\CourseNotification::where('pending_course_id', $course->id)->exists();
+
+    // ── Pick the right table depending on course type ──
+    if ($course->course_type === 'live') {
+        $uploadedModuleIds = \App\Models\LiveSession::where('course_id', $course_id)
+            ->pluck('session_number')
+            ->map(fn($id) => (int) $id)
+            ->values()
+            ->all();
+    } else {
+        $uploadedModuleIds = DB::table('pending_resources')
+            ->where('courseId', $course_id)
+            ->pluck('moduleId')
+            ->unique()
+            ->map(fn($id) => (int) $id)
+            ->values()
+            ->all();
+    }
 
     $modules = [];
     $allUploaded = true;
-    $alreadySubmitted = \App\Models\CourseNotification::where('pending_course_id', $course->id)->exists();
 
     for ($i = 1; $i <= (int) $course->video_count; $i++) {
         $isUploaded = in_array($i, $uploadedModuleIds, true);
@@ -90,7 +101,7 @@ public function showModules($course_id)
         }
     }
 
-    return view('Instructor.show_modules', compact('course', 'modules', 'allUploaded','alreadySubmitted'));
+    return view('Instructor.show_modules', compact('course', 'modules', 'allUploaded', 'alreadySubmitted'));
 }
 
 public function editModule($course_id, $module_id){
