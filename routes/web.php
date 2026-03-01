@@ -18,7 +18,6 @@ use App\Http\Controllers\ResetPasswordControl;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\StudentFinalExamController;
-<<<<<<< HEAD
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserProgressController;
 use App\Http\Controllers\UserQuizController;
@@ -29,11 +28,8 @@ use App\Models\Instructor;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rules;
-=======
-use App\Http\Controllers\DiscussionForumController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AssignmentSubmissionController;
->>>>>>> 60ff778578741d28a36e8eaca35774306df34434
 
 Route::get('/', [LandingController::class, 'showLanding']);
 Route::get('/my-courses/{courseId}/assignments', 
