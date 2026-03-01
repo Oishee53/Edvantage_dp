@@ -464,6 +464,10 @@
                         <i class="fas fa-file-alt" style="margin-right: 0.5rem;"></i>
                         Final Exam
                     </button>
+                      <button class="tab" data-tab="assignments">
+        <i class="fas fa-tasks" style="margin-right: 0.5rem;"></i>
+        Assignments
+    </button>
                 </div>
 
                 <!-- Tab Content: Lectures -->
@@ -590,6 +594,46 @@
                         </div>
                     @endif
                 </div>
+                <!-- Tab Content: Assignments -->
+<div class="tab-content" id="assignments-content">
+    @php
+        $assignments = \App\Models\Assignment::where('course_id', $course->id)->latest()->get();
+    @endphp
+
+    @if($assignments->count() > 0)
+        @foreach($assignments as $assignment)
+<a href="{{ route('assignment.show', $assignment->id) }}" class="block">
+    <div class="final-exam-card" style="margin-bottom: 1rem;">
+        <div class="exam-header">
+            <div class="exam-title-section">
+                <div class="exam-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div>
+                    <h3 class="exam-title heading-font">{{ $assignment->title }}</h3>
+                    <p class="exam-subtitle">{{ $assignment->description }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="notice-box">
+            <p><strong>Deadline:</strong> 
+                {{ \Carbon\Carbon::parse($assignment->deadline)->format('M d, Y - g:i A') }}
+            </p>
+        </div>
+    </div>
+</a>
+@endforeach
+    @else
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <h3 class="heading-font">No Assignments Available</h3>
+            <p>This course doesn't have any assignments yet.</p>
+        </div>
+    @endif
+</div>
             </div>
         </div>
     </div>

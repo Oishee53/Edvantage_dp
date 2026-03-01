@@ -18,6 +18,7 @@ use App\Http\Controllers\ResetPasswordControl;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\StudentFinalExamController;
+<<<<<<< HEAD
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserProgressController;
 use App\Http\Controllers\UserQuizController;
@@ -28,8 +29,18 @@ use App\Models\Instructor;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rules;
+=======
+use App\Http\Controllers\DiscussionForumController;
+use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\AssignmentSubmissionController;
+>>>>>>> 60ff778578741d28a36e8eaca35774306df34434
 
 Route::get('/', [LandingController::class, 'showLanding']);
+Route::get('/my-courses/{courseId}/assignments', 
+    [AssignmentController::class, 'studentAssignments']
+)->name('course.assignments');
+
+    
 
 Route::post('/logout', function () {
     auth()->logout();
@@ -192,6 +203,56 @@ Route::get('/courses/{id}', [CourseController::class, 'show'])
     Route::get('/instructor/live-class/{course_id}', [InstructorController::class, 'liveClassForm'])->name('live.class.form');
 
 Route::post('/instructor/live-class/store', [InstructorController::class, 'storeLiveClass'])->name('live.class.store');
+Route::middleware(['auth'])->group(function () {
+     Route::get('/instructor/course/{courseId}/assignments',
+    [AssignmentController::class, 'index'])
+    ->name('instructor.assignments.index');
+    // Instructor - Create Assignment
+    Route::get('/course/{id}/assignment/create', [AssignmentController::class, 'create']);
+    Route::post('/assignment/store', [AssignmentController::class, 'store']);
+     
+    Route::get('/assignment/{id}/edit',
+    [AssignmentController::class, 'edit'])
+    ->name('assignment.edit');
 
 Route::get('/courses/{course}/session/{session}/watch', [LiveSessionController::class, 'watch'])
     ->name('student.live_session.watch');
+    Route::post('/assignment/{id}/update',
+    [AssignmentController::class, 'update'])
+    ->name('assignment.update');
+
+    // Instructor - View Submissions
+    Route::get('/instructor/assignment/{id}/submissions',
+        [AssignmentController::class, 'submissions'])
+        ->name('assignment.submissions');
+
+    // Instructor - Grade Form
+    Route::get('/instructor/submission/{id}/grade',
+        [AssignmentController::class, 'gradeForm'])
+        ->name('assignment.grade.form');
+
+    // Instructor - Save Grade
+    Route::post('/instructor/submission/{id}/grade',
+        [AssignmentController::class, 'grade'])
+        ->name('assignment.grade');
+
+    // Student - Submit Assignment
+    Route::post('/assignment/submit', [AssignmentSubmissionController::class, 'store'])
+        ->name('assignment.submit');
+        // Student - Delete Uploaded File (BEFORE deadline)
+    Route::delete('/submission/file/{id}',
+    [AssignmentSubmissionController::class, 'deleteFile'])
+    ->name('submission.file.delete');
+
+    // Student - View Assignment Page
+    Route::get('/assignment/{id}', [AssignmentSubmissionController::class, 'show'])
+        ->name('assignment.show');
+
+        Route::get('/assignment/result/{id}', function($id) {
+    $submission = \App\Models\AssignmentSubmission::with('assignment')
+        ->findOrFail($id);
+
+    return view('Student.assignments.result', compact('submission'));
+})->name('assignment.result');
+
+});
