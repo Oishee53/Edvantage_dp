@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 use App\Models\Cart;
-use App\Models\Quiz;
+use App\Models\CourseLiveSession;
 use App\Models\Courses;
-use App\Models\Resource;
-use App\Models\Enrollment;
 use App\Models\DiscussionForum;
-use Illuminate\Http\Request;
-use App\Models\VideoProgress;
+use App\Models\Enrollment;
 use App\Models\PendingResources;
+use App\Models\Quiz;
+use App\Models\Resource;
+use App\Models\VideoProgress;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Response;
@@ -72,19 +73,42 @@ public function userEnrolledCourses() {
 }
 
 
-public function viewCourseModules($courseId)
-{
-   
+    public function viewCourseModules($courseId)
+    {
+        $course = Courses::findOrFail($courseId);
 
-   $course = Courses::findOrFail($courseId);
+        if ($course->course_type === 'live') {
+            // Load live sessions from DB
+            $sessions = CourseLiveSession::where('course_id', $courseId)
+                ->orderBy('session_number')
+                ->get()
+                ->keyBy('session_number');
 
- 
-    $videoCount = $course->video_count; 
+            $modules = [];
+            for ($i = 1; $i <= (int) $course->video_count; $i++) {
+                $session   = $sessions->get($i);
+                $modules[] = [
+                    'id'            => $i,
+                    'title'         => $session?->title ?? 'Session ' . $i,
+                    'date'          => $session?->date,
+                    'start_time'    => $session?->start_time,
+                    'duration'      => $session?->duration_minutes,
+                    'status'        => $session?->status ?? 'scheduled',
+                    'recording_url' => $session?->recording_url,
+                    'pdf'           => $session?->pdf,
+                    'is_live'       => true,
+                ];
+            }
 
-    $modules = range(1, $videoCount);
+            return view('user.course_modules', compact('course', 'modules'));
+        }
 
-    return view('user.course_modules', compact('course', 'modules'));
-}
+        // Recorded course — keep original simple range
+        $videoCount = $course->video_count;
+        $modules    = range(1, $videoCount);
+
+        return view('user.course_modules', compact('course', 'modules'));
+    }
 
 public function showInsideModule($courseId, $moduleNumber)
 {

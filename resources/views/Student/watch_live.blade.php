@@ -179,16 +179,33 @@
             });
         });
 
-        peer.on('error', (err) => {
-            if (err.type === 'peer-unavailable') {
-                document.getElementById('connect-status').textContent = 'Stream not started yet. Retrying...';
-                // Retry after 5 seconds
-                setTimeout(() => window.location.reload(), 5000);
-            } else {
-                document.getElementById('connect-status').textContent = 'Connection failed. Please refresh.';
-                console.error('Peer error:', err);
-            }
-        });
+       peer.on('open', () => {
+        document.getElementById('connect-status').textContent = 'Joined! Waiting for stream...';
+
+        // ✅ Get a dummy stream so PeerJS negotiation works properly
+        navigator.mediaDevices.getUserMedia({ video: false, audio: false })
+            .catch(() => new MediaStream()) // silent fallback if denied
+            .then((dummyStream) => {
+                const call = peer.call(HOST_PEER_ID, dummyStream);
+
+                call.on('stream', (remoteStream) => {
+                    const video = document.getElementById('remote-video');
+                    video.srcObject = remoteStream;
+                    video.play();
+                    document.getElementById('connecting-overlay').style.display = 'none';
+                });
+
+                call.on('error', (err) => {
+                    document.getElementById('connect-status').textContent = 'Connection error. Please refresh.';
+                    console.error('Call error:', err);
+                });
+
+                call.on('close', () => {
+                    document.getElementById('connecting-overlay').style.display = 'flex';
+                    document.getElementById('connect-status').textContent = 'Stream ended.';
+                });
+            });
+    });
     </script>
     @endif
 
