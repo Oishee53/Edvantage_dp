@@ -10,6 +10,7 @@ class Courses extends Model
     protected $table = 'courses';
     protected $fillable = [
         'image',
+        'course_type',
         'title',
         'description',
         'category',

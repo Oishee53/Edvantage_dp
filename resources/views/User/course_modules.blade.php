@@ -135,6 +135,8 @@
                 </div>
             </div>
 
+            
+
             <!-- Tabs Container -->
             <div class="tabs-container">
                 <div class="tabs">
@@ -184,6 +186,14 @@
                                             Not scheduled yet
                                         @endif
                                     </p>
+                                </div>
+
+                                <div>
+                                    @if(isset($module['pdf']))
+                                        <a href="{{ asset($module['pdf']) }}" target="_blank" class="text-xs text-indigo-600 hover:underline truncate block mt-0.5">
+                                            <i class="fas fa-file-pdf"></i> View PDF
+                                        </a>
+                                    @endif
                                 </div>
 
                                 <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -276,8 +286,6 @@
                                     ->first();
                             }
                         @endphp
-
-                        @if($finalExam)
                             <div class="final-exam-card">
                                 <div class="exam-header">
                                     <div class="exam-title-section">
@@ -380,8 +388,6 @@
                             </div>
                         @endif
                     </div>
-
-                @endif
 
             </div>
         </div>
