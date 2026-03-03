@@ -37,23 +37,46 @@ class ResourceController extends Controller
 public function showModules($course_id)
 {
     $course = Courses::findOrFail($course_id);
+    $user   = auth()->user();
 
-    $user = auth()->user();
+    // ── LIVE COURSE ──────────────────────────────────────────────────────────
+    if ($course->course_type === 'live') {
+        $sessions = \App\Models\CourseLiveSession::where('course_id', $course_id)
+                        ->orderBy('session_number')
+                        ->get()
+                        ->keyBy('session_number');
 
-    $quizModules = collect();
+        $modules = [];
+        for ($i = 1; $i <= (int) $course->video_count; $i++) {
+            $session   = $sessions->get($i);
+            $modules[] = [
+                'id'       => $i,
+                'quiz'     => false,   // no quiz for live courses
+                'resource' => $session ? true : false,
+                'status'   => $session?->status ?? 'scheduled',
+                'date'     => $session?->date,
+                'title'    => $session?->title,
+            ];
+        }
+
+        return view('Resources.show_modules', compact('course', 'modules'));
+    }
+
+    // ── RECORDED COURSE ───────────────────────────────────────────────────────
+    $quizModules     = collect();
     $resourceModules = collect();
 
     if ($user->role === 3) {
-        // Students: only check quizzes
         $quizModules = DB::table('quizzes')
             ->where('course_id', $course_id)
             ->pluck('module_number');
-         $user->unreadNotifications()
+
+        $user->unreadNotifications()
             ->where('type', 'App\\Notifications\\approveCourseNotification')
-            ->where('data->course_id', $course_id) // JSON field check
+            ->where('data->course_id', $course_id)
             ->update(['read_at' => now()]);
+
     } elseif ($user->role === 2) {
-        // Instructors/Admins: check both quizzes and resources separately
         $quizModules = DB::table('quizzes')
             ->where('course_id', $course_id)
             ->pluck('module_number');
@@ -63,23 +86,23 @@ public function showModules($course_id)
             ->pluck('moduleId');
     }
 
-    // Normalize IDs to integers
     $quizModules     = $quizModules->map(fn($id) => (int) $id)->values()->all();
     $resourceModules = $resourceModules->map(fn($id) => (int) $id)->values()->all();
 
-    // Build modules with separate upload status
     $modules = [];
     for ($i = 1; $i <= (int) $course->video_count; $i++) {
         $modules[] = [
-            'id'        => $i,
-            'quiz'      => in_array($i, $quizModules, true),
-            'resource'  => in_array($i, $resourceModules, true),
+            'id'       => $i,
+            'quiz'     => in_array($i, $quizModules, true),
+            'resource' => in_array($i, $resourceModules, true),
+            'status'   => 'scheduled', // default, blade checks $isLive first
+            'date'     => null,
+            'title'    => null,
         ];
     }
 
     return view('Resources.show_modules', compact('course', 'modules'));
 }
-
 
 
 

@@ -1,32 +1,33 @@
 <?php
 
-use App\Models\Courses;
-use App\Models\Instructor;
-use Illuminate\Validation\Rules;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\UserController;
-use Illuminate\Support\Facades\Password;
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\DiscussionForumController;
+use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\LiveSessionController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\QuestionController;
-use App\Http\Controllers\ResourceController;
-use App\Http\Controllers\UserQuizController;
-use App\Http\Controllers\WishlistController;
-use App\Http\Controllers\EnrollmentController;
-use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\ResetPasswordControl;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\UserProgressController;
 use App\Http\Controllers\ResetPasswordController;
-use App\Http\Controllers\VideoProgressController;
-use App\Http\Controllers\ForgotPasswordController;
-use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\StudentFinalExamController;
-use App\Http\Controllers\DiscussionForumController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserProgressController;
+use App\Http\Controllers\UserQuizController;
+use App\Http\Controllers\VideoProgressController;
+use App\Http\Controllers\WishlistController;
+use App\Models\Courses;
+use App\Models\Instructor;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\Rules;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AssignmentSubmissionController;
 
@@ -210,6 +211,8 @@ Route::middleware(['auth'])->group(function () {
     [AssignmentController::class, 'edit'])
     ->name('assignment.edit');
 
+Route::get('/courses/{course}/session/{session}/watch', [LiveSessionController::class, 'watch'])
+    ->name('student.live_session.watch');
     Route::post('/assignment/{id}/update',
     [AssignmentController::class, 'update'])
     ->name('assignment.update');

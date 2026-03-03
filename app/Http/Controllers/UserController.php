@@ -22,6 +22,9 @@ public function homepage(RecommendationService $recommendationService)
     $courses = Courses::withCount('quizzes')
         ->get()
         ->filter(function ($course) {
+            if ($course->course_type === 'live') {
+            return true;
+            }
             return $course->quizzes_count == $course->video_count && $course->hasPublishedFinalExam();
         });
 
