@@ -31,7 +31,6 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Recorded module card */
         .module-card { background: #f9fafb; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; box-shadow: 0 1px 2px rgba(0,0,0,0.03); border: 1px solid #e5e7eb; transition: all 0.2s ease; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: space-between; }
         .module-card:hover { border-color: #0d7377; background: white; box-shadow: 0 4px 12px rgba(13,115,119,0.12); transform: translateY(-2px); }
         .module-info h3 { font-size: 1rem; font-weight: 600; color: #1f2937; margin-bottom: 0.25rem; letter-spacing: -0.01em; }
@@ -39,7 +38,6 @@
         .module-arrow { color: #9ca3af; transition: all 0.2s; }
         .module-card:hover .module-arrow { color: #0d7377; transform: translateX(4px); }
 
-        /* Live session card */
         .session-card { background: #f9fafb; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; border: 1px solid #e5e7eb; transition: all 0.2s ease; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
         .session-card:hover { border-color: #0d7377; background: white; box-shadow: 0 4px 12px rgba(13,115,119,0.12); }
         .session-card.is-live { border-color: #ef4444; background: #fff5f5; }
@@ -49,7 +47,7 @@
         .badge-live { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
         .badge-ended { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
         .badge-scheduled { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
-        .session-btn { padding: 0.45rem 1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .session-btn { padding: 0.45rem 1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s; white-space: nowrap; display: inline-block; }
         .btn-join { background: #ef4444; color: white; }
         .btn-join:hover { background: #dc2626; }
         .btn-watch { background: #0d7377; color: white; }
@@ -73,7 +71,7 @@
         .status-pending { background: #fffbeb; color: #92400e; border-color: #fde68a; }
         .status-passed { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
         .status-failed { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
-        .btn-small { padding: 0.5rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.8rem; text-align: center; text-decoration: none; transition: all 0.2s; border: 2px solid; cursor: pointer; letter-spacing: -0.01em; white-space: nowrap; }
+        .btn-small { padding: 0.5rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.8rem; text-align: center; text-decoration: none; transition: all 0.2s; border: 2px solid; cursor: pointer; letter-spacing: -0.01em; white-space: nowrap; display: inline-block; }
         .btn-small.btn-primary { background: #0d7377; color: white; border-color: #0d7377; }
         .btn-small.btn-primary:hover { background: #0a5c5f; border-color: #0a5c5f; transform: translateY(-1px); box-shadow: 0 2px 8px rgba(13,115,119,0.25); }
         .btn-small.btn-disabled { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; border-color: #e5e7eb; }
@@ -92,7 +90,7 @@
             .tabs { gap: 0.5rem; }
             .tab { padding: 0.75rem 1rem; font-size: 0.875rem; }
             .course-meta { flex-direction: column; gap: 0.625rem; }
-            .exam-header { flex-wrap: wrap; }
+            .exam-header { flex-wrap: wrap; gap: 0.75rem; }
             .session-card { flex-wrap: wrap; }
         }
     </style>
@@ -100,9 +98,7 @@
 <body class="px-20 pt-5">
     @include('layouts.header')
 
-    @php
-        $isLiveCourse = $course->course_type === 'live';
-    @endphp
+    @php $isLiveCourse = $course->course_type === 'live'; @endphp
 
     <div class="pt-24">
         <div class="container">
@@ -110,9 +106,7 @@
             <!-- Course Header -->
             <div class="course-header">
                 <h1 class="course-title heading-font">{{ $course->title }}</h1>
-                <p class="course-subtitle">
-                    {{ $isLiveCourse ? 'Live Course Sessions' : 'Course Content' }}
-                </p>
+                <p class="course-subtitle">{{ $isLiveCourse ? 'Live Course Sessions' : 'Course Content' }}</p>
                 <div class="course-meta">
                     <div class="meta-item">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,112 +122,93 @@
                     </div>
                     @if($isLiveCourse)
                         <div class="meta-item">
-                            <i class="fas fa-circle" style="color: #ef4444; font-size: 0.6rem;"></i>
+                            <i class="fas fa-circle" style="color:#ef4444;font-size:0.6rem;"></i>
                             <span>Live Course</span>
                         </div>
                     @endif
                 </div>
             </div>
 
-            
-
             <!-- Tabs Container -->
             <div class="tabs-container">
+
+                <!-- Tab Buttons -->
                 <div class="tabs">
                     <button class="tab active" data-tab="lectures">
-                        <i class="fas {{ $isLiveCourse ? 'fa-broadcast-tower' : 'fa-book-open' }}" style="margin-right: 0.5rem;"></i>
+                        <i class="fas {{ $isLiveCourse ? 'fa-broadcast-tower' : 'fa-book-open' }}" style="margin-right:0.5rem;"></i>
                         {{ $isLiveCourse ? 'Sessions' : 'Lectures' }}
                     </button>
-                    @if(!$isLiveCourse)
+        
                         <button class="tab" data-tab="final-exam">
-                            <i class="fas fa-file-alt" style="margin-right: 0.5rem;"></i>
-                            Final Exam
+                            <i class="fas fa-file-alt" style="margin-right:0.5rem;"></i>Final Exam
                         </button>
                         <button class="tab" data-tab="assignments">
-                            <i class="fas fa-tasks" style="margin-right: 0.5rem;"></i>
-                            Assignments
+                            <i class="fas fa-tasks" style="margin-right:0.5rem;"></i>Assignments
                         </button>
-                    @endif
                 </div>
 
-                <!-- Tab Content: Lectures / Sessions -->
+                <!-- ── Lectures / Sessions Tab ── -->
                 <div class="tab-content active" id="lectures-content">
-
                     @if($isLiveCourse)
-                        {{-- ── LIVE COURSE SESSIONS ── --}}
+
                         @forelse($modules as $module)
                             @php
                                 $status    = $module['status'] ?? 'scheduled';
                                 $isLiveNow = $status === 'live';
                                 $isEnded   = $status === 'ended';
                             @endphp
-
                             <div class="session-card {{ $isLiveNow ? 'is-live' : '' }}">
-                                <div class="session-info" style="flex: 1;">
+                                <div class="session-info" style="flex:1;">
                                     <h3>{{ $module['title'] ?? 'Session ' . $module['id'] }}</h3>
                                     <p>
                                         @if($module['date'])
-                                            <i class="fas fa-calendar-alt" style="margin-right: 0.3rem;"></i>
+                                            <i class="fas fa-calendar-alt" style="margin-right:0.3rem;"></i>
                                             {{ \Carbon\Carbon::parse($module['date'])->format('d M Y') }}
-                                            @if($module['start_time'])
-                                                · {{ \Carbon\Carbon::parse($module['start_time'])->format('h:i A') }}
-                                            @endif
-                                            @if($module['duration'])
-                                                · {{ $module['duration'] }} mins
-                                            @endif
+                                            @if($module['start_time']) · {{ \Carbon\Carbon::parse($module['start_time'])->format('h:i A') }} @endif
+                                            @if($module['duration']) · {{ $module['duration'] }} mins @endif
                                         @else
-                                            <i class="fas fa-calendar-alt" style="margin-right: 0.3rem;"></i>
-                                            Not scheduled yet
+                                            <i class="fas fa-calendar-alt" style="margin-right:0.3rem;"></i>Not scheduled yet
                                         @endif
                                     </p>
                                 </div>
 
-                                <div>
-                                    @if(isset($module['pdf']))
-                                        <a href="{{ asset($module['pdf']) }}" target="_blank" class="text-xs text-indigo-600 hover:underline truncate block mt-0.5">
+                                @if(isset($module['pdf']))
+                                    <div>
+                                        <a href="{{ asset($module['pdf']) }}" target="_blank"
+                                           class="text-xs text-indigo-600 hover:underline block">
                                             <i class="fas fa-file-pdf"></i> View PDF
                                         </a>
-                                    @endif
-                                </div>
+                                    </div>
+                                @endif
 
-                                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    {{-- Status badge --}}
+                                <div style="display:flex;align-items:center;gap:0.75rem;">
                                     @if($isLiveNow)
                                         <span class="session-badge badge-live">
                                             <span style="width:6px;height:6px;border-radius:50%;background:#ef4444;display:inline-block;animation:ping 1s infinite;"></span>
                                             LIVE NOW
                                         </span>
-                                    @elseif($isEnded)
-                                        <span class="session-badge badge-ended">
-                                            <i class="fas fa-video" style="font-size:0.65rem;"></i>
-                                            Recording
-                                        </span>
-                                    @else
-                                        <span class="session-badge badge-scheduled">
-                                            <i class="fas fa-clock" style="font-size:0.65rem;"></i>
-                                            Upcoming
-                                        </span>
-                                    @endif
-
-                                    {{-- Action button --}}
-                                    @if($isLiveNow)
                                         <a href="{{ route('student.live_session.watch', ['course' => $course->id, 'session' => $module['id']]) }}"
                                            class="session-btn btn-join">
-                                            <i class="fas fa-circle" style="font-size:0.6rem; margin-right: 0.3rem;"></i> Join Live
+                                            <i class="fas fa-circle" style="font-size:0.6rem;margin-right:0.3rem;"></i> Join Live
                                         </a>
                                     @elseif($isEnded)
+                                        <span class="session-badge badge-ended">
+                                            <i class="fas fa-video" style="font-size:0.65rem;"></i> Recording
+                                        </span>
                                         <a href="{{ route('student.live_session.watch', ['course' => $course->id, 'session' => $module['id']]) }}"
                                            class="session-btn btn-watch">
-                                            <i class="fas fa-play" style="font-size:0.7rem; margin-right: 0.3rem;"></i> Watch
+                                            <i class="fas fa-play" style="font-size:0.7rem;margin-right:0.3rem;"></i> Watch
                                         </a>
                                     @else
+                                        <span class="session-badge badge-scheduled">
+                                            <i class="fas fa-clock" style="font-size:0.65rem;"></i> Upcoming
+                                        </span>
                                         <span class="session-btn btn-upcoming">
-                                            <i class="fas fa-lock" style="font-size:0.7rem; margin-right: 0.3rem;"></i> Upcoming
+                                            <i class="fas fa-lock" style="font-size:0.7rem;margin-right:0.3rem;"></i> Upcoming
                                         </span>
                                     @endif
                                 </div>
                             </div>
-
                         @empty
                             <div class="empty-state">
                                 <div class="empty-icon"><i class="fas fa-broadcast-tower"></i></div>
@@ -243,7 +218,7 @@
                         @endforelse
 
                     @else
-                        {{-- ── RECORDED COURSE LECTURES ── --}}
+
                         @forelse($modules as $moduleNumber)
                             <a href="{{ route('inside.module', ['courseId' => $course->id, 'moduleNumber' => $moduleNumber]) }}"
                                class="module-card">
@@ -266,26 +241,23 @@
                                 <p>This course doesn't have any lectures yet.</p>
                             </div>
                         @endforelse
+
                     @endif
+                </div>{{-- /#lectures-content --}}
 
-                </div>
 
-                {{-- ── FINAL EXAM + ASSIGNMENTS — recorded courses only ── --}}
-                @if(!$isLiveCourse)
-
-                    <!-- Tab Content: Final Exam -->
+                    <!-- ── Final Exam Tab ── -->
                     <div class="tab-content" id="final-exam-content">
                         @php
-                            $finalExam = \App\Models\FinalExam::where('course_id', $course->id)
-                                ->where('status', 'published')
-                                ->first();
+                            $finalExam  = \App\Models\FinalExam::where('course_id', $course->id)->where('status','published')->first();
                             $submission = null;
                             if ($finalExam && auth()->check()) {
                                 $submission = \App\Models\FinalExamSubmission::where('final_exam_id', $finalExam->id)
-                                    ->where('user_id', auth()->id())
-                                    ->first();
+                                    ->where('user_id', auth()->id())->first();
                             }
                         @endphp
+
+                        @if($finalExam)
                             <div class="final-exam-card">
                                 <div class="exam-header">
                                     <div class="exam-title-section">
@@ -301,15 +273,15 @@
                                     </div>
                                     <div class="exam-actions-top">
                                         @if($submission)
-                                            @if(in_array($submission->status, ['not_started', 'in_progress']))
+                                            @if(in_array($submission->status, ['not_started','in_progress']))
                                                 <span class="status-badge status-not-started">Not Completed</span>
                                             @elseif($submission->status === 'submitted')
                                                 <span class="status-badge status-pending">Awaiting Grading</span>
                                             @elseif($submission->status === 'graded')
                                                 @if($submission->percentage >= 70)
-                                                    <span class="status-badge status-passed">Passed · {{ number_format($submission->percentage, 0) }}%</span>
+                                                    <span class="status-badge status-passed">Passed · {{ number_format($submission->percentage,0) }}%</span>
                                                 @else
-                                                    <span class="status-badge status-failed">Failed · {{ number_format($submission->percentage, 0) }}%</span>
+                                                    <span class="status-badge status-failed">Failed · {{ number_format($submission->percentage,0) }}%</span>
                                                 @endif
                                             @endif
                                         @else
@@ -351,9 +323,9 @@
                                 <p>The final exam has not been published yet.</p>
                             </div>
                         @endif
-                    </div>
+                    </div>{{-- /#final-exam-content --}}
 
-                    <!-- Tab Content: Assignments -->
+                    <!-- ── Assignments Tab ── -->
                     <div class="tab-content" id="assignments-content">
                         @php
                             $assignments = \App\Models\Assignment::where('course_id', $course->id)->latest()->get();
@@ -361,8 +333,9 @@
 
                         @if($assignments->count() > 0)
                             @foreach($assignments as $assignment)
-                                <a href="{{ route('assignment.show', $assignment->id) }}" class="block">
-                                    <div class="final-exam-card" style="margin-bottom: 1rem;">
+                                <a href="{{ route('assignment.show', $assignment->id) }}"
+                                   style="text-decoration:none;display:block;margin-bottom:1rem;">
+                                    <div class="final-exam-card" style="cursor:pointer;transition:all 0.2s;">
                                         <div class="exam-header">
                                             <div class="exam-title-section">
                                                 <div class="exam-icon">
@@ -373,6 +346,7 @@
                                                     <p class="exam-subtitle">{{ $assignment->description }}</p>
                                                 </div>
                                             </div>
+                                            <span class="btn-small btn-primary">View</span>
                                         </div>
                                         <div class="notice-box">
                                             <p><strong>Deadline:</strong> {{ \Carbon\Carbon::parse($assignment->deadline)->format('M d, Y - g:i A') }}</p>
@@ -387,15 +361,15 @@
                                 <p>This course doesn't have any assignments yet.</p>
                             </div>
                         @endif
-                    </div>
+                    </div>{{-- /#assignments-content --}}
 
-            </div>
-        </div>
+            </div>{{-- /.tabs-container --}}
+        </div>{{-- /.container --}}
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const tabs = document.querySelectorAll('.tab');
+            const tabs        = document.querySelectorAll('.tab');
             const tabContents = document.querySelectorAll('.tab-content');
 
             tabs.forEach(tab => {

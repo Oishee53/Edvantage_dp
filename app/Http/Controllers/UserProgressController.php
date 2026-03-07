@@ -82,6 +82,7 @@ public function index()
         'courseProgress' => $courseProgress,
         'user'           => $user,
         'enrolledCourses'=> $courses,
+        'LiveCourse'     => $courses->contains('course_type', 'live') // Check if any enrolled course is live
     ]);
 }
 

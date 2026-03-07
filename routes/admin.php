@@ -233,3 +233,12 @@ Route::middleware('auth')->group(function () {
 Route::post('/courses/{course}/session/{session}/upload-recording',
     [LiveSessionController::class, 'uploadRecording'])
     ->name('live_session.upload_recording');
+
+Route::patch('/instructor/manage_resources/{course_id}/session/{session_number}/schedule',
+    [LiveSessionController::class, 'updateSchedule'])
+    ->name('live_session.update_schedule');
+
+// For admin (if admins use a different URL prefix):
+Route::patch('/admin_panel/manage_resources/{course_id}/session/{session_number}/schedule',
+    [LiveSessionController::class, 'updateSchedule'])
+    ->name('admin.live_session.update_schedule');

@@ -56,6 +56,8 @@ public function showModules($course_id)
                 'status'   => $session?->status ?? 'scheduled',
                 'date'     => $session?->date,
                 'title'    => $session?->title,
+                'start_time' => $session?->start_time,        // ← add this
+                'duration'   => $session?->duration_minutes,
             ];
         }
 

@@ -156,6 +156,7 @@
                             </div>
 
                             <!-- Progress -->
+                            @if(!$LiveCourse)
                             <div class="mb-6">
                                 <div class="flex justify-between items-end mb-2">
                                     <span class="text-sm font-medium text-gray-600">Course Progress</span>
@@ -165,6 +166,7 @@
                                     <div class="h-full progress-gradient rounded-full transition-all duration-1000 ease-out" style="width: {{ $progress['completion_percentage'] }}%"></div>
                                 </div>
                             </div>
+                            @endif
 
                             <!-- Meta Stats -->
                             <div class="grid grid-cols-2 gap-4 py-4 border-t border-gray-100">
@@ -209,6 +211,7 @@
                         </div>
 
                         <!-- Expandable Details -->
+                        @if(!$LiveCourse)
                         <div x-show="expanded" x-collapse x-cloak class="bg-gray-50 border-t border-gray-100 p-6">
                             <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Quiz Performance</h4>
                             
@@ -229,6 +232,7 @@
                                 </div>
                             @endif
                         </div>
+                        @endif
                     </div>
                     @empty
                     <div class="col-span-1 lg:col-span-2 py-20 bg-white rounded-3xl border border-dashed border-gray-300 text-center">
