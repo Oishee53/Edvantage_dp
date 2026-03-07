@@ -41,7 +41,6 @@
         }
         .live-pulse { animation: pulse-ring 1.2s ease-out infinite; }
 
-        /* Modal backdrop */
         #schedule-modal {
             display: none;
             position: fixed; inset: 0; z-index: 50;
@@ -49,10 +48,7 @@
             align-items: center; justify-content: center;
         }
         #schedule-modal.open { display: flex; }
-
-        /* Input focus ring */
         .modal-input:focus { outline: none; border-color: #0d9488; box-shadow: 0 0 0 3px rgba(13,148,136,0.15); }
-
         @media (min-width: 1024px) { aside { display: block !important; } }
     </style>
 </head>
@@ -145,6 +141,117 @@
                         </div>
 
                         <div class="p-6">
+
+                            {{-- ── Hybrid Live Sessions block (recorded courses, instructor/admin only) ── --}}
+                            @if(!$isLiveCourse && ($isInstructor || $isAdmin) && isset($liveSessions))
+                                @php
+                                    $activeSessions = $liveSessions
+                                        ->whereIn('status', ['scheduled', 'live'])
+                                        ->sortBy('date')
+                                        ->sortBy('start_time')
+                                        ->values();
+                                @endphp
+
+                                <div class="mb-6 rounded-xl border border-indigo-200 overflow-hidden">
+                                    <div class="px-5 py-3 border-b border-indigo-200 bg-indigo-50 flex items-center justify-between">
+                                        <h4 class="text-sm font-bold text-indigo-900 flex items-center gap-2">
+                                            <i class="fas fa-broadcast-tower text-indigo-500"></i>
+                                            Scheduled Live Classes
+                                            @if($activeSessions->count() > 0)
+                                                <span class="px-2 py-0.5 rounded-full bg-indigo-200 text-indigo-700 text-xs font-bold">
+                                                    {{ $activeSessions->count() }}
+                                                </span>
+                                            @endif
+                                        </h4>
+                                        <a href="{{ route('live.class.form', ['course_id' => $course->id]) }}"
+                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition-all">
+                                            <i class="fas fa-plus text-[10px]"></i> Schedule New
+                                        </a>
+                                    </div>
+
+                                    @if($activeSessions->count() > 0)
+                                        <div class="divide-y divide-indigo-100 bg-white">
+                                            @foreach($activeSessions as $ls)
+                                                @php
+                                                    $hlIsLive  = $ls->status === 'live';
+                                                    $hlIsToday = $ls->date && \Carbon\Carbon::parse(\Carbon\Carbon::parse($ls->date)->toDateString())->isToday();
+
+                                                    $hlInWindow  = false;
+                                                    $hlWindowMsg = '';
+                                                    if ($ls->date && $ls->start_time) {
+                                                        $hlStart     = \Carbon\Carbon::parse(\Carbon\Carbon::parse($ls->date)->toDateString() . ' ' . $ls->start_time);
+                                                        $hlWindowEnd = $hlStart->copy()->addMinutes(30);
+                                                        $hlInWindow  = now()->between($hlStart, $hlWindowEnd);
+                                                        if (now()->lt($hlStart)) {
+                                                            $hlWindowMsg = 'Go live opens at ' . $hlStart->format('h:i A') . ' on ' . $hlStart->format('d M Y');
+                                                        } elseif (now()->gt($hlWindowEnd)) {
+                                                            $hlWindowMsg = 'Go-live window passed (' . $hlStart->format('h:i A') . ' to ' . $hlWindowEnd->format('h:i A') . ')';
+                                                        }
+                                                    } else {
+                                                        $hlWindowMsg = 'Set a start time to enable Go Live';
+                                                    }
+                                                @endphp
+
+                                                <div class="px-5 py-4 flex items-center justify-between gap-4 flex-wrap {{ $hlIsLive ? 'bg-red-50' : '' }}">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0
+                                                            {{ $hlIsLive ? 'bg-red-500 live-pulse' : 'bg-indigo-100' }}">
+                                                            <i class="fas fa-broadcast-tower text-sm {{ $hlIsLive ? 'text-white' : 'text-indigo-500' }}"></i>
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-sm font-bold text-gray-900">
+                                                                {{ $ls->title ?? 'Live Session ' . $ls->session_number }}
+                                                            </p>
+                                                            <p class="text-xs text-gray-500 mt-0.5 flex flex-wrap items-center gap-2">
+                                                                @if($ls->date)
+                                                                    <span><i class="fas fa-calendar-alt mr-1"></i>{{ \Carbon\Carbon::parse($ls->date)->format('d M Y') }}</span>
+                                                                @endif
+                                                                @if($ls->start_time)
+                                                                    <span><i class="fas fa-clock mr-1"></i>{{ \Carbon\Carbon::parse($ls->start_time)->format('h:i A') }}</span>
+                                                                @endif
+                                                                @if($ls->duration_minutes)
+                                                                    <span><i class="fas fa-hourglass-half mr-1"></i>{{ $ls->duration_minutes }} mins</span>
+                                                                @endif
+                                                                @if($hlIsToday && !$hlIsLive)
+                                                                    <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 text-[10px] font-bold">TODAY</span>
+                                                                @endif
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="flex items-center gap-2 flex-shrink-0">
+                                                        @if($hlIsLive)
+                                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-100 border border-red-300 rounded-lg text-xs font-bold text-red-700">
+                                                                <span class="w-2 h-2 rounded-full bg-red-500 animate-ping inline-block"></span> LIVE NOW
+                                                            </span>
+                                                            <a href="{{ route('instructor.live_session.go_live', ['course' => $course->id, 'session' => $ls->session_number]) }}"
+                                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold hover:bg-red-700 transition-all">
+                                                                <i class="fas fa-broadcast-tower text-[10px]"></i> Manage Stream
+                                                            </a>
+                                                        @elseif($hlInWindow)
+                                                            <a href="{{ route('instructor.live_session.go_live', ['course' => $course->id, 'session' => $ls->session_number]) }}"
+                                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition-all">
+                                                                <i class="fas fa-broadcast-tower text-[10px]"></i> Go Live
+                                                            </a>
+                                                        @else
+                                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-400 rounded-lg text-xs font-medium cursor-not-allowed"
+                                                                  title="{{ $hlWindowMsg }}">
+                                                                <i class="fas fa-lock text-[10px]"></i> Go Live
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="px-5 py-6 text-center bg-white">
+                                            <p class="text-sm text-gray-400">No live classes scheduled yet.</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
+
+                            {{-- ── Lectures / Sessions list ── --}}
                             @if(count($modules) > 0)
                                 <div class="space-y-3">
                                     @foreach ($modules as $module)
@@ -152,21 +259,20 @@
                                             $status      = $module['status'] ?? 'scheduled';
                                             $sessionDate = $module['date'] ?? null;
                                             $sessionTime = $module['start_time'] ?? null;
-                                            $isToday     = $sessionDate && \Carbon\Carbon::parse($sessionDate)->isToday();
+                                            $isToday     = $sessionDate && \Carbon\Carbon::parse(\Carbon\Carbon::parse($sessionDate)->toDateString())->isToday();
                                             $isLiveNow   = $isLiveCourse && $status === 'live';
                                             $isEnded     = $isLiveCourse && $status === 'ended';
 
-                                            // Go-live window: scheduled start_time to +30 mins
                                             $inGoLiveWindow = false;
                                             $goLiveWindowMsg = '';
                                             if ($sessionDate && $sessionTime) {
-                                                $scheduledStart  = \Carbon\Carbon::parse($sessionDate . ' ' . $sessionTime);
+                                                $scheduledStart  = \Carbon\Carbon::parse(\Carbon\Carbon::parse($sessionDate)->toDateString() . ' ' . $sessionTime);
                                                 $goLiveWindowEnd = $scheduledStart->copy()->addMinutes(30);
                                                 $inGoLiveWindow  = now()->between($scheduledStart, $goLiveWindowEnd);
                                                 if (now()->lt($scheduledStart)) {
                                                     $goLiveWindowMsg = 'Go live opens at ' . $scheduledStart->format('h:i A') . ' on ' . $scheduledStart->format('d M Y');
                                                 } elseif (now()->gt($goLiveWindowEnd)) {
-                                                    $goLiveWindowMsg = 'Go-live window passed (' . $scheduledStart->format('h:i A') . ' â ' . $goLiveWindowEnd->format('h:i A') . ')';
+                                                    $goLiveWindowMsg = 'Go-live window passed (' . $scheduledStart->format('h:i A') . ' to ' . $goLiveWindowEnd->format('h:i A') . ')';
                                                 }
                                             } elseif (!$sessionTime) {
                                                 $goLiveWindowMsg = 'Set a start time to enable Go Live';
@@ -269,8 +375,6 @@
                                             <div class="flex gap-2 flex-shrink-0 ml-3">
 
                                                 @if($isLiveCourse)
-
-                                                    {{-- Edit Schedule button — only for admin/instructor on non-live, non-ended sessions --}}
                                                     @if(($isAdmin || $isInstructor) && !$isLiveNow && !$isEnded)
                                                         <button
                                                             onclick="openScheduleModal(
@@ -287,7 +391,6 @@
                                                         </button>
                                                     @endif
 
-                                                    {{-- Go Live / Join / Watch buttons --}}
                                                     @if($isLiveNow)
                                                         @if($isInstructor || $isAdmin)
                                                             <a href="{{ route('instructor.live_session.go_live', ['course' => $course->id, 'session' => $module['id']]) }}"
@@ -300,13 +403,11 @@
                                                                 <i class="fas fa-circle text-xs animate-ping"></i> Join Live
                                                             </a>
                                                         @endif
-
                                                     @elseif($isEnded)
                                                         <a href="{{ route('student.live_session.watch', ['course' => $course->id, 'session' => $module['id']]) }}"
                                                            class="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-800 transition-all text-sm">
                                                             <i class="fas fa-play text-xs"></i> Watch Recording
                                                         </a>
-
                                                     @else
                                                         @if($isInstructor || $isAdmin)
                                                             @if($inGoLiveWindow)
@@ -380,8 +481,6 @@
         <!-- ── Edit Schedule Modal ─────────────────────────────────────────── -->
         <div id="schedule-modal">
             <div class="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-md mx-4 overflow-hidden">
-
-                <!-- Modal header -->
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
@@ -398,14 +497,10 @@
                     </button>
                 </div>
 
-                <!-- Modal form -->
                 <form id="schedule-form" method="POST">
                     @csrf
                     @method('PATCH')
-
                     <div class="p-6 space-y-5">
-
-                        <!-- Date -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1.5">
                                 <i class="fas fa-calendar-alt text-indigo-500 mr-1"></i> Session Date
@@ -413,8 +508,6 @@
                             <input type="date" name="date" id="modal-date" required
                                    class="modal-input w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 bg-white transition-all">
                         </div>
-
-                        <!-- Start Time -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1.5">
                                 <i class="fas fa-clock text-indigo-500 mr-1"></i> Start Time
@@ -422,8 +515,6 @@
                             <input type="time" name="start_time" id="modal-start-time"
                                    class="modal-input w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 bg-white transition-all">
                         </div>
-
-                        <!-- Duration -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1.5">
                                 <i class="fas fa-hourglass-half text-indigo-500 mr-1"></i> Duration (minutes)
@@ -432,10 +523,7 @@
                                    min="15" max="480" placeholder="e.g. 60"
                                    class="modal-input w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 bg-white transition-all">
                         </div>
-
                     </div>
-
-                    <!-- Modal footer -->
                     <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-3">
                         <button type="button" onclick="closeScheduleModal()"
                                 class="px-4 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-all">
@@ -468,20 +556,14 @@
     @endauth
 
     <script>
-        // ── Schedule Modal ──────────────────────────────────────────────────────
-        // Use Laravel-generated base URL so the path matches web.php exactly
         const SCHEDULE_BASE = "{{ url($isAdmin ? 'admin_panel' : 'instructor') }}/manage_resources/{{ $course->id }}/session";
 
         function openScheduleModal(sessionId, title, date, startTime, duration) {
             document.getElementById('modal-session-title').textContent = title;
-            document.getElementById('modal-date').value       = date       || '';
-            document.getElementById('modal-start-time').value = startTime  ? startTime.substring(0,5) : '';
-            document.getElementById('modal-duration').value   = duration   || '';
-
-            // Set form action — matches Route::patch in web.php
-            document.getElementById('schedule-form').action =
-                `${SCHEDULE_BASE}/${sessionId}/schedule`;
-
+            document.getElementById('modal-date').value       = date      || '';
+            document.getElementById('modal-start-time').value = startTime ? startTime.substring(0, 5) : '';
+            document.getElementById('modal-duration').value   = duration  || '';
+            document.getElementById('schedule-form').action   = `${SCHEDULE_BASE}/${sessionId}/schedule`;
             document.getElementById('schedule-modal').classList.add('open');
             document.body.style.overflow = 'hidden';
         }
@@ -491,12 +573,10 @@
             document.body.style.overflow = '';
         }
 
-        // Close on backdrop click
         document.getElementById('schedule-modal').addEventListener('click', function(e) {
             if (e.target === this) closeScheduleModal();
         });
 
-        // Close on Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeScheduleModal();
         });

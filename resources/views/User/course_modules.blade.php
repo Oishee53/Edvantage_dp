@@ -82,6 +82,21 @@
         .submitted-info p { font-size: 0.8rem; color: #6b7280; font-weight: 500; }
         .submitted-info strong { color: #1f2937; font-size: 0.85rem; font-weight: 600; }
 
+        /* Hybrid live class banner */
+        .live-banner { border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+        .live-banner.is-live-now { background: #fff5f5; border: 1.5px solid #fca5a5; }
+        .live-banner.is-upcoming  { background: #eff6ff; border: 1.5px solid #bfdbfe; }
+        .live-banner-left { display: flex; align-items: center; gap: 0.875rem; }
+        .live-banner-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .live-banner-icon.live  { background: #fee2e2; color: #ef4444; }
+        .live-banner-icon.upcoming { background: #dbeafe; color: #2563eb; }
+        .live-banner-title { font-size: 0.95rem; font-weight: 700; color: #1f2937; margin-bottom: 0.15rem; }
+        .live-banner-meta  { font-size: 0.8rem; color: #6b7280; font-weight: 500; }
+        .btn-join-banner { padding: 0.5rem 1.25rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: all 0.2s; white-space: nowrap; display: inline-block; }
+        .btn-join-banner.live     { background: #ef4444; color: white; }
+        .btn-join-banner.live:hover { background: #dc2626; }
+        .btn-join-banner.upcoming { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; }
+
         @media (max-width: 768px) {
             .container { padding: 1.5rem 1rem; }
             .course-header { padding: 1.5rem; }
@@ -98,7 +113,20 @@
 <body class="px-20 pt-5">
     @include('layouts.header')
 
-    @php $isLiveCourse = $course->course_type === 'live'; @endphp
+    @php
+    $isLiveCourse = $course->course_type === 'live';
+    $isHybrid     = !$isLiveCourse; // recorded courses can have hybrid live classes
+
+    // Upcoming / live class for hybrid recorded courses
+    $upcomingLiveClass = null;
+    if ($isHybrid) {
+        $upcomingLiveClass = \App\Models\CourseLiveSession::where('course_id', $course->id)
+            ->whereIn('status', ['scheduled', 'live'])
+            ->orderBy('date')
+            ->orderBy('start_time')
+            ->first();
+    }
+@endphp
 
     <div class="pt-24">
         <div class="container">
@@ -129,6 +157,56 @@
                 </div>
             </div>
 
+            {{-- ── Hybrid Live Class Banner (recorded courses only) ── --}}
+            @if($isHybrid && $upcomingLiveClass)
+                @php
+                    $liveIsNow  = $upcomingLiveClass->status === 'live';
+                    $liveDate   = $upcomingLiveClass->date
+                        ? \Carbon\Carbon::parse($upcomingLiveClass->date)->format('d M Y')
+                        : null;
+                    $liveTime   = $upcomingLiveClass->start_time
+                        ? \Carbon\Carbon::parse($upcomingLiveClass->start_time)->format('h:i A')
+                        : null;
+                    $liveDur    = $upcomingLiveClass->duration_minutes;
+                @endphp
+                <div class="live-banner {{ $liveIsNow ? 'is-live-now' : 'is-upcoming' }}">
+                    <div class="live-banner-left">
+                        <div class="live-banner-icon {{ $liveIsNow ? 'live' : 'upcoming' }}">
+                            <i class="fas {{ $liveIsNow ? 'fa-broadcast-tower' : 'fa-calendar-alt' }}"></i>
+                        </div>
+                        <div>
+                            <div class="live-banner-title">
+                                @if($liveIsNow)
+                                    <span style="display:inline-flex;align-items:center;gap:0.4rem;">
+                                        <span style="width:7px;height:7px;border-radius:50%;background:#ef4444;display:inline-block;animation:ping 1s infinite;"></span>
+                                        Live Class in Progress
+                                    </span>
+                                @else
+                                    Upcoming Live Class
+                                @endif
+                            </div>
+                            <div class="live-banner-meta">
+                                {{ $upcomingLiveClass->title ?? 'Live Session ' . $upcomingLiveClass->session_number }}
+                                @if($liveDate) &nbsp;·&nbsp; <i class="fas fa-calendar-alt" style="font-size:0.7rem;"></i> {{ $liveDate }} @endif
+                                @if($liveTime) &nbsp;·&nbsp; <i class="fas fa-clock" style="font-size:0.7rem;"></i> {{ $liveTime }} @endif
+                                @if($liveDur)  &nbsp;·&nbsp; {{ $liveDur }} mins @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    @if($liveIsNow)
+                        <a href="{{ route('student.live_session.watch', ['course' => $course->id, 'session' => $upcomingLiveClass->session_number]) }}"
+                           class="btn-join-banner live">
+                            <i class="fas fa-circle" style="font-size:0.6rem;margin-right:0.3rem;"></i> Join Live
+                        </a>
+                    @else
+                        <span class="btn-join-banner upcoming">
+                            <i class="fas fa-lock" style="font-size:0.7rem;margin-right:0.3rem;"></i> Upcoming
+                        </span>
+                    @endif
+                </div>
+            @endif
+
             <!-- Tabs Container -->
             <div class="tabs-container">
 
@@ -138,13 +216,17 @@
                         <i class="fas {{ $isLiveCourse ? 'fa-broadcast-tower' : 'fa-book-open' }}" style="margin-right:0.5rem;"></i>
                         {{ $isLiveCourse ? 'Sessions' : 'Lectures' }}
                     </button>
-        
+                    @if(!$isLiveCourse)
+                        <button class="tab" data-tab="live-sessions">
+                            <i class="fas fa-broadcast-tower" style="margin-right:0.5rem;"></i>Live Classes
+                        </button>
                         <button class="tab" data-tab="final-exam">
                             <i class="fas fa-file-alt" style="margin-right:0.5rem;"></i>Final Exam
                         </button>
                         <button class="tab" data-tab="assignments">
                             <i class="fas fa-tasks" style="margin-right:0.5rem;"></i>Assignments
                         </button>
+                    @endif
                 </div>
 
                 <!-- ── Lectures / Sessions Tab ── -->
@@ -245,6 +327,79 @@
                     @endif
                 </div>{{-- /#lectures-content --}}
 
+                @if(!$isLiveCourse)
+
+                    <!-- ── Live Sessions Tab (hybrid: recorded courses with live classes) ── -->
+                    <div class="tab-content" id="live-sessions-content">
+                        @if($isHybrid)
+                            @php
+                                $hybridSessions = \App\Models\CourseLiveSession::where('course_id', $course->id)
+                                    ->orderBy('date')
+                                    ->orderBy('start_time')
+                                    ->get();
+                            @endphp
+
+                            @if($hybridSessions->count() > 0)
+                                @foreach($hybridSessions as $hs)
+                                    @php
+                                        $hsLive   = $hs->status === 'live';
+                                        $hsEnded  = $hs->status === 'ended';
+                                        $hsDate   = $hs->date ? \Carbon\Carbon::parse($hs->date)->format('d M Y') : null;
+                                        $hsTime   = $hs->start_time ? \Carbon\Carbon::parse($hs->start_time)->format('h:i A') : null;
+                                    @endphp
+                                    <div class="session-card {{ $hsLive ? 'is-live' : '' }}">
+                                        <div class="session-info" style="flex:1;">
+                                            <h3>{{ $hs->title ?? 'Live Session ' . $hs->session_number }}</h3>
+                                            <p>
+                                                @if($hsDate)
+                                                    <i class="fas fa-calendar-alt" style="margin-right:0.3rem;"></i>
+                                                    {{ $hsDate }}
+                                                    @if($hsTime) &nbsp;·&nbsp; {{ $hsTime }} @endif
+                                                    @if($hs->duration_minutes) &nbsp;·&nbsp; {{ $hs->duration_minutes }} mins @endif
+                                                @else
+                                                    <i class="fas fa-calendar-alt" style="margin-right:0.3rem;"></i>Not scheduled yet
+                                                @endif
+                                            </p>
+                                        </div>
+
+                                        <div style="display:flex;align-items:center;gap:0.75rem;">
+                                            @if($hsLive)
+                                                <span class="session-badge badge-live">
+                                                    <span style="width:6px;height:6px;border-radius:50%;background:#ef4444;display:inline-block;animation:ping 1s infinite;"></span>
+                                                    LIVE NOW
+                                                </span>
+                                                <a href="{{ route('student.live_session.watch', ['course' => $course->id, 'session' => $hs->session_number]) }}"
+                                                   class="session-btn btn-join">
+                                                    <i class="fas fa-circle" style="font-size:0.6rem;margin-right:0.3rem;"></i> Join Live
+                                                </a>
+                                            @elseif($hsEnded)
+                                                <span class="session-badge badge-ended">
+                                                    <i class="fas fa-video" style="font-size:0.65rem;"></i> Recording
+                                                </span>
+                                                <a href="{{ route('student.live_session.watch', ['course' => $course->id, 'session' => $hs->session_number]) }}"
+                                                   class="session-btn btn-watch">
+                                                    <i class="fas fa-play" style="font-size:0.7rem;margin-right:0.3rem;"></i> Watch
+                                                </a>
+                                            @else
+                                                <span class="session-badge badge-scheduled">
+                                                    <i class="fas fa-clock" style="font-size:0.65rem;"></i> Upcoming
+                                                </span>
+                                                <span class="session-btn btn-upcoming">
+                                                    <i class="fas fa-lock" style="font-size:0.7rem;margin-right:0.3rem;"></i> Upcoming
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="empty-state">
+                                    <div class="empty-icon"><i class="fas fa-broadcast-tower"></i></div>
+                                    <h3 class="heading-font">No Live Classes Yet</h3>
+                                    <p>Live classes will appear here once scheduled by your instructor.</p>
+                                </div>
+                            @endif
+                        @endif
+                    </div>{{-- /#live-sessions-content --}}
 
                     <!-- ── Final Exam Tab ── -->
                     <div class="tab-content" id="final-exam-content">
@@ -362,6 +517,8 @@
                             </div>
                         @endif
                     </div>{{-- /#assignments-content --}}
+
+                @endif{{-- @if(!$isLiveCourse) --}}
 
             </div>{{-- /.tabs-container --}}
         </div>{{-- /.container --}}

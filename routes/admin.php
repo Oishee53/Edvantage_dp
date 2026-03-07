@@ -242,3 +242,9 @@ Route::patch('/instructor/manage_resources/{course_id}/session/{session_number}/
 Route::patch('/admin_panel/manage_resources/{course_id}/session/{session_number}/schedule',
     [LiveSessionController::class, 'updateSchedule'])
     ->name('admin.live_session.update_schedule');
+
+Route::post('/instructor/live-class/store', [LiveSessionController::class, 'storeLiveHybridClass'])->name('live.class.store');
+
+Route::get('/courses/{id}', [CourseController::class, 'show'])
+    ->name('courses.details');
+    Route::get('/instructor/live-class/{course_id}', [InstructorController::class, 'liveClassForm'])->name('live.class.form');

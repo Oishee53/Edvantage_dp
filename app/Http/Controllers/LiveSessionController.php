@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\PendingCourses;
-use App\Models\LiveSession;
 use App\Models\CourseLiveSession;
+use App\Models\Enrollment;
+use App\Models\LiveSession;
+use App\Models\PendingCourses;
+use App\Models\User;
+use App\Notifications\LiveClassScheduledNotification;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Log;
 
 class LiveSessionController extends Controller
@@ -215,5 +219,40 @@ class LiveSessionController extends Controller
         $peerId = $session->daily_room_name;
 
         return view('Student.watch_live', compact('session', 'peerId', 'course_id', 'session_number'));
+    }
+
+        public function storeLiveHybridClass(Request $request)
+    {
+        $request->validate([
+            'course_id'        => 'required|exists:courses,id',
+            'title'            => 'required|string|max:255',
+            'date'             => 'required|date|after_or_equal:today',
+            'start_time'       => 'required|date_format:H:i',
+            'duration_minutes' => 'required|integer|min:15|max:480',
+        ]);
+
+        // Auto-assign next session_number for this course
+        $nextNumber = CourseLiveSession::where('course_id', $request->course_id)
+            ->max('session_number') + 1;
+
+        $session = CourseLiveSession::create([
+            'course_id'        => $request->course_id,
+            'session_number'   => $nextNumber,
+            'title'            => $request->title,
+            'date'             => $request->date,
+            'start_time'       => $request->start_time,
+            'duration_minutes' => $request->duration_minutes,
+            'status'           => 'scheduled',
+        ]);
+
+        // Notify enrolled students
+        $studentIds = Enrollment::where('course_id', $request->course_id)->pluck('user_id');
+        $students   = User::whereIn('id', $studentIds)->get();
+
+        if ($students->isNotEmpty()) {
+            Notification::send($students, new LiveClassScheduledNotification($session));
+        }
+
+        return back()->with('success', 'Live class scheduled successfully.');
     }
 }
