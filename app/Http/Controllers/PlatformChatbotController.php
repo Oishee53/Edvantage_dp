@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Courses;
 use App\Models\Enrollment;
+use App\Models\UserSearch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -18,35 +19,59 @@ class PlatformChatbotController extends Controller
         $this->apiKey = env('GEMINI_API_KEY');
     }
 
-    /**
-     * Main chat endpoint - handles conversation with function calling
-     */
     public function chat(Request $request)
     {
-        $request->validate([
-            'message' => 'required|string|max:1000',
-            'history' => 'nullable|array', // conversation history from frontend
-        ]);
-
-        $userMessage = $request->message;
-        $history = $request->history ?? [];
-
         try {
-            // Build conversation with system prompt
-            $messages = $this->buildMessages($userMessage, $history);
+            if (!$this->apiKey) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Chatbot is not configured. Please contact administrator.',
+                ], 500);
+            }
 
-            // Call Gemini with function calling enabled
-            $response = $this->callGeminiWithTools($messages);
+            $request->validate([
+                'message' => 'required|string|max:1000',
+            ]);
 
+            $userMessage = $request->message;
+
+            // Save search query if user is logged in
+            if (auth()->check()) {
+                UserSearch::create([
+                    'user_id' => auth()->id(),
+                    'keyword' => substr($userMessage, 0, 191),
+                ]);
+            }
+
+            // Handle course-related queries
+            if ($this->isAskingAboutCourses($userMessage)) {
+                $response = $this->handleCourseQuery($userMessage);
+                return response()->json([
+                    'success' => true,
+                    'message' => $response,
+                ]);
+            }
+
+            // Handle "my courses" query
+            if ($this->isAskingAboutMyEnrollments($userMessage)) {
+                $response = $this->handleMyEnrollments();
+                return response()->json([
+                    'success' => true,
+                    'message' => $response,
+                ]);
+            }
+
+            // General questions - use Gemini
+            $response = $this->callGemini($userMessage);
             return response()->json([
                 'success' => true,
-                'message' => $response['message'],
-                'function_used' => $response['function_used'] ?? null,
+                'message' => $response,
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Platform chatbot error', [
-                'error' => $e->getMessage(),
+            Log::error('Chatbot error', [
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString(),
             ]);
 
@@ -57,352 +82,215 @@ class PlatformChatbotController extends Controller
         }
     }
 
-    /**
-     * Build messages array with system prompt
-     */
-    private function buildMessages(string $userMessage, array $history): array
+    private function isAskingAboutCourses(string $message): bool
     {
-        $systemPrompt = $this->getSystemPrompt();
-
-        $messages = [];
-
-        // Add system context as first user message (Gemini doesn't have system role)
-        if (empty($history)) {
-            $messages[] = [
-                'role' => 'user',
-                'parts' => [['text' => $systemPrompt]]
-            ];
-            $messages[] = [
-                'role' => 'model',
-                'parts' => [['text' => 'Hello! I\'m your Edvantage assistant. I can help you find courses, get course details, answer platform questions, and more. What would you like to know?']]
-            ];
-        }
-
-        // Add conversation history
-        foreach ($history as $msg) {
-            $messages[] = [
-                'role' => $msg['role'], // 'user' or 'model'
-                'parts' => [['text' => $msg['content']]]
-            ];
-        }
-
-        // Add current user message
-        $messages[] = [
-            'role' => 'user',
-            'parts' => [['text' => $userMessage]]
+        $keywords = [
+            'course', 'courses', 'find course', 'search course', 'show course',
+            'machine learning', 'web development', 'python', 'data science',
+            'programming', 'learn', 'learning', 'tutorial', 'class',
+            'beginner', 'intermediate', 'advanced',
+            'development', 'design', 'marketing', 'business',
+            'javascript', 'react', 'node', 'django', 'java'
         ];
 
-        return $messages;
+        $messageLower = strtolower($message);
+        foreach ($keywords as $keyword) {
+            if (strpos($messageLower, $keyword) !== false) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    /**
-     * Call Gemini API with function calling (tools)
-     */
-    private function callGeminiWithTools(array $messages): array
+    private function isAskingAboutMyEnrollments(string $message): bool
     {
-        $tools = $this->getAvailableTools();
+        $messageLower = strtolower($message);
+        return strpos($messageLower, 'my course') !== false || 
+               strpos($messageLower, 'enrolled') !== false ||
+               strpos($messageLower, 'my enrollment') !== false;
+    }
 
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-        ])->timeout(30)->post("{$this->baseUrl}/models/gemini-1.5-flash:generateContent?key={$this->apiKey}", [
-            'contents' => $messages,
-            'tools' => [$tools],
-            'generationConfig' => [
-                'temperature' => 0.7,
-                'maxOutputTokens' => 1024,
-            ],
-        ]);
-
-        if (!$response->successful()) {
-            throw new \Exception('Gemini API error: ' . $response->body());
+    private function handleCourseQuery(string $message): string
+    {
+        $searchTerms = $this->extractSearchTerms($message);
+        $query = Courses::query();
+        
+        // Search by keywords
+        if (!empty($searchTerms)) {
+            $query->where(function ($q) use ($searchTerms) {
+                foreach ($searchTerms as $term) {
+                    $q->orWhere('title', 'LIKE', "%{$term}%")
+                      ->orWhere('description', 'LIKE', "%{$term}%")
+                      ->orWhere('category', 'LIKE', "%{$term}%");
+                }
+            });
         }
 
-        $data = $response->json();
-        $candidate = $data['candidates'][0] ?? null;
-
-        if (!$candidate) {
-            throw new \Exception('No response from Gemini');
+        // Filter by level if mentioned
+        if (stripos($message, 'beginner') !== false) {
+            $query->where('level', 'beginner');
+        } elseif (stripos($message, 'intermediate') !== false) {
+            $query->where('level', 'intermediate');
+        } elseif (stripos($message, 'advanced') !== false) {
+            $query->where('level', 'advanced');
         }
 
-        // Check if Gemini wants to call a function
-        $functionCall = $candidate['content']['parts'][0]['functionCall'] ?? null;
-
-        if ($functionCall) {
-            // Execute the function
-            $functionResult = $this->executeFunction(
-                $functionCall['name'],
-                $functionCall['args'] ?? []
-            );
-
-            // Send function result back to Gemini for final answer
-            $messages[] = [
-                'role' => 'model',
-                'parts' => [['functionCall' => $functionCall]]
-            ];
-
-            $messages[] = [
-                'role' => 'user',
-                'parts' => [[
-                    'functionResponse' => [
-                        'name' => $functionCall['name'],
-                        'response' => ['result' => $functionResult]
-                    ]
-                ]]
-            ];
-
-            // Get final response from Gemini
-            $finalResponse = Http::withHeaders([
-                'Content-Type' => 'application/json',
-            ])->timeout(30)->post("{$this->baseUrl}/models/gemini-1.5-flash:generateContent?key={$this->apiKey}", [
-                'contents' => $messages,
-                'tools' => [$tools],
-                'generationConfig' => [
-                    'temperature' => 0.7,
-                    'maxOutputTokens' => 1024,
-                ],
-            ]);
-
-            $finalData = $finalResponse->json();
-            $finalText = $finalData['candidates'][0]['content']['parts'][0]['text'] ?? 'I found the information but had trouble formatting the response.';
-
-            return [
-                'message' => $finalText,
-                'function_used' => $functionCall['name'],
-            ];
+        // Filter by course type if mentioned
+        if (stripos($message, 'live') !== false) {
+            $query->where('course_type', 'live');
+        } elseif (stripos($message, 'recorded') !== false) {
+            $query->where('course_type', 'recorded');
         }
 
-        // No function call - return direct text response
-        $text = $candidate['content']['parts'][0]['text'] ?? 'I\'m not sure how to respond to that.';
-
-        return [
-            'message' => $text,
-        ];
-    }
-
-    /**
-     * Define available functions (tools) for Gemini
-     */
-    private function getAvailableTools(): array
-    {
-        return [
-            'function_declarations' => [
-                [
-                    'name' => 'searchCourses',
-                    'description' => 'Search for courses by keyword. Returns a list of matching courses with titles, descriptions, prices, and URLs.',
-                    'parameters' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'query' => [
-                                'type' => 'string',
-                                'description' => 'Search keyword or topic (e.g., "machine learning", "web development", "python")',
-                            ],
-                            'limit' => [
-                                'type' => 'integer',
-                                'description' => 'Maximum number of results to return (default 5)',
-                            ],
-                        ],
-                        'required' => ['query'],
-                    ],
-                ],
-                [
-                    'name' => 'getCourseDetails',
-                    'description' => 'Get detailed information about a specific course by its ID or title.',
-                    'parameters' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'course_id' => [
-                                'type' => 'integer',
-                                'description' => 'The course ID',
-                            ],
-                        ],
-                        'required' => ['course_id'],
-                    ],
-                ],
-                [
-                    'name' => 'getMyEnrollments',
-                    'description' => 'Get list of courses the current user is enrolled in. Only use if user asks about "my courses" or "enrolled courses".',
-                    'parameters' => [
-                        'type' => 'object',
-                        'properties' => [],
-                    ],
-                ],
-                [
-                    'name' => 'getBrowseLink',
-                    'description' => 'Get the URL to browse all courses on the platform.',
-                    'parameters' => [
-                        'type' => 'object',
-                        'properties' => [],
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * Execute function calls from Gemini
-     */
-    private function executeFunction(string $functionName, array $args): array
-    {
-        return match ($functionName) {
-            'searchCourses' => $this->searchCourses(
-                $args['query'] ?? '',
-                $args['limit'] ?? 5
-            ),
-            'getCourseDetails' => $this->getCourseDetails(
-                $args['course_id'] ?? null
-            ),
-            'getMyEnrollments' => $this->getMyEnrollments(),
-            'getBrowseLink' => $this->getBrowseLink(),
-            default => ['error' => 'Unknown function'],
-        };
-    }
-
-    /**
-     * Search courses by keyword
-     */
-    private function searchCourses(string $query, int $limit = 5): array
-    {
-        $courses = Courses::where('status', 'approved')
-            ->where(function ($q) use ($query) {
-                $q->where('title', 'LIKE', "%{$query}%")
-                    ->orWhere('description', 'LIKE', "%{$query}%")
-                    ->orWhere('name', 'LIKE', "%{$query}%");
-            })
-            ->limit($limit)
-            ->get();
+        $courses = $query->limit(5)->get();
 
         if ($courses->isEmpty()) {
-            return [
-                'found' => false,
-                'message' => "No courses found matching '{$query}'",
+            return "I couldn't find any courses matching your query. Browse all courses here: [View All Courses](" . route('courses.all') . ")";
+        }
+
+        $response = "**Here are some courses I found:**\n\n";
+        
+        foreach ($courses as $course) {
+            $response .= "📚 **{$course->title}**\n";
+            
+            // Category badge
+            if ($course->category) {
+                $response .= "🏷️ Category: {$course->category}\n";
+            }
+            
+            // Level
+            $levelEmoji = [
+                'beginner' => '🌱',
+                'intermediate' => '📈',
+                'advanced' => '🚀'
             ];
+            $response .= ($levelEmoji[$course->level] ?? '📖') . " Level: " . ucfirst($course->level) . "\n";
+            
+            // Type
+            $typeEmoji = $course->course_type === 'live' ? '🔴 Live' : '📹 Recorded';
+            $response .= "{$typeEmoji}\n";
+            
+            // Duration
+            if ($course->total_duration) {
+                $response .= "⏱️ Duration: {$course->total_duration}\n";
+            }
+            
+            // Price
+            $response .= "💰 Price: **৳" . number_format($course->price, 0) . "**\n";
+            
+            // Links
+            $response .= "[View Details](" . route('courses.details', $course->id) . ") | ";
+            $response .= "[Add to Cart](" . route('cart.add', $course->id) . ")\n\n";
         }
 
-        return [
-            'found' => true,
-            'count' => $courses->count(),
-            'courses' => $courses->map(function ($course) {
-                return [
-                    'id' => $course->id,
-                    'title' => $course->title,
-                    'name' => $course->name,
-                    'description' => substr($course->description, 0, 200),
-                    'price' => $course->price,
-                    'instructor' => $course->instructor->name ?? 'Unknown',
-                    'url' => route('courses.details', $course->id),
-                ];
-            })->toArray(),
-        ];
+        $response .= "---\n[🔍 Browse All Courses](" . route('courses.all') . ")";
+
+        return $response;
     }
 
-    /**
-     * Get course details by ID
-     */
-    private function getCourseDetails(?int $courseId): array
-    {
-        if (!$courseId) {
-            return ['error' => 'Course ID is required'];
-        }
-
-        $course = Courses::with('instructor')->find($courseId);
-
-        if (!$course) {
-            return ['error' => 'Course not found'];
-        }
-
-        return [
-            'id' => $course->id,
-            'title' => $course->title,
-            'name' => $course->name,
-            'description' => $course->description,
-            'price' => $course->price,
-            'video_count' => $course->video_count,
-            'duration' => $course->duration ?? 'Not specified',
-            'level' => $course->level ?? 'All levels',
-            'instructor' => [
-                'name' => $course->instructor->name ?? 'Unknown',
-                'bio' => $course->instructor->bio ?? null,
-            ],
-            'url' => route('courses.details', $course->id),
-            'enroll_url' => route('cart.add', $course->id),
-        ];
-    }
-
-    /**
-     * Get user's enrolled courses
-     */
-    private function getMyEnrollments(): array
+    private function handleMyEnrollments(): string
     {
         if (!auth()->check()) {
-            return [
-                'error' => 'User not logged in',
-                'message' => 'Please log in to see your enrolled courses.',
-            ];
+            return "🔒 Please log in to see your enrolled courses.\n\n[Login Here](/login)";
         }
 
         $enrollments = Enrollment::where('user_id', auth()->id())
+            ->where('status', 'enrolled')
             ->with('course')
             ->get();
 
         if ($enrollments->isEmpty()) {
-            return [
-                'found' => false,
-                'message' => 'You are not enrolled in any courses yet.',
-            ];
+            return "📚 You haven't enrolled in any courses yet.\n\n[Browse Courses](" . route('courses.all') . ") to get started!";
         }
 
-        return [
-            'found' => true,
-            'count' => $enrollments->count(),
-            'courses' => $enrollments->map(function ($enrollment) {
-                return [
-                    'id' => $enrollment->course->id,
-                    'title' => $enrollment->course->title,
-                    'name' => $enrollment->course->name,
-                    'url' => route('user.course.modules', $enrollment->course->id),
-                ];
-            })->toArray(),
-        ];
+        $response = "**📚 Your Enrolled Courses:**\n\n";
+        
+        foreach ($enrollments as $enrollment) {
+            $course = $enrollment->course;
+            $response .= "• **{$course->title}**\n";
+            $response .= "  Level: " . ucfirst($course->level) . " | ";
+            $response .= ($course->course_type === 'live' ? '🔴 Live' : '📹 Recorded') . "\n";
+            $response .= "  [📖 Go to Course](" . route('user.course.modules', $course->id) . ")\n\n";
+        }
+
+        return $response;
     }
 
-    /**
-     * Get browse all courses link
-     */
-    private function getBrowseLink(): array
+    private function extractSearchTerms(string $message): array
     {
-        return [
-            'url' => route('courses.all'),
-            'text' => 'Browse All Courses',
+        $commonTopics = [
+            'machine learning', 'ml', 'artificial intelligence', 'ai',
+            'web development', 'frontend', 'backend', 'fullstack', 'full stack',
+            'data science', 'data analysis', 'analytics',
+            'python', 'java', 'javascript', 'js', 'typescript',
+            'react', 'reactjs', 'angular', 'vue', 'vuejs',
+            'node', 'nodejs', 'express', 'django', 'flask', 'laravel',
+            'php', 'ruby', 'c++', 'c#', 'swift', 'kotlin',
+            'marketing', 'digital marketing', 'seo', 'social media',
+            'business', 'management', 'finance', 'accounting',
+            'design', 'graphic design', 'ui', 'ux', 'ui/ux',
+            'photoshop', 'illustrator', 'figma', 'sketch',
+            'mobile', 'android', 'ios', 'flutter', 'react native'
         ];
+
+        $messageLower = strtolower($message);
+        $found = [];
+
+        foreach ($commonTopics as $topic) {
+            if (strpos($messageLower, $topic) !== false) {
+                $found[] = $topic;
+            }
+        }
+
+        // If no specific topics found, extract general words
+        if (empty($found)) {
+            $words = explode(' ', $messageLower);
+            $stopWords = ['do', 'you', 'have', 'any', 'show', 'me', 'find', 'search', 'for', 'about', 'course', 'courses'];
+            foreach ($words as $word) {
+                if (strlen($word) > 3 && !in_array($word, $stopWords)) {
+                    $found[] = $word;
+                }
+            }
+        }
+
+        return array_unique($found);
     }
 
-    /**
-     * System prompt that defines chatbot behavior
-     */
-    private function getSystemPrompt(): string
+    private function callGemini(string $userMessage): string
     {
-        return <<<PROMPT
-You are a helpful assistant for Edvantage, an online learning platform.
+        $systemPrompt = "You are a helpful assistant for Edvantage, an online learning platform. " .
+                       "Be friendly, concise, and helpful. " .
+                       "Platform features: Video lectures, quizzes, discussion forums, certificates, AI study assistant. " .
+                       "We offer both live and recorded courses. " .
+                       "Payment: One-time purchase per course. " .
+                       "Keep responses brief (2-3 sentences) and friendly.";
 
-Your capabilities:
-- Search for courses by topic/keyword
-- Get detailed information about specific courses
-- Show user's enrolled courses (if logged in)
-- Answer general questions about the platform
+        $response = Http::timeout(30)->post(
+            "{$this->baseUrl}/models/gemini-2.5-flash:generateContent?key={$this->apiKey}",
+            [
+                'contents' => [
+                    [
+                        'parts' => [
+                            ['text' => $systemPrompt . "\n\nUser question: " . $userMessage]
+                        ]
+                    ]
+                ],
+                'generationConfig' => [
+                    'temperature' => 0.7,
+                    'maxOutputTokens' => 256,
+                ]
+            ]
+        );
 
-Guidelines:
-- Be friendly, concise, and helpful
-- When users ask about courses, use the searchCourses function
-- When users ask for course details, use getCourseDetails function
-- Always provide clickable links when mentioning courses
-- If users ask about their enrollments, use getMyEnrollments function
-- For questions about platform features, answer based on common e-learning platform features
-- If you don't know something, be honest and suggest browsing all courses
+        if (!$response->successful()) {
+            Log::error('Gemini API error', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+            return "I can help you find courses! What topic are you interested in learning? 📚";
+        }
 
-Platform info:
-- Platform name: Edvantage
-- Features: Video lectures, quizzes, discussion forums, certificates, AI study assistant
-- Payment: One-time purchase per course
-PROMPT;
+        $data = $response->json();
+        return $data['candidates'][0]['content']['parts'][0]['text'] ?? "I can help you find courses! What would you like to learn?";
     }
 }
