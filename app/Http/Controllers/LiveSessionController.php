@@ -1,0 +1,214 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\PendingCourses;
+use App\Models\LiveSession;
+use App\Models\CourseLiveSession;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Support\Facades\Log;
+
+class LiveSessionController extends Controller
+{
+    /**
+     * Show the schedule + PDF upload form for a single session.
+     */
+    public function edit($course_id, $session_number)
+    {
+        $course = PendingCourses::findOrFail($course_id);
+
+        if ($session_number < 1 || $session_number > $course->video_count) {
+            abort(404);
+        }
+
+        $session = LiveSession::where('course_id', $course_id)
+                              ->where('session_number', $session_number)
+                              ->first();
+
+        return view('Instructor.edit_live_session', compact('course', 'session', 'session_number'));
+    }
+
+    /**
+     * Save or update schedule + PDF for a pending session.
+     */
+    public function update(Request $request, $course_id, $session_number)
+    {
+        $course = PendingCourses::findOrFail($course_id);
+
+        if ($session_number < 1 || $session_number > $course->video_count) {
+            abort(404);
+        }
+
+        $request->validate([
+            'title'            => 'nullable|string|max:255',
+            'date'             => 'required|date|after_or_equal:today',
+            'start_time'       => 'required|date_format:H:i',
+            'duration_minutes' => 'required|integer|min:15',
+            'pdf'              => 'nullable|file|mimes:pdf|max:10240',
+        ]);
+
+        $liveSession = LiveSession::firstOrNew([
+            'course_id'      => $course_id,
+            'session_number' => $session_number,
+        ]);
+
+        $liveSession->title            = $request->title;
+        $liveSession->date             = $request->date;
+        $liveSession->start_time       = $request->start_time;
+        $liveSession->duration_minutes = $request->duration_minutes;
+
+        if ($request->hasFile('pdf')) {
+            try {
+                $originalName = pathinfo($request->file('pdf')->getClientOriginalName(), PATHINFO_FILENAME);
+
+                $result = Cloudinary::uploadApi()->upload($request->file('pdf')->getRealPath(), [
+                    'resource_type'   => 'raw',
+                    'folder'          => "course_{$course_id}/session_{$session_number}",
+                    'public_id'       => $originalName,
+                    'format'          => 'pdf',
+                    'overwrite'       => true,
+                    'use_filename'    => true,
+                    'unique_filename' => false,
+                ]);
+
+                $liveSession->pdf = $result['secure_url'];
+
+            } catch (\Exception $e) {
+                Log::error('Session PDF upload failed:', ['error' => $e->getMessage()]);
+                return back()->withErrors(['pdf' => 'PDF upload failed: ' . $e->getMessage()]);
+            }
+        }
+
+        $liveSession->save();
+
+        return redirect("/instructor/manage_resources/{$course_id}/modules")
+               ->with('success', 'Session saved successfully!');
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // LIVE STREAM — WebRTC via PeerJS (no third party service needed)
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Instructor goes live.
+     * Generates a unique peer ID for this session and marks it live.
+     */
+    public function goLive($course_id, $session_number)
+    {
+        $session = CourseLiveSession::where('course_id', $course_id)
+                                    ->where('session_number', $session_number)
+                                    ->firstOrFail();
+
+        // Allow going live 1 hour before the scheduled date, up to end of day
+        if ($session->date) {
+            $sessionDate = $session->date instanceof \Carbon\Carbon
+                ? $session->date
+                : \Carbon\Carbon::parse($session->date);
+
+            $goLiveFrom  = $sessionDate->copy()->startOfDay()->subHour();
+            $goLiveUntil = $sessionDate->copy()->endOfDay();
+
+            if (now()->lt($goLiveFrom)) {
+                return back()->with('error', 'You can go live from '
+                    . $goLiveFrom->format('d M Y, h:i A')
+                    . ' (1 hour before session day).');
+            }
+
+            if (now()->gt($goLiveUntil)) {
+                return back()->with('error', 'The scheduled date for this session was '
+                    . $sessionDate->format('d M Y') . '. Please reschedule to go live.');
+            }
+        }
+
+        if ($session->status === 'ended') {
+            return back()->with('error', 'This session has already ended.');
+        }
+
+        // Generate a stable peer ID for this session
+        // Format: live-{course_id}-{session_number}
+        $peerId = 'live-' . $course_id . '-' . $session_number;
+
+        $session->update([
+            'status'          => 'live',
+            'daily_room_name' => $peerId, // reusing column to store peer ID
+        ]);
+
+        return view('Instructor.go_live', compact('session', 'peerId', 'course_id', 'session_number'));
+    }
+
+    /**
+     * Instructor ends the live stream.
+     */
+    public function endStream($course_id, $session_number)
+    {
+        $session = CourseLiveSession::where('course_id', $course_id)
+                                    ->where('session_number', $session_number)
+                                    ->firstOrFail();
+
+        if ($session->status !== 'live') {
+            return back()->with('error', 'No active stream found for this session.');
+        }
+
+        $session->update(['status' => 'ended']);
+
+        return redirect("/instructor/manage_courses")
+               ->with('success', 'Live stream ended. Recording will be available shortly.');
+    }
+
+    /**
+     * Upload recording blob from instructor browser to Cloudinary.
+     * Called automatically by JS when instructor ends stream.
+     */
+    public function uploadRecording(Request $request, $course_id, $session_number)
+    {
+        $request->validate([
+            'recording' => 'required|file|max:512000', // 500MB max
+        ]);
+
+        $session = CourseLiveSession::where('course_id', $course_id)
+                                    ->where('session_number', $session_number)
+                                    ->firstOrFail();
+
+        try {
+            $result = Cloudinary::uploadApi()->upload(
+                $request->file('recording')->getRealPath(),
+                [
+                    'resource_type' => 'video',
+                    'folder'        => "recordings/course_{$course_id}",
+                    'public_id'     => "session_{$session_number}",
+                    'overwrite'     => true,
+                ]
+            );
+
+            $session->update(['recording_url' => $result['secure_url']]);
+
+            Log::info('Recording uploaded for session', [
+                'course_id'      => $course_id,
+                'session_number' => $session_number,
+                'url'            => $result['secure_url'],
+            ]);
+
+            return response()->json(['success' => true, 'url' => $result['secure_url']]);
+
+        } catch (\Exception $e) {
+            Log::error('Recording upload failed:', ['error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Student watches the live session or recording.
+     */
+    public function watch($course_id, $session_number)
+    {
+        $session = CourseLiveSession::where('course_id', $course_id)
+                                    ->where('session_number', $session_number)
+                                    ->firstOrFail();
+
+        // Peer ID is stored in daily_room_name column
+        $peerId = $session->daily_room_name;
+
+        return view('Student.watch_live', compact('session', 'peerId', 'course_id', 'session_number'));
+    }
+}

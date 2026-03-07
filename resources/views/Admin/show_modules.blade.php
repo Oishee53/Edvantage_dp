@@ -526,26 +526,51 @@
 
         <!-- Modules Section -->
         <div class="modules-section">
-          <h3 class="modules-title">Course Lectures</h3>
-          
-          @if(isset($modules) && count($modules) > 0)
-            <div class="modules-list">
-              @foreach ($modules as $index)
-                <a href="/view_pending_resources/{{$course->id}}/{{$index}}" class="module-card">
-                  <div>
-                    <div class="module-number">Lecture {{ $index }}</div>
-                    <div class="module-description">Click to view lecture content and materials</div>
-                  </div>
-                  <div style="color: var(--text-teal-500);">→</div>
-                </a>
-              @endforeach
-            </div>
-          @else
-            <div class="empty-state">
-              <div class="empty-state-icon">📚</div>
-              <p>No lectures found for this course</p>
-            </div>
-          @endif
+            <h3 class="modules-title">Course Lectures</h3>
+
+            @if(isset($modules) && count($modules) > 0)
+                <div class="modules-list">
+                    @if($course->course_type === 'live')
+                        {{-- Live sessions --}}
+                        @foreach ($modules as $session)
+                            <a href="{{ route('admin.live_session.review', ['course' => $course->id, 'session' => $session->session_number]) }}"
+                              class="module-card">
+                                <div>
+                                    <div class="module-number">
+                                        Session {{ $session->session_number }}
+                                        @if($session->title) — {{ $session->title }} @endif
+                                    </div>
+                                    <div class="module-description">
+                                        📅 {{ \Carbon\Carbon::parse($session->date)->format('d M Y') }}
+                                        &nbsp;·&nbsp;
+                                        🕐 {{ \Carbon\Carbon::parse($session->start_time)->format('g:i A') }}
+                                        &nbsp;·&nbsp;
+                                        ⏱ {{ $session->duration_minutes }} min
+                                    </div>
+                                </div>
+                                <div style="color: var(--text-teal-500);">→</div>
+                            </a>
+                        @endforeach
+                    @else
+                        {{-- Recorded modules — existing behaviour --}}
+                        @foreach ($modules as $index)
+                            <a href="/view_pending_resources/{{ $course->id }}/{{ $index }}"
+                              class="module-card">
+                                <div>
+                                    <div class="module-number">Lecture {{ $index }}</div>
+                                    <div class="module-description">Click to view lecture content and materials</div>
+                                </div>
+                                <div style="color: var(--text-teal-500);">→</div>
+                            </a>
+                        @endforeach
+                    @endif
+                </div>
+            @else
+                <div class="empty-state">
+                    <div class="empty-state-icon">📚</div>
+                    <p>No lectures found for this course</p>
+                </div>
+            @endif
         </div>
 
        @if(auth()->user()->role == 2)

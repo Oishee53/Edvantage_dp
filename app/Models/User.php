@@ -82,6 +82,14 @@ public function quizSubmissions() {
     return $this->hasMany(QuizSubmission::class);
 }
 
+public function assignments()
+{
+    return $this->hasMany(Assignment::class, 'created_by');
+}
 
+public function assignmentSubmissions()
+{
+    return $this->hasMany(AssignmentSubmission::class, 'student_id');
+}
 
 }

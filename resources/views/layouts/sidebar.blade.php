@@ -83,7 +83,7 @@
             {{-- ================= ADMIN ================= --}}
             @elseif(auth()->user()->role === 2)
                 <!-- Dashboard -->
-                <a href="{{ route('admin.dashboard') }}"
+                <a href="/admin_panel"
                    :class="collapsed ? 'lg:justify-center lg:px-0' : ''"
                    :title="collapsed ? 'Dashboard' : ''"
                    class="group flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200
@@ -95,7 +95,7 @@
                 </a>
 
                 <!-- Manage Courses -->
-                <a href="{{ route('admin.courses') }}"
+                <a href="/admin_panel/manage_courses"
                    :class="collapsed ? 'lg:justify-center lg:px-0' : ''"
                    :title="collapsed ? 'Manage Courses' : ''"
                    class="group flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200
@@ -107,7 +107,7 @@
                 </a>
 
                 <!-- Manage Users -->
-                <a href="{{ route('admin.users') }}"
+                <a href="/admin_panel/manage_users"
                    :class="collapsed ? 'lg:justify-center lg:px-0' : ''"
                    :title="collapsed ? 'Manage Users' : ''"
                    class="group flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200
@@ -119,7 +119,7 @@
                 </a>
 
                 <!-- Pending Courses -->
-                <a href="{{ route('admin.pending') }}"
+                <a href="/pending-courses"
                    :class="collapsed ? 'lg:justify-center lg:px-0' : ''"
                    :title="collapsed ? 'Pending Courses' : ''"
                    class="group flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200

@@ -1,25 +1,26 @@
 <?php
 
-use App\Models\Courses;
-use App\Models\Resource;
-use MuxPhp\Models\Upload;
-use App\Models\Enrollment;
-use App\Models\PendingCourses;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Foundation\Auth\User;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\QuizController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CourseController;
-use App\Http\Controllers\UploadController;
-use App\Http\Controllers\StudentController;
-use App\Http\Controllers\QuestionController;
-use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\CourseNotificatioController;
 use App\Http\Controllers\InstructorController;
+use App\Http\Controllers\InstructorFinalExamController; // ADD THIS
+use App\Http\Controllers\LiveSessionController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PendingCourseController;
-use App\Http\Controllers\CourseNotificatioController;
-use App\Http\Controllers\InstructorFinalExamController; // ADD THIS
+use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\QuizController;
+use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\UploadController;
+use App\Models\Courses;
+use App\Models\Enrollment;
+use App\Models\PendingCourses;
+use App\Models\Resource;
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
+use MuxPhp\Models\Upload;
 
 // ===================
 // Public / Login Routes
@@ -93,6 +94,10 @@ Route::get('/admin/view', function() {
     return view('Resources.viewVideo');
 });
 
+Route::get('/admin/courses/{course}/live-session/{session}/review',
+    [CourseNotificatioController::class, 'reviewLiveSession'])
+    ->name('admin.live_session.review');
+
 Route::get('admin/manage_courses/courses/{id}/edit', [CourseController::class, 'editCourse']);
 Route::put('admin/manage_courses/courses/{id}/edit', [CourseController::class, 'update']);
 Route::delete('/admin_panel/manage_courses/delete-course/{id}', [CourseController::class, 'destroy']);
@@ -141,7 +146,20 @@ Route::middleware(['auth'])->prefix('instructor')->group(function () {
     
     Route::post('/final-exam-submissions/{submissionId}/save-grades', [InstructorFinalExamController::class, 'saveGrades'])
         ->name('instructor.final-exams.save-grades');
+    
+    // Instructor — go live & end stream (on approved courses)
+    Route::get('/instructor/courses/{course}/sessions/{session}/go-live',
+        [LiveSessionController::class, 'goLive'])
+        ->name('instructor.live_session.go_live');
+
+    Route::put('/instructor/courses/{course}/sessions/{session}/end',
+        [LiveSessionController::class, 'endStream'])
+        ->name('instructor.live_session.end');
+
 });
+
+Route::post('/courses/{course}/session/{session}/end', [LiveSessionController::class, 'endStream'])
+    ->name('instructor.live_session.end_stream');
 
 // Other Instructor Routes (without prefix)
 Route::get('/instructor_homepage', [InstructorController::class, 'viewInstructorHomepage'])
@@ -188,6 +206,15 @@ Route::get('/view_pending_resources/{courseId}/{moduleNumber}', [PendingCourseCo
 Route::get('/view/inside-module/{courseId}/{moduleNumber}', [ResourceController::class, 'showInsideModule'])->name('inside.module2');
 Route::get('/instructor/rejected_courses', [InstructorController::class, 'showRejectedCourses'])->name('rejected.course.show');
 
+Route::get('/instructor/manage_resources/{course}/sessions/{session}/edit', 
+    [LiveSessionController::class, 'edit'])
+    ->name('instructor.live_session.edit');
+
+Route::put('/instructor/manage_resources/{course}/sessions/{session}/edit',
+    [LiveSessionController::class, 'update'])
+    ->name('instructor.live_session.update');
+
+
 // Notification routes
 Route::middleware('auth')->group(function () {
     // Mark all notifications as read
@@ -200,4 +227,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/notifications/{id}/view', [InstructorController::class, 'viewNotification'])->name('notifications.view');
     Route::get('/notifications/{id}/read', [CourseController::class, 'markAsReadNotification'])
     ->name('notifications.read');
+
 });
+
+Route::post('/courses/{course}/session/{session}/upload-recording',
+    [LiveSessionController::class, 'uploadRecording'])
+    ->name('live_session.upload_recording');
