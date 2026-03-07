@@ -28,6 +28,7 @@ use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\StudentFinalExamController;
 use App\Http\Controllers\DiscussionForumController;
 use App\Http\Controllers\NotebookController;
+use App\Http\Controllers\PlatformChatbotController; 
 
 Route::get('/', [LandingController::class, 'showLanding']);
 
@@ -192,6 +193,16 @@ Route::get('/courses/{id}', [CourseController::class, 'show'])
     Route::get('/instructor/live-class/{course_id}', [InstructorController::class, 'liveClassForm'])->name('live.class.form');
 
 Route::post('/instructor/live-class/store', [InstructorController::class, 'storeLiveClass'])->name('live.class.store');
+
+
+
+Route::post('/chatbot/ask', [PlatformChatbotController::class, 'chat'])->name('chatbot.ask');
+
+
+
+
+
+
 
 Route::middleware(['auth'])->prefix('courses/{courseId}/notebook')->group(function () {
 

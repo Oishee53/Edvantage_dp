@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>EDVANTAGE - Your Virtual Classroom Redefined</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -27,6 +28,50 @@
             line-height: 1.6;
             color: #333;
         }
+
+        /* Chatbot Animations */
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 6px 24px rgba(13,148,136,0.4); }
+            50% { box-shadow: 0 6px 32px rgba(13,148,136,0.6), 0 0 0 8px rgba(13,148,136,0.1); }
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes bounce-small {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes bounce-dot {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-6px); }
+        }
+
+        .chatbot-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        /* Mobile Responsive for Chatbot */
+        @media (max-width: 640px) {
+            .chatbot-head {
+                bottom: 16px !important;
+                right: 16px !important;
+            }
+            .chatbot-window {
+                width: calc(100vw - 32px) !important;
+                right: 16px !important;
+                bottom: 90px !important;
+                height: 480px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -39,7 +84,6 @@
     
 
       {{-- ================= RECOMMENDED COURSES ================= --}}
-{{-- ================= RECOMMENDED COURSES ================= --}}
 @if(auth()->check() && isset($recommendedCourses) && count($recommendedCourses))
 <section id="recommended" class="py-16 bg-gray-50"> 
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -154,38 +198,200 @@
 
 
 @include('layouts.featured-course')
+
+
+{{-- ================= CHATBOT WIDGET ================= --}}
+<div x-data="landingChatbot()" x-init="init()" class="landing-chatbot">
+    
+    <!-- Chat Head Button (Always Visible) -->
+    <div @click="toggleChat()" 
+         class="chatbot-head"
+         :class="{ 'chat-open': isOpen }"
+         style="position: fixed; bottom: 24px; right: 24px; z-index: 9999; cursor: pointer;">
+        
+        <!-- Chat Head Circle -->
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); box-shadow: 0 6px 24px rgba(13,148,136,0.4); display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative;"
+             :style="isOpen ? 'transform: scale(0.9);' : 'transform: scale(1); animation: pulse 2s infinite;'">
+            
+            <!-- Icon (switches between message and close) -->
+            <div style="color: white; font-size: 28px; transition: all 0.3s;" x-show="!isOpen">
+                <i class="fas fa-comments"></i>
+            </div>
+            <div style="color: white; font-size: 24px; transition: all 0.3s;" x-show="isOpen">
+                <i class="fas fa-times"></i>
+            </div>
+
+            <!-- Unread Badge -->
+            <div x-show="hasUnread && !isOpen" 
+                 style="position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: #ef4444; border-radius: 50%; border: 3px solid white; animation: bounce-small 1s infinite;"></div>
+        </div>
+
+        <!-- Tooltip -->
+        <div x-show="!isOpen" 
+             style="position: absolute; right: 76px; top: 50%; transform: translateY(-50%); background: #1f2937; color: white; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.15); pointer-events: none;"
+             x-transition>
+            💬 Need help? Chat with us!
+        </div>
+    </div>
+
+    <!-- Chat Window (Slides in from bottom right) -->
+    <div x-show="isOpen" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform translate-y-4 scale-95"
+         x-transition:enter-end="opacity-100 transform translate-y-0 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 transform translate-y-0 scale-100"
+         x-transition:leave-end="opacity-0 transform translate-y-4 scale-95"
+         class="chatbot-window"
+         style="position: fixed; bottom: 100px; right: 24px; z-index: 9998; width: 380px; height: 520px; background: white; border-radius: 16px; box-shadow: 0 12px 48px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #e5e7eb;">
+
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); padding: 18px 20px; display: flex; align-items: center; gap: 12px; color: white; flex-shrink: 0;">
+            <div style="width: 44px; height: 44px; background: rgba(255,255,255,0.25); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px;">
+                🤖
+            </div>
+            <div style="flex: 1;">
+                <h3 style="margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.02em;">Edvantage Assistant</h3>
+                <p style="margin: 0; font-size: 12px; opacity: 0.95;">Here to help you find courses!</p>
+            </div>
+            <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: pulse-dot 2s infinite;"></div>
+        </div>
+
+        <!-- Messages Area -->
+        <div x-ref="messages" 
+             class="chatbot-messages"
+             style="flex: 1; overflow-y: auto; padding: 16px; background: #f9fafb; display: flex; flex-direction: column; gap: 12px;">
+
+            <!-- Welcome Message (Only shown when no messages) -->
+            <template x-if="messages.length === 0 && !isTyping">
+                <div style="text-align: center; padding: 20px 16px;">
+                    <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #ccfbf1, #99f6e4); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(13,148,136,0.15);">
+                        👋
+                    </div>
+                    <h4 style="margin: 0 0 6px; font-size: 15px; font-weight: 700; color: #1f2937;">Hi there!</h4>
+                    <p style="margin: 0 0 16px; font-size: 12px; color: #6b7280; line-height: 1.5;">I can help you find courses, answer questions, and more!</p>
+                    
+                    <!-- Quick Actions -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button @click="askQuestion('Do you have machine learning courses?')"
+                                style="background: white; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #374151; cursor: pointer; text-align: left; transition: all 0.2s; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                            <span style="width: 28px; height: 28px; background: #f0fdfa; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">🔍</span>
+                            <span>Find ML courses</span>
+                        </button>
+                        <button @click="askQuestion('Show me popular courses')"
+                                style="background: white; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #374151; cursor: pointer; text-align: left; transition: all 0.2s; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                            <span style="width: 28px; height: 28px; background: #fef3c7; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">⭐</span>
+                            <span>Popular courses</span>
+                        </button>
+                        <button @click="askQuestion('How does the platform work?')"
+                                style="background: white; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #374151; cursor: pointer; text-align: left; transition: all 0.2s; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                            <span style="width: 28px; height: 28px; background: #dbeafe; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">ℹ️</span>
+                            <span>How it works</span>
+                        </button>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Conversation Messages -->
+            <template x-for="(msg, index) in messages" :key="index">
+                <div>
+                    <!-- User Message -->
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                        <div style="background: #0d9488; color: white; padding: 9px 13px; border-radius: 14px; border-bottom-right-radius: 3px; max-width: 75%; font-size: 13px; line-height: 1.5; word-break: break-word;" x-text="msg.user"></div>
+                    </div>
+
+                    <!-- Bot Message -->
+                    <div style="display: flex; gap: 8px; align-items: flex-start;">
+                        <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #1a1a2e, #2d2d5e); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;">
+                            🤖
+                        </div>
+                        <div style="background: white; padding: 9px 13px; border-radius: 14px; border-bottom-left-radius: 3px; max-width: 75%; border: 1px solid #e5e7eb; font-size: 13px; line-height: 1.6; color: #1f2937; word-break: break-word;" x-html="formatMessage(msg.bot)"></div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Typing Indicator -->
+            <template x-if="isTyping">
+                <div style="display: flex; gap: 8px; align-items: flex-start;">
+                    <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #1a1a2e, #2d2d5e); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;">
+                        🤖
+                    </div>
+                    <div style="background: white; padding: 11px 14px; border-radius: 14px; border-bottom-left-radius: 3px; border: 1px solid #e5e7eb; display: flex; gap: 3px;">
+                        <div style="width: 7px; height: 7px; background: #9ca3af; border-radius: 50%; animation: bounce-dot 1.2s infinite;"></div>
+                        <div style="width: 7px; height: 7px; background: #9ca3af; border-radius: 50%; animation: bounce-dot 1.2s infinite 0.2s;"></div>
+                        <div style="width: 7px; height: 7px; background: #9ca3af; border-radius: 50%; animation: bounce-dot 1.2s infinite 0.4s;"></div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Input Area -->
+        <div style="padding: 12px 14px; border-top: 1px solid #e5e7eb; background: white; flex-shrink: 0;">
+            <form @submit.prevent="sendMessage()" style="display: flex; gap: 8px; align-items: flex-end;">
+                <textarea x-model="input" 
+                          placeholder="Ask me anything..."
+                          @keydown.enter.prevent="!$event.shiftKey && sendMessage()"
+                          rows="1"
+                          style="flex: 1; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 9px 12px; font-size: 13px; outline: none; resize: none; max-height: 80px; font-family: 'Montserrat', sans-serif; transition: border-color 0.2s;"
+                          :disabled="isTyping"
+                          @focus="$event.target.style.borderColor='#0d9488'"
+                          @blur="$event.target.style.borderColor='#e5e7eb'"
+                          @input="autoResize($event)"></textarea>
+                <button type="submit" 
+                        :disabled="!input.trim() || isTyping"
+                        style="width: 38px; height: 38px; background: #0d9488; color: white; border: none; border-radius: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: all 0.2s; flex-shrink: 0;"
+                        :style="(!input.trim() || isTyping) ? 'background: #cbd5e1; cursor: not-allowed;' : ''"
+                        @mouseover="!(!input.trim() || isTyping) && ($event.target.style.background='#0f766e')"
+                        @mouseout="!(!input.trim() || isTyping) && ($event.target.style.background='#0d9488')">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+            <p style="text-align: center; font-size: 10px; color: #9ca3af; margin: 6px 0 0;">Powered by AI</p>
+        </div>
+    </div>
+</div>
+{{-- ================= END CHATBOT WIDGET ================= --}}
+
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.querySelector('.search-input');
     const searchForm = document.querySelector('.search-form');
     
     // Submit on Enter key
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            if (this.value.trim().length > 0) {
-                searchForm.submit();
+    if (searchInput && searchForm) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (this.value.trim().length > 0) {
+                    searchForm.submit();
+                }
             }
-        }
-    });
+        });
+    }
 });
   // Smooth scrolling for navigation links
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
       e.preventDefault();
-      document.querySelector(this.getAttribute('href')).scrollIntoView({
-        behavior: 'smooth'
-      });
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth'
+          });
+      }
     });
   });
 
   // Header background on scroll
   window.addEventListener('scroll', function () {
     const header = document.querySelector('.header');
-    if (window.scrollY > 100) {
-      header.style.background = 'rgba(255, 255, 255, 0.98)';
-    } else {
-      header.style.background = 'rgba(255, 255, 255, 0.95)';
+    if (header) {
+        if (window.scrollY > 100) {
+          header.style.background = 'rgba(255, 255, 255, 0.98)';
+        } else {
+          header.style.background = 'rgba(255, 255, 255, 0.95)';
+        }
     }
   });
 
@@ -201,16 +407,140 @@
       window.location.href = "{{ route('wishlist.all') }}";
     }
   @endif
+
+  // Chatbot Alpine.js Component
+  function landingChatbot() {
+        return {
+            isOpen: false,
+            isTyping: false,
+            hasUnread: false,
+            input: '',
+            messages: [],
+            conversationHistory: [],
+            csrf: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+
+            init() {
+                // Show welcome badge after 3 seconds
+                setTimeout(() => {
+                    if (!this.isOpen && this.messages.length === 0) {
+                        this.hasUnread = true;
+                    }
+                }, 3000);
+            },
+
+            toggleChat() {
+                this.isOpen = !this.isOpen;
+                this.hasUnread = false;
+                if (this.isOpen) {
+                    this.scrollToBottom();
+                }
+            },
+
+            askQuestion(question) {
+                this.input = question;
+                this.sendMessage();
+            },
+
+            autoResize(event) {
+                event.target.style.height = 'auto';
+                event.target.style.height = Math.min(event.target.scrollHeight, 80) + 'px';
+            },
+
+            async sendMessage() {
+                const msg = this.input.trim();
+                if (!msg || this.isTyping) return;
+
+                this.input = '';
+                this.isTyping = true;
+
+                this.messages.push({
+                    user: msg,
+                    bot: '',
+                });
+
+                this.scrollToBottom();
+
+                try {
+                    const res = await fetch('/chatbot/ask', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': this.csrf,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: msg,
+                            history: this.conversationHistory,
+                        }),
+                    });
+
+                    const data = await res.json();
+
+                    if (data.success) {
+                        this.messages[this.messages.length - 1].bot = data.message;
+
+                        this.conversationHistory.push({
+                            role: 'user',
+                            content: msg,
+                        });
+                        this.conversationHistory.push({
+                            role: 'model',
+                            content: data.message,
+                        });
+
+                        if (this.conversationHistory.length > 20) {
+                            this.conversationHistory = this.conversationHistory.slice(-20);
+                        }
+                    } else {
+                        this.messages[this.messages.length - 1].bot = data.message || 'Sorry, something went wrong.';
+                    }
+
+                } catch (error) {
+                    console.error('Chatbot error:', error);
+                    this.messages[this.messages.length - 1].bot = 'Sorry, I encountered an error. Please try again.';
+                } finally {
+                    this.isTyping = false;
+                    this.scrollToBottom();
+
+                    if (!this.isOpen) {
+                        this.hasUnread = true;
+                    }
+                }
+            },
+
+            formatMessage(text) {
+                if (!text) return '';
+                
+                // Convert markdown links
+                text = text.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank" style="color: #0d9488; font-weight: 600; text-decoration: underline;">$1</a>');
+                
+                // Convert **bold**
+                text = text.replace(/\*\*([^*]+)\*\*/g, '<strong style="color: #0f766e; font-weight: 600;">$1</strong>');
+                
+                // Convert newlines
+                text = text.replace(/\n/g, '<br>');
+                
+                return text;
+            },
+
+            scrollToBottom() {
+                this.$nextTick(() => {
+                    const el = this.$refs.messages;
+                    if (el) el.scrollTop = el.scrollHeight;
+                });
+            },
+        };
+    }
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const loadMoreBtn = document.getElementById('loadMoreBtn');
     const cards = document.querySelectorAll('#coursesGrid .course-card');
 
+    if (!loadMoreBtn || cards.length === 0) return;
+
     let visible = 4;
     const increment = 4;
-
-    if (!loadMoreBtn || cards.length === 0) return;
 
     loadMoreBtn.addEventListener('click', function () {
         let shown = 0;
