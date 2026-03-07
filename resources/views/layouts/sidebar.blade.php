@@ -152,7 +152,7 @@
                         {{ Auth::user()->name }}
                     </p>
                     <p class="text-xs text-gray-600">
-                        {{ auth()->user()->role === 2 ? 'Admin' : 'Instructor' }}
+                        {{ auth()->user()->role === 2 ? 'Admin' : (auth()->user()->role === 3 ? 'Instructor' : 'Student') }}
                     </p>
                 </div>
             </div>
