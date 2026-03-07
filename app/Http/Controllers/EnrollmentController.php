@@ -76,13 +76,6 @@ class EnrollmentController extends Controller
     public function viewCourseModules($courseId)
     {
         $course = Courses::findOrFail($courseId);
-        $videoCount = $course->video_count;
-        $modules = range(1, $videoCount);
-
-        return view('user.course_modules', compact('course', 'modules'));
-    public function viewCourseModules($courseId)
-    {
-        $course = Courses::findOrFail($courseId);
 
         if ($course->course_type === 'live') {
             // Load live sessions from DB
@@ -115,39 +108,6 @@ class EnrollmentController extends Controller
         $modules    = range(1, $videoCount);
 
         return view('user.course_modules', compact('course', 'modules'));
-    }
-
-public function showInsideModule($courseId, $moduleNumber)
-{
-    $resource = Resource::where('courseId', $courseId)->where('moduleId', $moduleNumber)->firstOrFail();
-    $course = Courses::findOrFail($courseId);
-    $quiz = Quiz::where('course_id', $courseId)
-                ->where('module_number', $moduleNumber)
-                ->first();
-    $questions = $quiz ? $quiz->questions : collect();
-    $forum = DiscussionForum::where('course_id', $courseId)
-        ->where('module_id', $resource->id) 
-        ->first(); 
-
-    return view('Resources.inside_module', [
-        'course' => $course,
-        'quiz' => $quiz,
-        'questions' => $questions,
-        'moduleNumber' => $moduleNumber,
-        'resource' => $resource,
-        'forum' => $forum,
-    ]);
-}
-
-
-
-public function viewPDF($id)
-{
-    $resource = Resource::find($id);
-
-    // If not found, fallback to pending resources
-    if (!$resource) {
-        $resource = PendingResources::findOrFail($id); // will throw 404 if not found
     }
 
     public function showInsideModule($courseId, $moduleNumber)

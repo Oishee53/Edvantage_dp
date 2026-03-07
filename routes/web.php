@@ -18,7 +18,7 @@ use App\Http\Controllers\ResetPasswordControl;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\StudentFinalExamController;
-use App\Http\Controllers\DiscussionForumController;
+
 use App\Http\Controllers\NotebookController;
 use App\Http\Controllers\PlatformChatbotController; 
 use App\Http\Controllers\UserController;
