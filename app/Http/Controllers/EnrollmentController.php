@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Cart;
 use App\Models\CourseLiveSession;
 use App\Models\Courses;
@@ -14,41 +15,41 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Response;
+use App\Models\NotebookDocument;
+use App\Models\NotebookConversation;
 
 class EnrollmentController extends Controller
 {
-public function checkout()
-{
-    $user = Auth::user();
+    public function checkout()
+    {
+        $user = Auth::user();
 
-    // Get all cart items for the authenticated user
-    $cartItems = Cart::where('user_id', $user->id)->get();
+        // Get all cart items for the authenticated user
+        $cartItems = Cart::where('user_id', $user->id)->get();
 
-    foreach ($cartItems as $item) {
-        // Prevent duplicate enrollments
-        if (!Enrollment::where('user_id', $user->id)->where('course_id', $item->course_id)->exists()) {
-            Enrollment::create([
-                'user_id' => $user->id,
-                'course_id' => $item->course_id,
-            ]);
+        foreach ($cartItems as $item) {
+            // Prevent duplicate enrollments
+            if (!Enrollment::where('user_id', $user->id)->where('course_id', $item->course_id)->exists()) {
+                Enrollment::create([
+                    'user_id' => $user->id,
+                    'course_id' => $item->course_id,
+                ]);
+            }
         }
+
+        // Clear cart after successful enrollment
+        Cart::where('user_id', $user->id)->delete();
+
+        return redirect()->route('courses.all')->with('success', 'Checkout successful. You are now enrolled in all selected courses!');
     }
 
-    // Clear cart after successful enrollment
-    Cart::where('user_id', $user->id)->delete();
-
-    return redirect()->route('courses.all')->with('success', 'Checkout successful. You are now enrolled in all selected courses!');
-}
-
-
-
+    
 
 public function userEnrolledCourses() {
     $user = Auth::user();
     
-    // Load the instructor relationship (assuming User model with role=3)
     $enrolledCourses = $user->enrollments()
-        ->with(['course.instructor']) // This will load the instructor
+        ->with(['course.instructor'])
         ->get()
         ->pluck('course');
     
@@ -68,10 +69,45 @@ public function userEnrolledCourses() {
             'completion_percentage' => $totalVideos > 0 ? round(($completedVideos / $totalVideos) * 100) : 0,
         ];
     }
-    
-    return view('User.enrolled_courses', compact('user', 'enrolledCourses', 'courseProgress'));
-}
 
+    // Calendar events
+    $courseIds = $enrolledCourses->pluck('id')->toArray();
+    $calendarEvents = [];
+
+    if (!empty($courseIds)) {
+        $liveClasses = \App\Models\CourseLiveSession::whereIn('course_id', $courseIds)
+            ->whereNotNull('date')
+            ->whereNotNull('start_time')
+            ->get();
+
+        foreach ($liveClasses as $class) {
+            $dateStr  = \Carbon\Carbon::parse($class->date)->format('Y-m-d');
+            $calendarEvents[] = [
+                'date'  => $dateStr,
+                'type'  => 'live',
+                'title' => $class->title ?? 'Live Session',
+                'time'  => \Carbon\Carbon::parse($class->start_time)->format('h:i A'),
+                'duration' => $class->duration_minutes . ' mins',
+                'status' => $class->status,
+            ];
+        }
+
+        $assignments = \App\Models\Assignment::whereIn('course_id', $courseIds)
+            ->whereNotNull('deadline')
+            ->get();
+
+        foreach ($assignments as $assignment) {
+            $calendarEvents[] = [
+                'date'  => \Carbon\Carbon::parse($assignment->deadline)->format('Y-m-d'),
+                'type'  => 'deadline',
+                'title' => $assignment->title,
+                'time'  => \Carbon\Carbon::parse($assignment->deadline)->format('h:i A'),
+            ];
+        }
+    }
+    
+    return view('User.enrolled_courses', compact('user', 'enrolledCourses', 'courseProgress', 'calendarEvents'));
+}
 
     public function viewCourseModules($courseId)
     {
@@ -110,63 +146,100 @@ public function userEnrolledCourses() {
         return view('user.course_modules', compact('course', 'modules'));
     }
 
-public function showInsideModule($courseId, $moduleNumber)
-{
-    $resource = Resource::where('courseId', $courseId)->where('moduleId', $moduleNumber)->firstOrFail();
-    $course = Courses::findOrFail($courseId);
-    $quiz = Quiz::where('course_id', $courseId)
-                ->where('module_number', $moduleNumber)
-                ->first();
-    $questions = $quiz ? $quiz->questions : collect();
-    $forum = DiscussionForum::where('course_id', $courseId)
-        ->where('module_id', $resource->id) 
-        ->first(); 
+    public function showInsideModule($courseId, $moduleNumber)
+    {
+        $resource = Resource::where('courseId', $courseId)
+            ->where('moduleId', $moduleNumber)
+            ->firstOrFail();
 
-    return view('Resources.inside_module', [
-        'course' => $course,
-        'quiz' => $quiz,
-        'questions' => $questions,
-        'moduleNumber' => $moduleNumber,
-        'resource' => $resource,
-        'forum' => $forum,
-    ]);
-}
+        $course = Courses::findOrFail($courseId);
 
+        $quiz = Quiz::where('course_id', $courseId)
+            ->where('module_number', $moduleNumber)
+            ->first();
 
+        $questions = $quiz ? $quiz->questions : collect();
 
-public function viewPDF($id)
-{
-    $resource = Resource::find($id);
+        $forum = DiscussionForum::where('course_id', $courseId)
+            ->where('module_id', $resource->id)
+            ->first();
 
-    // If not found, fallback to pending resources
-    if (!$resource) {
-        $resource = PendingResources::findOrFail($id); // will throw 404 if not found
+        // Get notebook documents for this student + course
+        $nbDocuments = NotebookDocument::where('course_id', $courseId)
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->get()
+            ->map(function ($d) {
+                return [
+                    'id'          => $d->id,
+                    'title'       => $d->title,
+                    'file_name'   => $d->file_name,
+                    'file_type'   => $d->file_type,
+                    'chunk_count' => $d->chunk_count,
+                    'status'      => $d->status,
+                ];
+            });
+
+        // Get conversation history for this student + course
+        $nbConversations = NotebookConversation::where('course_id', $courseId)
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->take(30)
+            ->get()
+            ->reverse()
+            ->values()
+            ->map(function ($c) {
+                return [
+                    'question' => $c->question,
+                    'answer'   => $c->answer,
+                    'sources'  => [],
+                    'showSrc'  => false,
+                ];
+            });
+
+        return view('Resources.inside_module', [
+            'course'          => $course,
+            'quiz'            => $quiz,
+            'questions'       => $questions,
+            'moduleNumber'    => $moduleNumber,
+            'resource'        => $resource,
+            'forum'           => $forum,
+            'nbDocuments'     => $nbDocuments,
+            'nbConversations' => $nbConversations,
+        ]);
     }
-    
-    // Cloudinary public URL
-    $pdfUrl = $resource->pdf;
 
-    //Option 2: Stream the file securely through your server (better for privacy, heavier on backend)
-    $response = Http::get($pdfUrl);
-    return Response::make($response->body(), 200, [
-    'Content-Type' => 'application/pdf',
-    'Content-Disposition' => 'inline; filename="module-resource.pdf"',
-    ]);
-}
+    public function viewPDF($id)
+    {
+        $resource = Resource::find($id);
 
+        // If not found, fallback to pending resources
+        if (!$resource) {
+            $resource = PendingResources::findOrFail($id);
+        }
 
-public function purchaseHistory()
-{
-    $user = auth()->user();
+        // Cloudinary public URL
+        $pdfUrl = $resource->pdf;
 
-    // Get all enrolled courses with enrollment info
-    $enrollments = Enrollment::with('course')
-        ->where('user_id', $user->id)
-        ->orderBy('created_at', 'desc')
-        ->get();
+        // Stream the file securely through your server
+        $response = Http::get($pdfUrl);
 
-    return view('user.purchase_history', compact('enrollments'));
-}
+        return Response::make($response->body(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="module-resource.pdf"',
+        ]);
+    }
 
-    
+    public function purchaseHistory()
+    {
+        $user = auth()->user();
+
+        // Get all enrolled courses with enrollment info
+        $enrollments = Enrollment::with('course')
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('user.purchase_history', compact('enrollments'));
+    }
 }
