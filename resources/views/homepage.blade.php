@@ -50,13 +50,30 @@
             30% { transform: translateY(-6px); }
         }
 
-        .chatbot-messages::-webkit-scrollbar {
-            width: 4px;
+        /* FIXED: Scrollable Messages Area */
+        .chatbot-messages-scroll {
+            overflow-y: auto !important;
+            overflow-x: hidden;
+            max-height: 100%;
+            scroll-behavior: smooth;
         }
-
-        .chatbot-messages::-webkit-scrollbar-thumb {
+        
+        .chatbot-messages-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chatbot-messages-scroll::-webkit-scrollbar-track {
+            background: #f3f4f6;
+            border-radius: 10px;
+        }
+        
+        .chatbot-messages-scroll::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 10px;
+        }
+        
+        .chatbot-messages-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
         /* Mobile Responsive for Chatbot */
@@ -69,7 +86,7 @@
                 width: calc(100vw - 32px) !important;
                 right: 16px !important;
                 bottom: 90px !important;
-                height: 480px !important;
+                height: 500px !important;
             }
         }
     </style>
@@ -200,20 +217,18 @@
 @include('layouts.featured-course')
 
 
-{{-- ================= CHATBOT WIDGET ================= --}}
+{{-- ================= FIXED CHATBOT WIDGET ================= --}}
 <div x-data="landingChatbot()" x-init="init()" class="landing-chatbot">
     
-    <!-- Chat Head Button (Always Visible) -->
+    <!-- Chat Head Button -->
     <div @click="toggleChat()" 
          class="chatbot-head"
          :class="{ 'chat-open': isOpen }"
          style="position: fixed; bottom: 24px; right: 24px; z-index: 9999; cursor: pointer;">
         
-        <!-- Chat Head Circle -->
         <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); box-shadow: 0 6px 24px rgba(13,148,136,0.4); display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative;"
              :style="isOpen ? 'transform: scale(0.9);' : 'transform: scale(1); animation: pulse 2s infinite;'">
             
-            <!-- Icon (switches between message and close) -->
             <div style="color: white; font-size: 28px; transition: all 0.3s;" x-show="!isOpen">
                 <i class="fas fa-comments"></i>
             </div>
@@ -221,12 +236,10 @@
                 <i class="fas fa-times"></i>
             </div>
 
-            <!-- Unread Badge -->
             <div x-show="hasUnread && !isOpen" 
                  style="position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: #ef4444; border-radius: 50%; border: 3px solid white; animation: bounce-small 1s infinite;"></div>
         </div>
 
-        <!-- Tooltip -->
         <div x-show="!isOpen" 
              style="position: absolute; right: 76px; top: 50%; transform: translateY(-50%); background: #1f2937; color: white; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.15); pointer-events: none;"
              x-transition>
@@ -234,7 +247,7 @@
         </div>
     </div>
 
-    <!-- Chat Window (Slides in from bottom right) -->
+    <!-- Chat Window -->
     <div x-show="isOpen" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 transform translate-y-4 scale-95"
@@ -243,9 +256,9 @@
          x-transition:leave-start="opacity-100 transform translate-y-0 scale-100"
          x-transition:leave-end="opacity-0 transform translate-y-4 scale-95"
          class="chatbot-window"
-         style="position: fixed; bottom: 100px; right: 24px; z-index: 9998; width: 380px; height: 520px; background: white; border-radius: 16px; box-shadow: 0 12px 48px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #e5e7eb;">
+         style="position: fixed; bottom: 100px; right: 24px; z-index: 9998; width: 380px; height: 550px; background: white; border-radius: 16px; box-shadow: 0 12px 48px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #e5e7eb;">
 
-        <!-- Header -->
+        <!-- Header (Fixed) -->
         <div style="background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); padding: 18px 20px; display: flex; align-items: center; gap: 12px; color: white; flex-shrink: 0;">
             <div style="width: 44px; height: 44px; background: rgba(255,255,255,0.25); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px;">
                 🤖
@@ -257,12 +270,12 @@
             <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: pulse-dot 2s infinite;"></div>
         </div>
 
-        <!-- Messages Area -->
+        <!-- Messages Area (Scrollable) -->
         <div x-ref="messages" 
-             class="chatbot-messages"
-             style="flex: 1; overflow-y: auto; padding: 16px; background: #f9fafb; display: flex; flex-direction: column; gap: 12px;">
+             class="chatbot-messages-scroll"
+             style="flex: 1; padding: 16px; background: #f9fafb; display: flex; flex-direction: column; gap: 12px;">
 
-            <!-- Welcome Message (Only shown when no messages) -->
+            <!-- Welcome Message -->
             <template x-if="messages.length === 0 && !isTyping">
                 <div style="text-align: center; padding: 20px 16px;">
                     <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #ccfbf1, #99f6e4); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(13,148,136,0.15);">
@@ -271,7 +284,6 @@
                     <h4 style="margin: 0 0 6px; font-size: 15px; font-weight: 700; color: #1f2937;">Hi there!</h4>
                     <p style="margin: 0 0 16px; font-size: 12px; color: #6b7280; line-height: 1.5;">I can help you find courses, answer questions, and more!</p>
                     
-                    <!-- Quick Actions -->
                     <div style="display: flex; flex-direction: column; gap: 8px;">
                         <button @click="askQuestion('Do you have machine learning courses?')"
                                 style="background: white; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #374151; cursor: pointer; text-align: left; transition: all 0.2s; font-weight: 500; display: flex; align-items: center; gap: 8px;">
@@ -325,10 +337,11 @@
             </template>
         </div>
 
-        <!-- Input Area -->
+        <!-- Input Area (Fixed at Bottom) -->
         <div style="padding: 12px 14px; border-top: 1px solid #e5e7eb; background: white; flex-shrink: 0;">
             <form @submit.prevent="sendMessage()" style="display: flex; gap: 8px; align-items: flex-end;">
                 <textarea x-model="input" 
+                          x-ref="inputField"
                           placeholder="Ask me anything..."
                           @keydown.enter.prevent="!$event.shiftKey && sendMessage()"
                           rows="1"
@@ -358,7 +371,6 @@
     const searchInput = document.querySelector('.search-input');
     const searchForm = document.querySelector('.search-form');
     
-    // Submit on Enter key
     if (searchInput && searchForm) {
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -370,7 +382,7 @@
         });
     }
 });
-  // Smooth scrolling for navigation links
+
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
       e.preventDefault();
@@ -383,7 +395,6 @@
     });
   });
 
-  // Header background on scroll
   window.addEventListener('scroll', function () {
     const header = document.querySelector('.header');
     if (header) {
@@ -395,7 +406,6 @@
     }
   });
 
-  // Session-based alerts for cart and wishlist
   @if(session('cart_added'))
     if (confirm("{{ session('cart_added') }} Go to cart?")) {
       window.location.href = "{{ route('cart.all') }}";
@@ -420,7 +430,6 @@
             csrf: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
 
             init() {
-                // Show welcome badge after 3 seconds
                 setTimeout(() => {
                     if (!this.isOpen && this.messages.length === 0) {
                         this.hasUnread = true;
@@ -432,7 +441,12 @@
                 this.isOpen = !this.isOpen;
                 this.hasUnread = false;
                 if (this.isOpen) {
-                    this.scrollToBottom();
+                    this.$nextTick(() => {
+                        this.scrollToBottom();
+                        if (this.$refs.inputField) {
+                            this.$refs.inputField.focus();
+                        }
+                    });
                 }
             },
 
@@ -451,6 +465,10 @@
                 if (!msg || this.isTyping) return;
 
                 this.input = '';
+                if (this.$refs.inputField) {
+                    this.$refs.inputField.style.height = 'auto';
+                }
+                
                 this.isTyping = true;
 
                 this.messages.push({
@@ -511,13 +529,8 @@
             formatMessage(text) {
                 if (!text) return '';
                 
-                // Convert markdown links
                 text = text.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank" style="color: #0d9488; font-weight: 600; text-decoration: underline;">$1</a>');
-                
-                // Convert **bold**
                 text = text.replace(/\*\*([^*]+)\*\*/g, '<strong style="color: #0f766e; font-weight: 600;">$1</strong>');
-                
-                // Convert newlines
                 text = text.replace(/\n/g, '<br>');
                 
                 return text;
@@ -526,7 +539,9 @@
             scrollToBottom() {
                 this.$nextTick(() => {
                     const el = this.$refs.messages;
-                    if (el) el.scrollTop = el.scrollHeight;
+                    if (el) {
+                        el.scrollTop = el.scrollHeight;
+                    }
                 });
             },
         };
