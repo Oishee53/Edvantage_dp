@@ -46,9 +46,8 @@ public function checkout()
 public function userEnrolledCourses() {
     $user = Auth::user();
     
-    // Load the instructor relationship (assuming User model with role=3)
     $enrolledCourses = $user->enrollments()
-        ->with(['course.instructor']) // This will load the instructor
+        ->with(['course.instructor'])
         ->get()
         ->pluck('course');
     
@@ -68,10 +67,45 @@ public function userEnrolledCourses() {
             'completion_percentage' => $totalVideos > 0 ? round(($completedVideos / $totalVideos) * 100) : 0,
         ];
     }
-    
-    return view('User.enrolled_courses', compact('user', 'enrolledCourses', 'courseProgress'));
-}
 
+    // Calendar events
+    $courseIds = $enrolledCourses->pluck('id')->toArray();
+    $calendarEvents = [];
+
+    if (!empty($courseIds)) {
+        $liveClasses = \App\Models\CourseLiveSession::whereIn('course_id', $courseIds)
+            ->whereNotNull('date')
+            ->whereNotNull('start_time')
+            ->get();
+
+        foreach ($liveClasses as $class) {
+            $dateStr  = \Carbon\Carbon::parse($class->date)->format('Y-m-d');
+            $calendarEvents[] = [
+                'date'  => $dateStr,
+                'type'  => 'live',
+                'title' => $class->title ?? 'Live Session',
+                'time'  => \Carbon\Carbon::parse($class->start_time)->format('h:i A'),
+                'duration' => $class->duration_minutes . ' mins',
+                'status' => $class->status,
+            ];
+        }
+
+        $assignments = \App\Models\Assignment::whereIn('course_id', $courseIds)
+            ->whereNotNull('deadline')
+            ->get();
+
+        foreach ($assignments as $assignment) {
+            $calendarEvents[] = [
+                'date'  => \Carbon\Carbon::parse($assignment->deadline)->format('Y-m-d'),
+                'type'  => 'deadline',
+                'title' => $assignment->title,
+                'time'  => \Carbon\Carbon::parse($assignment->deadline)->format('h:i A'),
+            ];
+        }
+    }
+    
+    return view('User.enrolled_courses', compact('user', 'enrolledCourses', 'courseProgress', 'calendarEvents'));
+}
 
     public function viewCourseModules($courseId)
     {
