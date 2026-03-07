@@ -119,7 +119,7 @@
 
             <!-- All Courses Section -->
             <div>
-                <h2 class="text-2xl font-semibold text-gray-900 mb-8">All</h2>
+                <h2 class="text-2xl font-semibold text-gray-900 mb-8">My Courses</h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     @forelse ($enrolledCourses as $course)

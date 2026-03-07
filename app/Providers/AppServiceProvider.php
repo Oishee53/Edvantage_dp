@@ -49,5 +49,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Resource::observe(ResourceObserver::class);
+        $this->app->bind(\App\Services\GeminiService::class);
+        $this->app->bind(\App\Services\DocumentProcessingService::class);
     }
 }

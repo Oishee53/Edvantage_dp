@@ -18,6 +18,9 @@ use App\Http\Controllers\ResetPasswordControl;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\StudentFinalExamController;
+
+use App\Http\Controllers\NotebookController;
+use App\Http\Controllers\PlatformChatbotController; 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserProgressController;
 use App\Http\Controllers\UserQuizController;
@@ -210,6 +213,36 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/assignment/{id}/edit',
     [AssignmentController::class, 'edit'])
     ->name('assignment.edit');
+
+
+
+Route::post('/chatbot/ask', [PlatformChatbotController::class, 'chat'])->name('chatbot.ask');
+
+
+
+
+
+
+
+Route::middleware(['auth'])->prefix('courses/{courseId}/notebook')->group(function () {
+
+    // Main notebook page (per course)
+    Route::get('/', [NotebookController::class, 'index'])->name('notebook.index');
+
+    // Upload a document
+    Route::post('/upload', [NotebookController::class, 'upload'])->name('notebook.upload');
+
+    // Ask a question (RAG)
+    Route::post('/ask', [NotebookController::class, 'ask'])->name('notebook.ask');
+
+    // Delete a document
+    Route::delete('/documents/{documentId}', [NotebookController::class, 'deleteDocument'])->name('notebook.deleteDocument');
+
+    // Clear chat history
+    Route::delete('/history', [NotebookController::class, 'clearHistory'])->name('notebook.clearHistory');
+});
+
+
 
 Route::get('/courses/{course}/session/{session}/watch', [LiveSessionController::class, 'watch'])
     ->name('student.live_session.watch');
