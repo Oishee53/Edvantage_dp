@@ -41,6 +41,67 @@
 
     <main class="pt-24 pb-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Calendar Section -->
+        <div class="mt-16">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-6">
+                <i class="fas fa-calendar-alt text-teal-600 mr-2"></i>My Schedule
+            </h2>
+
+            <div class="flex flex-col lg:flex-row gap-6 items-start">
+
+                <!-- Calendar -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 w-full lg:w-auto lg:flex-shrink-0" style="min-width:340px;">
+                    <!-- Legend -->
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>
+                            <span class="text-xs text-gray-500">Live Class</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-3 h-3 rounded-full bg-orange-400 inline-block"></span>
+                            <span class="text-xs text-gray-500">Deadline</span>
+                        </div>
+                    </div>
+
+                    <!-- Month/Year Header -->
+                    <div class="flex items-center justify-between mb-4">
+                        <button onclick="prevMonth()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
+                            <i class="fas fa-chevron-left text-gray-500 text-xs"></i>
+                        </button>
+                        <h3 id="cal-title" class="text-sm font-semibold text-gray-800"></h3>
+                        <button onclick="nextMonth()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
+                            <i class="fas fa-chevron-right text-gray-500 text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Day Headers -->
+                    <div class="grid grid-cols-7 mb-2">
+                        @foreach(['Su','Mo','Tu','We','Th','Fr','Sa'] as $d)
+                        <div class="text-center text-xs font-medium text-gray-400 py-1">{{ $d }}</div>
+                        @endforeach
+                    </div>
+
+                    <!-- Calendar Grid -->
+                    <div id="cal-grid" class="grid grid-cols-7 gap-y-1"></div>
+
+                    <!-- Tooltip -->
+                    <div id="cal-tooltip"
+                         class="hidden absolute z-50 bg-white border border-gray-200 rounded-xl shadow-xl p-3 w-64 text-xs"
+                         style="pointer-events:none;">
+                    </div>
+                </div>
+
+                <!-- Upcoming Events -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex-1 w-full">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                        <i class="fas fa-clock text-teal-500"></i> Upcoming Events
+                        <span class="text-xs text-gray-400 font-normal">(next 7 days)</span>
+                    </h4>
+                    <div id="upcoming-list" class="space-y-3"></div>
+                </div>
+
+            </div>
+        </div>
             
             <!-- Recent Activity Section (Only courses with progress > 0) -->
             @php
@@ -182,6 +243,7 @@
                 </div>
             </div>
         </div>
+        
     </main>
 
     <script>
@@ -197,5 +259,154 @@
             });
         });
     </script>
+    <script>
+    // Progress bar animation
+    window.addEventListener('load', function() {
+        const progressBars = document.querySelectorAll('.bg-white.rounded-full');
+        progressBars.forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => { bar.style.width = width; }, 100);
+        });
+    });
+
+    // Calendar data from Laravel
+    const calendarEvents = @json($calendarEvents);
+
+    // Group events by date
+    const eventsByDate = {};
+    calendarEvents.forEach(ev => {
+        if (!eventsByDate[ev.date]) eventsByDate[ev.date] = [];
+        eventsByDate[ev.date].push(ev);
+    });
+
+    let currentYear, currentMonth;
+
+    function renderCalendar(year, month) {
+        currentYear = year;
+        currentMonth = month;
+
+        const months = ['January','February','March','April','May','June',
+                        'July','August','September','October','November','December'];
+        document.getElementById('cal-title').textContent = months[month] + ' ' + year;
+
+        const grid = document.getElementById('cal-grid');
+        grid.innerHTML = '';
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+
+        // Empty cells before first day
+        for (let i = 0; i < firstDay; i++) {
+            grid.innerHTML += `<div></div>`;
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dateStr = year + '-' + String(month + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+            const events  = eventsByDate[dateStr] || [];
+            const hasLive = events.some(e => e.type === 'live');
+            const hasDead = events.some(e => e.type === 'deadline');
+            const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === d;
+
+            let dots = '';
+            if (hasLive) dots += `<span class="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block"></span>`;
+            if (hasDead) dots += `<span class="w-1.5 h-1.5 rounded-full bg-orange-400 inline-block"></span>`;
+
+            const hasEvent = events.length > 0;
+
+            grid.innerHTML += `
+                <div class="relative flex flex-col items-center py-1 group"
+                     ${hasEvent ? `data-date="${dateStr}"` : ''}>
+                    <span class="w-8 h-8 flex items-center justify-center rounded-full text-xs font-medium
+                        ${isToday ? 'bg-teal-600 text-white' : hasEvent ? 'hover:bg-gray-100 cursor-pointer text-gray-800' : 'text-gray-400'}
+                        transition">
+                        ${d}
+                    </span>
+                    <div class="flex gap-0.5 mt-0.5 h-2">${dots}</div>
+                    ${hasEvent ? `
+                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50
+                                bg-white border border-gray-200 rounded-xl shadow-xl p-3 w-56 text-xs pointer-events-none"
+                         style="min-width:200px;">
+                        ${events.map(ev => `
+                            <div class="mb-2 last:mb-0 flex items-start gap-2">
+                                <span class="mt-0.5 w-2 h-2 rounded-full flex-shrink-0 ${ev.type === 'live' ? 'bg-blue-500' : 'bg-orange-400'}"></span>
+                                <div>
+                                    <p class="font-semibold text-gray-800">${ev.title}</p>
+                                    <p class="text-gray-500">${ev.type === 'live' ? '🎥 Live · ' + ev.time + (ev.duration ? ' · ' + ev.duration : '') : '⏰ Deadline · ' + ev.time}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>` : ''}
+                </div>`;
+        }
+
+        renderUpcoming();
+    }
+
+    function renderUpcoming() {
+        const now   = new Date();
+        const seven = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        const list  = document.getElementById('upcoming-list');
+
+        const upcoming = calendarEvents
+            .filter(ev => {
+                const d = new Date(ev.date + 'T' + (ev.time ? convertTo24(ev.time) : '00:00'));
+                return d >= now && d <= seven;
+            })
+            .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        if (upcoming.length === 0) {
+            list.innerHTML = `<div class="text-center py-8 text-gray-400">
+                <i class="fas fa-calendar-check text-3xl mb-2"></i>
+                <p class="text-sm">No events in the next 7 days</p>
+            </div>`;
+            return;
+        }
+
+        list.innerHTML = upcoming.map(ev => `
+            <div class="flex items-start gap-3 p-3 rounded-xl border ${ev.type === 'live' ? 'border-blue-100 bg-blue-50' : 'border-orange-100 bg-orange-50'}">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${ev.type === 'live' ? 'bg-blue-500' : 'bg-orange-400'}">
+                    <i class="fas ${ev.type === 'live' ? 'fa-video' : 'fa-exclamation-circle'} text-white text-xs"></i>
+                </div>
+                <div>
+                    <p class="font-semibold text-gray-800 text-xs">${ev.title}</p>
+                    <p class="text-gray-500 text-xs mt-0.5">
+                        ${formatDate(ev.date)} · ${ev.time}
+                        ${ev.duration ? ' · ' + ev.duration : ''}
+                    </p>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function convertTo24(time12) {
+        const [time, modifier] = time12.split(' ');
+        let [hours, minutes] = time.split(':');
+        if (modifier === 'PM' && hours !== '12') hours = parseInt(hours) + 12;
+        if (modifier === 'AM' && hours === '12') hours = '00';
+        return String(hours).padStart(2,'0') + ':' + minutes;
+    }
+
+    function formatDate(dateStr) {
+        const d = new Date(dateStr + 'T00:00:00');
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function prevMonth() {
+        let m = currentMonth - 1, y = currentYear;
+        if (m < 0) { m = 11; y--; }
+        renderCalendar(y, m);
+    }
+
+    function nextMonth() {
+        let m = currentMonth + 1, y = currentYear;
+        if (m > 11) { m = 0; y++; }
+        renderCalendar(y, m);
+    }
+
+    const now = new Date();
+    renderCalendar(now.getFullYear(), now.getMonth());
+</script>
 </body>
 </html>

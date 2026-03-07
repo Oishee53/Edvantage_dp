@@ -33,7 +33,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rules;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AssignmentSubmissionController;
-use App\Http\Controllers\StudentController;
 
 Route::get('/', [LandingController::class, 'showLanding']);
 Route::get('/my-courses/{courseId}/assignments', 
@@ -81,11 +80,6 @@ Route::get('/homepage', [UserController::class, 'homepage'])
 
 
 Route::get('/profile', [UserController::class, 'profile'])->name('profile');
-Route::get('/my-calendar', [StudentController::class, 'calendar'])
-    ->name('student.calendar');
-
-Route::get('/calendar-events', [StudentController::class, 'calendarEvents'])
-    ->name('student.calendar.events');
 
 Route::get('/courses/enrolled', function () {
     return 'Enrolled courses page coming soon!';

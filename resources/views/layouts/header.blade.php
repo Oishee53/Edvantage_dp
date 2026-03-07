@@ -341,28 +341,18 @@
                              style="display: none;">
                             
                             <a href="/profile" class="flex items-center px-4 py-2.5 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors">
-    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-    </svg>
-    My Profile
-</a>
-
-<a href="{{ route('student.calendar') }}" class="flex items-center px-4 py-2.5 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors">
-    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v11a2 2 0 002 2z"/>
-    </svg>
-    My Calendar
-</a>
-
-<a href="{{ route('courses.enrolled') }}" class="flex items-center px-4 py-2.5 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors">
-    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13"/>
-    </svg>
-    My Courses
-</a>
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                                My Profile
+                            </a>
+                            
+                            <a href="{{ route('courses.enrolled') }}" class="flex items-center px-4 py-2.5 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                                My Courses
+                            </a>
                             
                             <a href="{{ route('user.progress') }}" class="flex items-center px-4 py-2.5 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors">
                                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -555,7 +545,6 @@
                         </svg>
                         My Courses
                     </a>
-                    
                     
                     <a href="{{ route('user.progress') }}" class="flex items-center py-2 px-2 text-gray-700 hover:bg-teal-50 rounded-md">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
