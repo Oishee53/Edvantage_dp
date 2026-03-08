@@ -110,7 +110,9 @@ class LiveSessionController extends Controller
 
         // Enforce go-live window: only from scheduled start_time up to 30 mins after
         if ($session->date && $session->start_time) {
-            $scheduledStart = \Carbon\Carbon::parse($session->date . ' ' . $session->start_time);
+            $scheduledStart = \Carbon\Carbon::parse(
+    \Carbon\Carbon::parse($session->date)->toDateString() . ' ' . $session->start_time
+);
             $goLiveUntil    = $scheduledStart->copy()->addMinutes(30);
 
             if (now()->lt($scheduledStart)) {

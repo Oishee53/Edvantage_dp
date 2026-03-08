@@ -216,7 +216,7 @@
                         <i class="fas {{ $isLiveCourse ? 'fa-broadcast-tower' : 'fa-book-open' }}" style="margin-right:0.5rem;"></i>
                         {{ $isLiveCourse ? 'Sessions' : 'Lectures' }}
                     </button>
-                    @if(!$isLiveCourse)
+                
                         <button class="tab" data-tab="live-sessions">
                             <i class="fas fa-broadcast-tower" style="margin-right:0.5rem;"></i>Live Classes
                         </button>
@@ -226,7 +226,7 @@
                         <button class="tab" data-tab="assignments">
                             <i class="fas fa-tasks" style="margin-right:0.5rem;"></i>Assignments
                         </button>
-                    @endif
+                    
                 </div>
 
                 <!-- ── Lectures / Sessions Tab ── -->
@@ -326,8 +326,6 @@
 
                     @endif
                 </div>{{-- /#lectures-content --}}
-
-                @if(!$isLiveCourse)
 
                     <!-- ── Live Sessions Tab (hybrid: recorded courses with live classes) ── -->
                     <div class="tab-content" id="live-sessions-content">
@@ -518,7 +516,7 @@
                         @endif
                     </div>{{-- /#assignments-content --}}
 
-                @endif{{-- @if(!$isLiveCourse) --}}
+                {{-- @if(!$isLiveCourse) --}}
 
             </div>{{-- /.tabs-container --}}
         </div>{{-- /.container --}}
