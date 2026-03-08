@@ -85,6 +85,10 @@ Route::get('/courses/enrolled', function () {
     return 'Enrolled courses page coming soon!';
 });
 
+Route::post('/chatbot/ask', [PlatformChatbotController::class, 'chat'])->name('chatbot.ask');
+
+
+
 Route::get('/browse',[CourseController::class, 'viewCourses'])->name('courses.all');
 
 Route::get('/search', [CourseController::class, 'logged_in_search'])->name('courses.search');
@@ -212,7 +216,6 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-Route::post('/chatbot/ask', [PlatformChatbotController::class, 'chat'])->name('chatbot.ask');
 
 
 
