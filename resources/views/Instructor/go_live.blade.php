@@ -9,11 +9,52 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background: #030712; }
-        #local-video {
-            width: 100%; height: 520px; object-fit: cover;
-            border-radius: 16px; background: #0f172a; display: block;
-        }
         .stat-pill { background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); }
+
+        #video-stage {
+            position: relative; flex: 1; border-radius: 16px; overflow: hidden;
+            background: #0f172a;
+        }
+
+        #main-video {
+            width: 100%; height: 100%; object-fit: cover;
+            display: block; border-radius: 16px;
+        }
+
+        /* PiP thumbnail */
+        #pip-video {
+            position: absolute; bottom: 80px; right: 16px;
+            width: 200px; height: 120px; object-fit: cover;
+            border-radius: 10px; border: 2px solid rgba(255,255,255,0.25);
+            cursor: pointer; display: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            transition: transform 0.15s, border-color 0.15s;
+            z-index: 10;
+            background: #0f172a;
+        }
+        #pip-video:hover { transform: scale(1.04); border-color: #14b8a6; }
+
+        #pip-label {
+            position: absolute; bottom: 200px; right: 16px;
+            background: rgba(0,0,0,0.7); color: #d1d5db;
+            font-size: 0.68rem; font-weight: 600; padding: 3px 9px;
+            border-radius: 6px; display: none; z-index: 11;
+            pointer-events: none; letter-spacing: 0.02em;
+        }
+
+        #pip-hint {
+            position: absolute; bottom: 80px; right: 16px;
+            width: 200px; height: 120px;
+            border-radius: 10px; z-index: 12;
+            display: none; align-items: center; justify-content: center;
+            pointer-events: none;
+            background: rgba(0,0,0,0.0);
+        }
+        #pip-video:hover ~ #pip-hint { display: flex; }
+        #pip-hint span {
+            background: rgba(0,0,0,0.6); color: white; font-size: 0.72rem;
+            padding: 4px 10px; border-radius: 6px;
+        }
 
         /* Sidebar */
         #sidebar {
@@ -28,21 +69,18 @@
         .tab-pane { display: none; flex: 1; overflow-y: auto; flex-direction: column; }
         .tab-pane.active { display: flex; }
 
-        /* Chat */
         #chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
         .chat-msg { background: #1f2937; border-radius: 10px; padding: 0.6rem 0.8rem; font-size: 0.82rem; }
         .chat-msg .sender { font-weight: 700; color: #14b8a6; margin-bottom: 0.2rem; font-size: 0.75rem; }
         .chat-msg.own { background: #134e4a; }
         .chat-msg.system { background: transparent; color: #6b7280; font-size: 0.75rem; text-align: center; }
 
-        /* Raised hands */
         .hand-item { display: flex; align-items: center; justify-content: space-between;
             padding: 0.75rem 1rem; border-bottom: 1px solid #1f2937; font-size: 0.85rem; }
         .lower-btn { font-size: 0.75rem; padding: 0.3rem 0.7rem; background: #374151;
             color: #d1d5db; border: none; border-radius: 6px; cursor: pointer; }
         .lower-btn:hover { background: #ef4444; color: white; }
 
-        /* Notification toast */
         #toast { position: fixed; top: 70px; right: 1rem; z-index: 999;
             background: #1f2937; border: 1px solid #374151; border-radius: 12px;
             padding: 0.75rem 1rem; font-size: 0.85rem; color: white;
@@ -57,6 +95,7 @@
             <span class="flex items-center gap-1.5 px-2.5 py-1 bg-red-600 rounded-full text-xs font-bold animate-pulse">
                 <span class="w-2 h-2 rounded-full bg-white"></span> LIVE
             </span>
+            <span id="timer-display" class="text-white text-sm font-mono font-bold"></span>
             <span class="text-gray-300 font-medium text-sm">{{ $session->title ?? 'Session ' . $session_number }}</span>
         </div>
         <div class="flex items-center gap-3">
@@ -67,24 +106,27 @@
         </div>
     </div>
 
-    <!-- Toast notification -->
     <div id="toast">
         <span>✋</span><span id="toast-text"></span>
         <button onclick="document.getElementById('toast').style.display='none'"
                 style="margin-left:0.5rem;background:none;border:none;color:#9ca3af;cursor:pointer;">✕</button>
     </div>
 
-    <!-- Main layout -->
     <div style="display:flex; height:calc(100vh - 53px);">
 
         <!-- Video area -->
         <div style="flex:1; padding:1.25rem; display:flex; flex-direction:column; gap:1rem; overflow:hidden;">
+            <div id="video-stage" style="flex:1;">
 
-            <div class="relative" style="flex:1;">
-                <video id="local-video" autoplay muted playsinline style="height:100%;"></video>
+                <video id="main-video" autoplay muted playsinline></video>
+
+                <!-- PiP: only shown when screen sharing is active -->
+                <video id="pip-video" autoplay muted playsinline onclick="swapFeeds()"></video>
+                <div id="pip-label"></div>
+                <div id="pip-hint"><span><i class="fas fa-exchange-alt mr-1"></i> Click to swap</span></div>
 
                 <!-- Controls overlay -->
-                <div class="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-3">
+                <div class="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-3" style="z-index:20;">
                     <button onclick="toggleMute()" class="stat-pill w-11 h-11 rounded-full flex items-center justify-center border border-gray-600 hover:bg-gray-700 transition-all">
                         <i id="mute-icon" class="fas fa-microphone text-sm"></i>
                     </button>
@@ -117,17 +159,16 @@
 
         <!-- Sidebar -->
         <div id="sidebar">
-            <!-- Sidebar tabs -->
             <div style="display:flex; border-bottom:1px solid #1f2937;">
                 <button class="tab-btn active" onclick="switchTab('chat', this)">
                     <i class="fas fa-comments mr-1"></i> Chat
                 </button>
                 <button class="tab-btn" onclick="switchTab('hands', this)" id="hands-tab-btn">
-                    <i class="fas fa-hand-paper mr-1"></i> Hands <span id="hand-count-badge" class="hidden ml-1 px-1.5 py-0.5 bg-amber-500 text-black text-xs rounded-full font-bold">0</span>
+                    <i class="fas fa-hand-paper mr-1"></i> Hands
+                    <span id="hand-count-badge" class="hidden ml-1 px-1.5 py-0.5 bg-amber-500 text-black text-xs rounded-full font-bold">0</span>
                 </button>
             </div>
 
-            <!-- Chat pane -->
             <div id="tab-chat" class="tab-pane active">
                 <div id="chat-messages"></div>
                 <div style="padding:0.75rem; border-top:1px solid #1f2937; display:flex; gap:0.5rem;">
@@ -143,7 +184,6 @@
                 </div>
             </div>
 
-            <!-- Raised hands pane -->
             <div id="tab-hands" class="tab-pane" style="flex-direction:column;">
                 <div id="hands-list" style="flex:1; overflow-y:auto;">
                     <p id="no-hands" style="text-align:center; color:#6b7280; padding:2rem; font-size:0.85rem;">No raised hands</p>
@@ -152,7 +192,6 @@
         </div>
     </div>
 
-    <!-- Hidden end-stream form -->
     <form id="end-stream-form" method="POST"
           action="{{ route('instructor.live_session.end_stream', ['course' => $course_id, 'session' => $session_number]) }}"
           class="hidden">@csrf</form>
@@ -165,21 +204,94 @@
         const MY_NAME    = "{{ auth()->user()->name }}";
 
         let localStream, screenStream, peer, mediaRecorder;
-        let recordedChunks = [], connectedPeers = {}, dataConns = {};
-        let raisedHands = {}; // peerId -> name
+        let recordedChunks = [];
+
+        // Per-student: { camera: PeerCall, screen: PeerCall }
+        let peerCalls = {};
+        // Data connections keyed by student peerId
+        let dataConns = {};
+        let raisedHands = {};
+
         let isMuted = false, isVideoOff = false, isSharingScreen = false, isEnding = false;
 
+        // ── PiP layout (instructor preview) ──────────────────────────────────
+        // mainFeed: 'camera' | 'screen'
+        let mainFeed = 'camera';
+        const mainVideo = document.getElementById('main-video');
+        const pipVideo  = document.getElementById('pip-video');
+        const pipLabel  = document.getElementById('pip-label');
+        const pipHint   = document.getElementById('pip-hint');
+
+        function showPip() {
+            pipVideo.style.display = 'block';
+            pipLabel.style.display = 'block';
+            refreshPipLabel();
+        }
+        function hidePip() {
+            pipVideo.style.display = 'none';
+            pipLabel.style.display = 'none';
+        }
+        function refreshPipLabel() {
+            pipLabel.textContent = mainFeed === 'screen' ? '📷 Camera' : '🖥 Screen';
+        }
+
+        // Instructor clicks PiP to swap which feed is shown large
+        function swapFeeds() {
+            if (!isSharingScreen) return;
+            if (mainFeed === 'screen') {
+                mainVideo.srcObject = localStream;
+                pipVideo.srcObject  = screenStream;
+                mainFeed = 'camera';
+            } else {
+                mainVideo.srcObject = screenStream;
+                pipVideo.srcObject  = localStream;
+                mainFeed = 'screen';
+            }
+            refreshPipLabel();
+            // Tell every student which feed is now "main" so they can mirror
+            broadcast({ type: 'layout_swap', mainFeed });
+        }
+
+        // ── Timer ─────────────────────────────────────────────────────────────
+        const DURATION_SECONDS = {{ ($session->duration_minutes ?? 60) * 60 }};
+        let secondsLeft   = DURATION_SECONDS;
+        let timerInterval = null;
+
+        function startTimer() {
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                secondsLeft--;
+                updateTimerDisplay();
+                if (secondsLeft === 300) { appendChat({ type:'system', text:'⚠️ 5 minutes remaining' }); broadcast({ type:'system', text:'⚠️ 5 minutes remaining' }); }
+                if (secondsLeft === 60)  { appendChat({ type:'system', text:'⚠️ 1 minute remaining'  }); broadcast({ type:'system', text:'⚠️ 1 minute remaining'  }); }
+                if (secondsLeft <= 0)   { clearInterval(timerInterval); autoEndStream(); }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const h = Math.floor(secondsLeft / 3600);
+            const m = Math.floor((secondsLeft % 3600) / 60);
+            const s = secondsLeft % 60;
+            const el = document.getElementById('timer-display');
+            if (!el) return;
+            el.textContent = h > 0
+                ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+                : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            el.style.color = secondsLeft <= 300 ? '#ef4444' : secondsLeft <= 600 ? '#f59e0b' : '#ffffff';
+        }
+
+        // ── ICE ───────────────────────────────────────────────────────────────
         const ICE = {
             iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' },
                 { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
-                { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+                { urls: 'turn:openrelay.metered.ca:80',                username: 'openrelayproject', credential: 'openrelayproject' },
+                { urls: 'turn:openrelay.metered.ca:443',               username: 'openrelayproject', credential: 'openrelayproject' },
                 { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
             ]
         };
 
-        // ── Tab switching ────────────────────────────────────────────────────
+        // ── Tabs / Chat / Hands ───────────────────────────────────────────────
         function switchTab(name, btn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
@@ -187,13 +299,11 @@
             document.getElementById('tab-' + name).classList.add('active');
         }
 
-        // ── Chat ─────────────────────────────────────────────────────────────
         function sendChat() {
             const input = document.getElementById('chat-input');
             const text  = input.value.trim();
             if (!text) return;
             input.value = '';
-
             const msg = { type: 'chat', sender: MY_NAME, text, isInstructor: true };
             appendChat(msg, true);
             broadcast(msg);
@@ -213,75 +323,54 @@
             div.scrollTop = div.scrollHeight;
         }
 
-        // ── Raised hands ─────────────────────────────────────────────────────
-        function addRaisedHand(peerId, name) {
-            if (raisedHands[peerId]) return;
-            raisedHands[peerId] = name;
+        function addRaisedHand(pid, name) {
+            if (raisedHands[pid]) return;
+            raisedHands[pid] = name;
             updateHandsUI();
             showToast(`✋ ${name} raised their hand`);
         }
 
-        function lowerHand(peerId) {
-            if (!raisedHands[peerId]) return;
-            const name = raisedHands[peerId];
-            delete raisedHands[peerId];
+        function lowerHand(pid) {
+            if (!raisedHands[pid]) return;
+            delete raisedHands[pid];
             updateHandsUI();
-            // Tell the student their hand was lowered
-            if (dataConns[peerId]) {
-                dataConns[peerId].send({ type: 'hand_lowered' });
-            }
+            if (dataConns[pid]?.open) dataConns[pid].send({ type: 'hand_lowered' });
         }
 
         function updateHandsUI() {
             const list  = document.getElementById('hands-list');
-            const noHands = document.getElementById('no-hands');
             const badge = document.getElementById('hand-count-badge');
             const count = Object.keys(raisedHands).length;
-
             badge.textContent = count;
-            if (count > 0) { badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
-
+            count > 0 ? badge.classList.remove('hidden') : badge.classList.add('hidden');
             list.querySelectorAll('.hand-item').forEach(el => el.remove());
-
             Object.entries(raisedHands).forEach(([pid, name]) => {
                 const item = document.createElement('div');
                 item.className = 'hand-item';
-                item.innerHTML = `
-                    <span>✋ ${name}</span>
-                    <button class="lower-btn" onclick="lowerHand('${pid}')">Lower</button>
-                `;
+                item.innerHTML = `<span>✋ ${name}</span><button class="lower-btn" onclick="lowerHand('${pid}')">Lower</button>`;
                 list.appendChild(item);
             });
-
-            if (count === 0) {
-                noHands.style.display = 'block';
-            } else {
-                noHands.style.display = 'none';
-            }
+            document.getElementById('no-hands').style.display = count === 0 ? 'block' : 'none';
         }
 
-        // ── Toast ─────────────────────────────────────────────────────────────
         function showToast(msg) {
-            const toast = document.getElementById('toast');
             document.getElementById('toast-text').textContent = msg;
-            toast.style.display = 'flex';
-            setTimeout(() => toast.style.display = 'none', 4000);
+            const t = document.getElementById('toast');
+            t.style.display = 'flex';
+            setTimeout(() => t.style.display = 'none', 4000);
         }
 
-        // ── Broadcast to all data connections ────────────────────────────────
-        function broadcast(data, excludePeer = null) {
+        function broadcast(data, excludePid = null) {
             Object.entries(dataConns).forEach(([pid, conn]) => {
-                if (pid !== excludePeer && conn.open) conn.send(data);
+                if (pid !== excludePid && conn.open) conn.send(data);
             });
         }
 
-        // ── Start stream ─────────────────────────────────────────────────────
+        // ── Stream start ──────────────────────────────────────────────────────
         async function startStream() {
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: 1280, height: 720 }, audio: true,
-                });
-                document.getElementById('local-video').srcObject = localStream;
+                localStream = await navigator.mediaDevices.getUserMedia({ video: { width:1280, height:720 }, audio: true });
+                mainVideo.srcObject = localStream;
                 document.getElementById('status-text').textContent = 'You are live!';
                 startRecording();
                 initPeer();
@@ -291,64 +380,71 @@
             }
         }
 
-        // ── Recording ────────────────────────────────────────────────────────
         function startRecording() {
-            const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm';
-            mediaRecorder = new MediaRecorder(localStream, { mimeType });
+            const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm';
+            mediaRecorder = new MediaRecorder(localStream, { mimeType: mime });
             mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
             mediaRecorder.start(1000);
             document.getElementById('rec-indicator').classList.replace('hidden', 'flex');
         }
 
-        // ── PeerJS ───────────────────────────────────────────────────────────
+        // ── PeerJS ────────────────────────────────────────────────────────────
         function initPeer() {
-            peer = new Peer(PEER_ID, { host: '0.peerjs.com', port: 443, secure: true, path: '/', config: ICE });
+            peer = new Peer(PEER_ID, { host:'0.peerjs.com', port:443, secure:true, path:'/', config:ICE });
 
             peer.on('open', () => {
                 document.getElementById('status-text').textContent = 'You are live! Students can now join.';
             });
 
-            // Student opens DATA connection to signal they want the stream
             peer.on('connection', (conn) => {
-                const studentPeer = conn.peer;
-                dataConns[studentPeer] = conn;
+                const pid = conn.peer;
+                dataConns[pid] = conn;
 
                 conn.on('open', () => {
-                    // Call student with video stream
-                    const streamToSend = new MediaStream([
-                        ...localStream.getVideoTracks(),
-                        ...localStream.getAudioTracks(),
-                    ]);
-                    const call = peer.call(studentPeer, streamToSend);
-                    connectedPeers[studentPeer] = call;
-                    document.getElementById('viewer-num').textContent = Object.keys(connectedPeers).length;
+                    // Send timer sync
+                    conn.send({ type: 'timer_sync', secondsLeft });
 
+                    // Always send camera stream first
+                    const camStream = new MediaStream([...localStream.getVideoTracks(), ...localStream.getAudioTracks()]);
+                    const camCall   = peer.call(pid, camStream, { metadata: { feed: 'camera' } });
+
+                    peerCalls[pid] = { camera: camCall, screen: null };
+                    document.getElementById('viewer-num').textContent = Object.keys(peerCalls).length;
                     appendChat({ type: 'system', text: `${conn.metadata?.name || 'A student'} joined` });
 
-                    call.on('close', () => {
-                        delete connectedPeers[studentPeer];
-                        delete dataConns[studentPeer];
-                        delete raisedHands[studentPeer];
+                    // If screen share is already running, send screen call immediately too
+                    if (isSharingScreen && screenStream) {
+                        const scrStream = new MediaStream([...screenStream.getVideoTracks()]);
+                        const scrCall   = peer.call(pid, scrStream, { metadata: { feed: 'screen' } });
+                        peerCalls[pid].screen = scrCall;
+                        // Tell student which feed is currently main
+                        conn.send({ type: 'layout_swap', mainFeed });
+                    }
+
+                    camCall.on('close', () => {
+                        delete peerCalls[pid];
+                        delete dataConns[pid];
+                        delete raisedHands[pid];
                         updateHandsUI();
-                        document.getElementById('viewer-num').textContent = Object.keys(connectedPeers).length;
+                        document.getElementById('viewer-num').textContent = Object.keys(peerCalls).length;
                     });
                 });
 
                 conn.on('data', (data) => {
                     if (data.type === 'chat') {
                         appendChat(data);
-                        broadcast(data, studentPeer); // relay to other students
+                        broadcast(data, pid);
                     } else if (data.type === 'raise_hand') {
-                        addRaisedHand(studentPeer, data.name);
+                        addRaisedHand(pid, data.name);
                     } else if (data.type === 'lower_hand') {
-                        delete raisedHands[studentPeer];
+                        delete raisedHands[pid];
                         updateHandsUI();
                     }
                 });
 
                 conn.on('close', () => {
-                    delete dataConns[studentPeer];
-                    delete raisedHands[studentPeer];
+                    delete dataConns[pid];
+                    delete raisedHands[pid];
                     updateHandsUI();
                 });
             });
@@ -356,36 +452,50 @@
             peer.on('error', console.error);
         }
 
-        // ── Controls ─────────────────────────────────────────────────────────
+        // ── Controls ──────────────────────────────────────────────────────────
         function toggleMute() {
             isMuted = !isMuted;
             localStream.getAudioTracks().forEach(t => t.enabled = !isMuted);
-            document.getElementById('mute-icon').className = isMuted ? 'fas fa-microphone-slash text-red-400 text-sm' : 'fas fa-microphone text-sm';
+            document.getElementById('mute-icon').className = isMuted
+                ? 'fas fa-microphone-slash text-red-400 text-sm'
+                : 'fas fa-microphone text-sm';
         }
 
         function toggleVideo() {
             isVideoOff = !isVideoOff;
             localStream.getVideoTracks().forEach(t => t.enabled = !isVideoOff);
-            document.getElementById('video-icon').className = isVideoOff ? 'fas fa-video-slash text-red-400 text-sm' : 'fas fa-video text-sm';
+            document.getElementById('video-icon').className = isVideoOff
+                ? 'fas fa-video-slash text-red-400 text-sm'
+                : 'fas fa-video text-sm';
         }
 
         async function toggleScreenShare() {
             if (!isSharingScreen) {
                 try {
-                    screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-                    const screenTrack = screenStream.getVideoTracks()[0];
-
-                    // Replace video track in all peer connections
-                    Object.values(connectedPeers).forEach(call => {
-                        const sender = call.peerConnection?.getSenders().find(s => s.track?.kind === 'video');
-                        if (sender) sender.replaceTrack(screenTrack);
-                    });
-
-                    document.getElementById('local-video').srcObject = screenStream;
-                    document.getElementById('screen-icon').className = 'fas fa-desktop text-sm text-teal-400';
+                    screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
                     isSharingScreen = true;
 
-                    screenTrack.onended = () => stopScreenShare();
+                    // Instructor preview: screen → main, camera → pip
+                    mainFeed = 'screen';
+                    mainVideo.srcObject = screenStream;
+                    pipVideo.srcObject  = localStream;
+                    showPip();
+
+                    document.getElementById('screen-icon').className = 'fas fa-desktop text-sm text-teal-400';
+
+                    // Send a separate screen call to every connected student
+                    Object.entries(peerCalls).forEach(([pid, calls]) => {
+                        if (!calls.screen) {
+                            const scrStream = new MediaStream([...screenStream.getVideoTracks()]);
+                            const scrCall   = peer.call(pid, scrStream, { metadata: { feed: 'screen' } });
+                            peerCalls[pid].screen = scrCall;
+                        }
+                    });
+
+                    // Tell all students screen share started and current layout
+                    broadcast({ type: 'screen_share_started', mainFeed });
+
+                    screenStream.getVideoTracks()[0].onended = () => stopScreenShare();
                 } catch (err) {
                     console.error('Screen share error:', err);
                 }
@@ -396,45 +506,62 @@
 
         function stopScreenShare() {
             if (screenStream) screenStream.getTracks().forEach(t => t.stop());
-            const camTrack = localStream.getVideoTracks()[0];
+            screenStream = null;
+            isSharingScreen = false;
 
-            Object.values(connectedPeers).forEach(call => {
-                const sender = call.peerConnection?.getSenders().find(s => s.track?.kind === 'video');
-                if (sender) sender.replaceTrack(camTrack);
+            // Close the screen call for every student
+            Object.values(peerCalls).forEach(calls => {
+                if (calls.screen) { calls.screen.close(); calls.screen = null; }
             });
 
-            document.getElementById('local-video').srcObject = localStream;
+            // Restore instructor preview to camera only
+            mainVideo.srcObject = localStream;
+            mainFeed = 'camera';
+            hidePip();
+
             document.getElementById('screen-icon').className = 'fas fa-desktop text-sm';
-            isSharingScreen = false;
+            broadcast({ type: 'screen_share_stopped' });
         }
 
-        // ── End stream ───────────────────────────────────────────────────────
+        // ── End stream ────────────────────────────────────────────────────────
         document.getElementById('end-stream-btn').addEventListener('click', async () => {
             if (isEnding) return;
             if (!confirm('End the live stream? Recording will be uploaded automatically.')) return;
+            await doEndStream();
+        });
 
+        async function autoEndStream() { if (!isEnding) await doEndStream(); }
+
+        async function doEndStream() {
             isEnding = true;
+            if (timerInterval) clearInterval(timerInterval);
+
             const btn = document.getElementById('end-stream-btn');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Saving...';
 
-            broadcast({ type: 'system', text: 'Stream has ended' });
+            broadcast({ type: 'stream_ended' });
 
             if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                await new Promise(resolve => { mediaRecorder.onstop = resolve; mediaRecorder.stop(); });
+                await new Promise(r => { mediaRecorder.onstop = r; mediaRecorder.stop(); });
             }
-            if (localStream) localStream.getTracks().forEach(t => t.stop());
-            Object.values(connectedPeers).forEach(call => call.close());
+            if (localStream)  localStream.getTracks().forEach(t => t.stop());
+            if (screenStream) screenStream.getTracks().forEach(t => t.stop());
+
+            Object.values(peerCalls).forEach(calls => {
+                if (calls.camera) calls.camera.close();
+                if (calls.screen) calls.screen.close();
+            });
             if (peer) peer.destroy();
 
             if (recordedChunks.length > 0) {
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Uploading...';
                 try {
                     const blob = new Blob(recordedChunks, { type: 'video/webm' });
-                    const formData = new FormData();
-                    formData.append('recording', blob, 'recording.webm');
-                    formData.append('_token', CSRF_TOKEN);
-                    const res = await fetch(UPLOAD_URL, { method: 'POST', body: formData });
+                    const fd   = new FormData();
+                    fd.append('recording', blob, 'recording.webm');
+                    fd.append('_token', CSRF_TOKEN);
+                    const res    = await fetch(UPLOAD_URL, { method: 'POST', body: fd });
                     const result = await res.json();
                     if (result.success) console.log('Recording saved:', result.url);
                 } catch (err) {
@@ -443,9 +570,10 @@
             }
 
             document.getElementById('end-stream-form').submit();
-        });
+        }
 
-        startStream();
+        // ── Boot ──────────────────────────────────────────────────────────────
+        startStream().then(() => startTimer());
     </script>
 </body>
 </html>

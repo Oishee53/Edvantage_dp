@@ -201,11 +201,7 @@ Route::post('/course/rate', [CourseController::class, 'submitRating'])
     ->middleware('auth');
 
 
-Route::get('/courses/{id}', [CourseController::class, 'show'])
-    ->name('courses.details');
-    Route::get('/instructor/live-class/{course_id}', [InstructorController::class, 'liveClassForm'])->name('live.class.form');
 
-Route::post('/instructor/live-class/store', [InstructorController::class, 'storeLiveClass'])->name('live.class.store');
 Route::middleware(['auth'])->group(function () {
      Route::get('/instructor/course/{courseId}/assignments',
     [AssignmentController::class, 'index'])
