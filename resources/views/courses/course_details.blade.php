@@ -96,10 +96,24 @@
                                     <span class="text-sm">{{ $course->approx_video_length }} min Avg Video Length</span>
                                 </div>
                                 <div class="flex items-center gap-3 text-gray-700">
-                                    <span class="text-xl">📅</span>
-                                    <span class="text-sm">{{ $course->updated_at->format('M d, Y') }} Last Updated</span>
-                                </div>
-                            </div>
+    <span class="text-xl">📅</span>
+    <span class="text-sm">{{ $course->updated_at->format('M d, Y') }} Last Updated</span>
+</div>
+
+@if(isset($liveSessions) && $liveSessions->count() > 0)
+<div class="flex items-center gap-3 text-gray-700">
+    <span class="text-xl">📡</span>
+    <span class="text-sm">
+        @foreach($liveSessions as $session)
+            {{ \Carbon\Carbon::parse($session->date)->format('M d, Y') }} |
+            ⏰ {{ \Carbon\Carbon::parse($session->start_time)->format('h:i A') }}
+             | Live Class
+        @endforeach
+    </span>
+</div>
+@endif
+
+         </div>
                             
                             <!-- What's Included -->
                             <div class="mb-6 pb-6 border-b border-gray-200">

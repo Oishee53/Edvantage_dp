@@ -39,7 +39,7 @@
 <body class="bg-gray-50 px-20 pt-5">
     @include('layouts.header')
 
-    <main class="pt-24 pb-16">
+    <main class="pt-5 pb-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Calendar Section -->
         <div class="mt-16">
@@ -112,7 +112,7 @@
             @endphp
 
             @if($recentCourses->count() > 0)
-            <div class="mb-16">
+            <div class="mt-20 mb-16">
                 <h2 class="text-2xl font-semibold text-gray-900 mb-8">Recent activity</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

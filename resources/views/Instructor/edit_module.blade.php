@@ -303,7 +303,7 @@
           <h2 class="section-header">Upload Course Resources</h2>
           
           <!-- Replaced basic form with styled upload form -->
-          <form method="POST" action="{{ route('upload.instructor.resources', [$course->id, $module_id]) }}" enctype="multipart/form-data">
+          <form id="uploadForm" method="POST" action="{{ route('upload.instructor.resources', [$course->id, $module_id]) }}" enctype="multipart/form-data">
             @csrf
 
             <div class="form-group">
@@ -317,6 +317,19 @@
             </div>
 
             <button type="submit" class="upload-button">Upload Resources</button>
+            <div style="margin-top:15px; display:none;" id="progressContainer">
+
+  <div style="width:100%; background:#e5e7eb; border-radius:6px; height:10px;">
+      <div id="uploadBar"
+           style="width:0%; height:10px; background:#0E1B33; border-radius:6px;">
+      </div>
+  </div>
+
+  <p id="uploadPercent" style="margin-top:5px; font-size:14px; color:#4b5563;">
+      0%
+  </p>
+
+</div>
           </form>
 
           <a href="javascript:history.back()" class="back-link">
@@ -328,6 +341,47 @@
       @endauth
     </section>
   </div>
+<script>
 
+document.getElementById("uploadForm").addEventListener("submit", function(e){
+
+    e.preventDefault();
+
+    let form = this;
+    let data = new FormData(form);
+
+    document.getElementById("progressContainer").style.display = "block";
+
+    let xhr = new XMLHttpRequest();
+
+    xhr.upload.addEventListener("progress", function(e){
+
+        if(e.lengthComputable){
+
+            let percent = Math.round((e.loaded / e.total) * 100);
+
+            document.getElementById("uploadBar").style.width = percent + "%";
+            document.getElementById("uploadPercent").innerText = percent + "%";
+
+        }
+
+    });
+
+    xhr.onload = function(){
+
+    if(xhr.status === 200){
+
+        window.location.href = "/instructor/manage_resources/{{ $course->id }}/modules";
+
+    }
+
+};
+
+    xhr.open("POST", form.action);
+    xhr.send(data);
+
+});
+
+</script>
 </body>
 </html>
