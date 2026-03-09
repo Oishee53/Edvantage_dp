@@ -8,6 +8,10 @@ use App\Models\Enrollment;
 use App\Models\Instructor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Assignment;
+use App\Models\LiveSession;
+use App\Models\CourseLiveSession;
+use Illuminate\Support\Facades\Auth;
 
 class StudentController extends Controller
 {
@@ -71,7 +75,116 @@ public function getMonthlyEnrollments()
 
     return response()->json(array_values($monthlyData));
 }
+public function calendar()
+{
+    return view('Student.calendar');
+}
+public function calendarEvents()
+{
+    $user = Auth::user();
 
+    $courseIds = Enrollment::where('user_id', $user->id)
+                            ->pluck('course_id')
+                            ->toArray();
+
+    $events = [];
+
+    // If student has no enrollments, return empty events
+    if (empty($courseIds)) {
+        return response()->json($events);
+    }
+
+    /* LIVE CLASSES - FROM APPROVED COURSES */
+   $approvedLiveClasses = CourseLiveSession::whereIn('course_id', $courseIds)
+                                  ->whereNotNull('date')
+                                  ->whereNotNull('start_time')
+                                  ->orderBy('date')
+                                  ->get();
+
+    foreach ($approvedLiveClasses as $class) {
+    $statusColor = match($class->status) {
+        'live'  => '#dc2626',
+        'ended' => '#10b981',
+        default => '#2563eb'
+    };
+
+    $dateStr  = \Carbon\Carbon::parse($class->date)->format('Y-m-d');
+    $startStr = \Carbon\Carbon::parse($class->start_time)->format('H:i:s');
+    $endStr   = \Carbon\Carbon::parse($class->start_time)
+                    ->addMinutes($class->duration_minutes)
+                    ->format('H:i:s');
+
+    $events[] = [
+        'title' => $class->title ? 'LIVE: ' . $class->title : 'Live Session',
+        'start' => $dateStr . 'T' . $startStr,
+        'end'   => $dateStr . 'T' . $endStr,
+        'color' => $statusColor,
+        'extendedProps' => [
+            'type'     => 'live_class',
+            'duration' => $class->duration_minutes . ' mins',
+            'status'   => $class->status
+        ]
+    ];
+}
+
+    /* LIVE CLASSES - FROM PENDING COURSES (instructor's pending courses) */
+    $instructorCourses = \App\Models\PendingCourses::where('instructor_id', $user->id)
+                                                   ->pluck('id')
+                                                   ->toArray();
+
+    if (!empty($instructorCourses)) {
+        $pendingLiveClasses = LiveSession::whereIn('course_id', $instructorCourses)
+                                         ->whereNotNull('date')
+                                         ->whereNotNull('start_time')
+                                         ->orderBy('date')
+                                         ->get();
+
+        foreach ($pendingLiveClasses as $class) {
+            $statusColor = match($class->status) {
+                'live' => '#dc2626',      // Red for live
+                'ended' => '#10b981',     // Green for ended/recording available
+                default => '#2563eb'      // Blue for scheduled
+            };
+
+            $events[] = [
+                'title' => $class->title ? 'LIVE: ' . $class->title : 'Live Session',
+                'start' => $class->date . 'T' . $class->start_time,
+                'end' => $class->date . 'T' . \Carbon\Carbon::parse($class->start_time)->addMinutes($class->duration_minutes)->format('H:i'),
+                'color' => $statusColor,
+                'extendedProps' => [
+                    'type' => 'live_class',
+                    'duration' => $class->duration_minutes . ' mins',
+                    'status' => $class->status
+                ]
+            ];
+        }
+    }
+
+    /* ASSIGNMENT DEADLINES */
+    if (!empty($courseIds)) {
+        $assignments = Assignment::whereIn('course_id', $courseIds)
+                                 ->orderBy('deadline')
+                                 ->get();
+
+        foreach ($assignments as $assignment) {
+            $events[] = [
+                'title' => 'DEADLINE: ' . $assignment->title,
+                'start' => $assignment->deadline,
+                'color' => '#f97316',
+                'extendedProps' => [
+                    'type' => 'assignment'
+                ]
+            ];
+        }
+    }
+
+    // Sort by start time
+    usort($events, function($a, $b) {
+        return strtotime($a['start']) - strtotime($b['start']);
+    });
+
+    return response()->json($events);
+}
 
 
 }

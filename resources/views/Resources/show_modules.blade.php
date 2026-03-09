@@ -14,11 +14,8 @@
                 extend: {
                     colors: {
                         primary: {
-                            50: '#f0f2f9',
-                            100: '#e3e6f3',
-                            600: '#1a2d52',
-                            700: '#0E1B33',
-                            800: '#0a1426',
+                            50: '#f0f2f9', 100: '#e3e6f3',
+                            600: '#1a2d52', 700: '#0E1B33', 800: '#0a1426',
                         }
                     },
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
@@ -32,11 +29,11 @@
             to   { opacity: 1; transform: translateY(0); }
         }
         .animate-slide-in { animation: slideIn 0.5s ease-out forwards; }
-        .module-item:nth-child(1) { animation-delay: 0.1s; }
-        .module-item:nth-child(2) { animation-delay: 0.15s; }
-        .module-item:nth-child(3) { animation-delay: 0.2s; }
-        .module-item:nth-child(4) { animation-delay: 0.25s; }
-        .module-item:nth-child(5) { animation-delay: 0.3s; }
+        .module-item:nth-child(1) { animation-delay: 0.05s; }
+        .module-item:nth-child(2) { animation-delay: 0.10s; }
+        .module-item:nth-child(3) { animation-delay: 0.15s; }
+        .module-item:nth-child(4) { animation-delay: 0.20s; }
+        .module-item:nth-child(5) { animation-delay: 0.25s; }
 
         @keyframes pulse-ring {
             0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
@@ -44,6 +41,14 @@
         }
         .live-pulse { animation: pulse-ring 1.2s ease-out infinite; }
 
+        #schedule-modal {
+            display: none;
+            position: fixed; inset: 0; z-index: 50;
+            background: rgba(0,0,0,0.45); backdrop-filter: blur(2px);
+            align-items: center; justify-content: center;
+        }
+        #schedule-modal.open { display: flex; }
+        .modal-input:focus { outline: none; border-color: #0d9488; box-shadow: 0 0 0 3px rgba(13,148,136,0.15); }
         @media (min-width: 1024px) { aside { display: block !important; } }
     </style>
 </head>
@@ -102,8 +107,8 @@
                         @if(!$isLiveCourse)
                             <div class="p-6">
                                 @php
-                                    $totalModules = count($modules);
-                                    $completed = $isStudent
+                                    $totalModules       = count($modules);
+                                    $completed          = $isStudent
                                         ? collect($modules)->where('quiz', true)->count()
                                         : collect($modules)->filter(fn($m) => $m['quiz'] && $m['resource'])->count();
                                     $progressPercentage = $totalModules > 0 ? round(($completed / $totalModules) * 100, 1) : 0;
@@ -136,15 +141,144 @@
                         </div>
 
                         <div class="p-6">
+
+                            {{-- ── Hybrid Live Sessions block (recorded courses, instructor/admin only) ── --}}
+                            @if(!$isLiveCourse && ($isInstructor || $isAdmin) && isset($liveSessions))
+                                @php
+                                    $activeSessions = $liveSessions
+                                        ->whereIn('status', ['scheduled', 'live'])
+                                        ->sortBy('date')
+                                        ->sortBy('start_time')
+                                        ->values();
+                                @endphp
+
+                                <div class="mb-6 rounded-xl border border-indigo-200 overflow-hidden">
+                                    <div class="px-5 py-3 border-b border-indigo-200 bg-indigo-50 flex items-center justify-between">
+                                        <h4 class="text-sm font-bold text-indigo-900 flex items-center gap-2">
+                                            <i class="fas fa-broadcast-tower text-indigo-500"></i>
+                                            Scheduled Live Classes
+                                            @if($activeSessions->count() > 0)
+                                                <span class="px-2 py-0.5 rounded-full bg-indigo-200 text-indigo-700 text-xs font-bold">
+                                                    {{ $activeSessions->count() }}
+                                                </span>
+                                            @endif
+                                        </h4>
+                                        <a href="{{ route('live.class.form', ['course_id' => $course->id]) }}"
+                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition-all">
+                                            <i class="fas fa-plus text-[10px]"></i> Schedule New
+                                        </a>
+                                    </div>
+
+                                    @if($activeSessions->count() > 0)
+                                        <div class="divide-y divide-indigo-100 bg-white">
+                                            @foreach($activeSessions as $ls)
+                                                @php
+                                                    $hlIsLive  = $ls->status === 'live';
+                                                    $hlIsToday = $ls->date && \Carbon\Carbon::parse(\Carbon\Carbon::parse($ls->date)->toDateString())->isToday();
+
+                                                    $hlInWindow  = false;
+                                                    $hlWindowMsg = '';
+                                                    if ($ls->date && $ls->start_time) {
+                                                        $hlStart     = \Carbon\Carbon::parse(\Carbon\Carbon::parse($ls->date)->toDateString() . ' ' . $ls->start_time);
+                                                        $hlWindowEnd = $hlStart->copy()->addMinutes(30);
+                                                        $hlInWindow  = now()->between($hlStart, $hlWindowEnd);
+                                                        if (now()->lt($hlStart)) {
+                                                            $hlWindowMsg = 'Go live opens at ' . $hlStart->format('h:i A') . ' on ' . $hlStart->format('d M Y');
+                                                        } elseif (now()->gt($hlWindowEnd)) {
+                                                            $hlWindowMsg = 'Go-live window passed (' . $hlStart->format('h:i A') . ' to ' . $hlWindowEnd->format('h:i A') . ')';
+                                                        }
+                                                    } else {
+                                                        $hlWindowMsg = 'Set a start time to enable Go Live';
+                                                    }
+                                                @endphp
+
+                                                <div class="px-5 py-4 flex items-center justify-between gap-4 flex-wrap {{ $hlIsLive ? 'bg-red-50' : '' }}">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0
+                                                            {{ $hlIsLive ? 'bg-red-500 live-pulse' : 'bg-indigo-100' }}">
+                                                            <i class="fas fa-broadcast-tower text-sm {{ $hlIsLive ? 'text-white' : 'text-indigo-500' }}"></i>
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-sm font-bold text-gray-900">
+                                                                {{ $ls->title ?? 'Live Session ' . $ls->session_number }}
+                                                            </p>
+                                                            <p class="text-xs text-gray-500 mt-0.5 flex flex-wrap items-center gap-2">
+                                                                @if($ls->date)
+                                                                    <span><i class="fas fa-calendar-alt mr-1"></i>{{ \Carbon\Carbon::parse($ls->date)->format('d M Y') }}</span>
+                                                                @endif
+                                                                @if($ls->start_time)
+                                                                    <span><i class="fas fa-clock mr-1"></i>{{ \Carbon\Carbon::parse($ls->start_time)->format('h:i A') }}</span>
+                                                                @endif
+                                                                @if($ls->duration_minutes)
+                                                                    <span><i class="fas fa-hourglass-half mr-1"></i>{{ $ls->duration_minutes }} mins</span>
+                                                                @endif
+                                                                @if($hlIsToday && !$hlIsLive)
+                                                                    <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 text-[10px] font-bold">TODAY</span>
+                                                                @endif
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="flex items-center gap-2 flex-shrink-0">
+                                                        @if($hlIsLive)
+                                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-100 border border-red-300 rounded-lg text-xs font-bold text-red-700">
+                                                                <span class="w-2 h-2 rounded-full bg-red-500 animate-ping inline-block"></span> LIVE NOW
+                                                            </span>
+                                                            <a href="{{ route('instructor.live_session.go_live', ['course' => $course->id, 'session' => $ls->session_number]) }}"
+                                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold hover:bg-red-700 transition-all">
+                                                                <i class="fas fa-broadcast-tower text-[10px]"></i> Manage Stream
+                                                            </a>
+                                                        @elseif($hlInWindow)
+                                                            <a href="{{ route('instructor.live_session.go_live', ['course' => $course->id, 'session' => $ls->session_number]) }}"
+                                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition-all">
+                                                                <i class="fas fa-broadcast-tower text-[10px]"></i> Go Live
+                                                            </a>
+                                                        @else
+                                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-400 rounded-lg text-xs font-medium cursor-not-allowed"
+                                                                  title="{{ $hlWindowMsg }}">
+                                                                <i class="fas fa-lock text-[10px]"></i> Go Live
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="px-5 py-6 text-center bg-white">
+                                            <p class="text-sm text-gray-400">No live classes scheduled yet.</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
+
+                            {{-- ── Lectures / Sessions list ── --}}
                             @if(count($modules) > 0)
                                 <div class="space-y-3">
                                     @foreach ($modules as $module)
                                         @php
                                             $status      = $module['status'] ?? 'scheduled';
                                             $sessionDate = $module['date'] ?? null;
-                                            $isToday     = $sessionDate && \Carbon\Carbon::parse($sessionDate)->isToday();
+                                            $sessionTime = $module['start_time'] ?? null;
+                                            $isToday     = $sessionDate && \Carbon\Carbon::parse(\Carbon\Carbon::parse($sessionDate)->toDateString())->isToday();
                                             $isLiveNow   = $isLiveCourse && $status === 'live';
                                             $isEnded     = $isLiveCourse && $status === 'ended';
+
+                                            $inGoLiveWindow = false;
+                                            $goLiveWindowMsg = '';
+                                            if ($sessionDate && $sessionTime) {
+                                                $scheduledStart  = \Carbon\Carbon::parse(\Carbon\Carbon::parse($sessionDate)->toDateString() . ' ' . $sessionTime);
+                                                $goLiveWindowEnd = $scheduledStart->copy()->addMinutes(30);
+                                                $inGoLiveWindow  = now()->between($scheduledStart, $goLiveWindowEnd);
+                                                if (now()->lt($scheduledStart)) {
+                                                    $goLiveWindowMsg = 'Go live opens at ' . $scheduledStart->format('h:i A') . ' on ' . $scheduledStart->format('d M Y');
+                                                } elseif (now()->gt($goLiveWindowEnd)) {
+                                                    $goLiveWindowMsg = 'Go-live window passed (' . $scheduledStart->format('h:i A') . ' to ' . $goLiveWindowEnd->format('h:i A') . ')';
+                                                }
+                                            } elseif (!$sessionTime) {
+                                                $goLiveWindowMsg = 'Set a start time to enable Go Live';
+                                            } else {
+                                                $goLiveWindowMsg = 'Schedule this session first';
+                                            }
                                         @endphp
 
                                         <div class="module-item group flex items-center justify-between p-4 border rounded-xl transition-all duration-200 bg-white opacity-0 animate-slide-in
@@ -168,11 +302,8 @@
                                                             : 'Lecture ' . $module['id'] }}
                                                     </h4>
 
-                                                    <!-- Status badges -->
                                                     <div class="flex flex-wrap gap-2">
-
                                                         @if($isLiveCourse)
-                                                            {{-- Live course: session status badge only, no quiz/resource badges --}}
                                                             @if($isLiveNow)
                                                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-100 border border-red-300 rounded-lg text-xs font-bold text-red-700">
                                                                     <span class="w-2 h-2 rounded-full bg-red-500 animate-ping inline-block"></span>
@@ -187,13 +318,21 @@
                                                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 border border-indigo-200 rounded-lg text-xs font-semibold text-indigo-700">
                                                                         <i class="fas fa-calendar-alt"></i>
                                                                         {{ \Carbon\Carbon::parse($sessionDate)->format('d M Y') }}
+                                                                        @if($module['start_time'] ?? null)
+                                                                            · {{ \Carbon\Carbon::parse($module['start_time'])->format('h:i A') }}
+                                                                        @endif
                                                                         @if($isToday)
                                                                             <span class="font-bold text-indigo-600">· Today</span>
                                                                         @endif
                                                                     </span>
+                                                                    @if($module['duration'] ?? null)
+                                                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold text-gray-500">
+                                                                            <i class="fas fa-clock"></i> {{ $module['duration'] }} mins
+                                                                        </span>
+                                                                    @endif
                                                                 @else
-                                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold text-gray-400">
-                                                                        <i class="fas fa-calendar-alt"></i> Not scheduled
+                                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-lg text-xs font-semibold text-amber-600">
+                                                                        <i class="fas fa-calendar-times"></i> Not scheduled yet
                                                                     </span>
                                                                 @endif
                                                             @endif
@@ -228,16 +367,29 @@
                                                                 </div>
                                                             @endif
                                                         @endif
-
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <!-- Right: Action Buttons -->
-                                            <div class="flex gap-2 flex-shrink-0">
+                                            <div class="flex gap-2 flex-shrink-0 ml-3">
 
                                                 @if($isLiveCourse)
-                                                    {{-- ── LIVE COURSE: status-driven buttons only, no quiz/resource upload ── --}}
+                                                    @if(($isAdmin || $isInstructor) && !$isLiveNow && !$isEnded)
+                                                        <button
+                                                            onclick="openScheduleModal(
+                                                                {{ $module['id'] }},
+                                                                '{{ addslashes($module['title'] ?? 'Session ' . $module['id']) }}',
+                                                                '{{ $module['date'] ?? '' }}',
+                                                                '{{ $module['start_time'] ?? '' }}',
+                                                                '{{ $module['duration'] ?? '' }}'
+                                                            )"
+                                                            class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 text-gray-600 rounded-lg font-medium hover:bg-indigo-50 hover:border-indigo-400 hover:text-indigo-700 transition-all text-sm"
+                                                            title="Edit Schedule">
+                                                            <i class="fas fa-calendar-edit text-xs"></i>
+                                                            <span class="hidden sm:inline">Schedule</span>
+                                                        </button>
+                                                    @endif
 
                                                     @if($isLiveNow)
                                                         @if($isInstructor || $isAdmin)
@@ -251,24 +403,21 @@
                                                                 <i class="fas fa-circle text-xs animate-ping"></i> Join Live
                                                             </a>
                                                         @endif
-
                                                     @elseif($isEnded)
                                                         <a href="{{ route('student.live_session.watch', ['course' => $course->id, 'session' => $module['id']]) }}"
                                                            class="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-800 transition-all text-sm">
                                                             <i class="fas fa-play text-xs"></i> Watch Recording
                                                         </a>
-
                                                     @else
-                                                        {{-- Scheduled but not yet started --}}
                                                         @if($isInstructor || $isAdmin)
-                                                            @if($isToday)
+                                                            @if($inGoLiveWindow)
                                                                 <a href="{{ route('instructor.live_session.go_live', ['course' => $course->id, 'session' => $module['id']]) }}"
                                                                    class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-all text-sm">
                                                                     <i class="fas fa-broadcast-tower text-xs"></i> Go Live
                                                                 </a>
                                                             @else
                                                                 <span class="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-100 text-gray-400 rounded-lg font-medium text-sm cursor-not-allowed"
-                                                                      title="Available on {{ $sessionDate ? \Carbon\Carbon::parse($sessionDate)->format('d M Y') : 'TBD' }}">
+                                                                      title="{{ $goLiveWindowMsg }}">
                                                                     <i class="fas fa-lock text-xs"></i> Go Live
                                                                 </span>
                                                             @endif
@@ -280,7 +429,7 @@
                                                     @endif
 
                                                 @else
-                                                    {{-- ── RECORDED COURSE ACTIONS ── --}}
+                                                    {{-- Recorded course actions --}}
                                                     <a href="{{ route('inside.module2', ['courseId' => $course->id, 'moduleNumber' => $module['id']]) }}"
                                                        class="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-800 transition-all hover:shadow-md text-sm">
                                                         <i class="fas fa-eye text-xs"></i> View
@@ -319,7 +468,8 @@
 
                     <!-- Back Button -->
                     <div class="flex justify-start">
-                        <a href="javascript:history.back()" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-teal-700 rounded-lg font-medium hover:bg-teal-50 hover:border-gray-900 transition-all shadow-sm hover:shadow-md">
+                        <a href="javascript:history.back()"
+                           class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-teal-700 rounded-lg font-medium hover:bg-teal-50 hover:border-gray-900 transition-all shadow-sm hover:shadow-md">
                             <i class="fas fa-arrow-left text-sm"></i>
                             <span>Back</span>
                         </a>
@@ -327,6 +477,67 @@
                 </div>
             </main>
         </div>
+
+        <!-- ── Edit Schedule Modal ─────────────────────────────────────────── -->
+        <div id="schedule-modal">
+            <div class="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-md mx-4 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-calendar-edit text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-gray-900">Edit Session Schedule</h3>
+                            <p id="modal-session-title" class="text-xs text-gray-500 mt-0.5"></p>
+                        </div>
+                    </div>
+                    <button onclick="closeScheduleModal()"
+                            class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+
+                <form id="schedule-form" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <div class="p-6 space-y-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                                <i class="fas fa-calendar-alt text-indigo-500 mr-1"></i> Session Date
+                            </label>
+                            <input type="date" name="date" id="modal-date" required
+                                   class="modal-input w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 bg-white transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                                <i class="fas fa-clock text-indigo-500 mr-1"></i> Start Time
+                            </label>
+                            <input type="time" name="start_time" id="modal-start-time"
+                                   class="modal-input w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 bg-white transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                                <i class="fas fa-hourglass-half text-indigo-500 mr-1"></i> Duration (minutes)
+                            </label>
+                            <input type="number" name="duration_minutes" id="modal-duration"
+                                   min="15" max="480" placeholder="e.g. 60"
+                                   class="modal-input w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 bg-white transition-all">
+                        </div>
+                    </div>
+                    <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-3">
+                        <button type="button" onclick="closeScheduleModal()"
+                                class="px-4 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-all">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="px-5 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-all flex items-center gap-2">
+                            <i class="fas fa-save"></i> Save Schedule
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     @else
         <div class="flex items-center justify-center min-h-screen p-4">
             <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden max-w-md w-full">
@@ -343,5 +554,33 @@
             </div>
         </div>
     @endauth
+
+    <script>
+        const SCHEDULE_BASE = "{{ url($isAdmin ? 'admin_panel' : 'instructor') }}/manage_resources/{{ $course->id }}/session";
+
+        function openScheduleModal(sessionId, title, date, startTime, duration) {
+            document.getElementById('modal-session-title').textContent = title;
+            document.getElementById('modal-date').value       = date      || '';
+            document.getElementById('modal-start-time').value = startTime ? startTime.substring(0, 5) : '';
+            document.getElementById('modal-duration').value   = duration  || '';
+            document.getElementById('schedule-form').action   = `${SCHEDULE_BASE}/${sessionId}/schedule`;
+            document.getElementById('schedule-modal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeScheduleModal() {
+            document.getElementById('schedule-modal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('schedule-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeScheduleModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeScheduleModal();
+        });
+    </script>
+
 </body>
 </html>

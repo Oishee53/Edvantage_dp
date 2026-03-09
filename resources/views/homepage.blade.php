@@ -687,12 +687,12 @@
     <!-- Header -->
     <div style="padding:15px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f3f4f6;flex-shrink:0;">
         <div style="display:flex;align-items:center;gap:10px;">
-            <div style="width:36px;height:36px;background:linear-gradient(135deg,#0d9488,#14b8a6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">🤖</div>
+
             <div>
                 <div style="font-size:14px;font-weight:700;color:#111827;">Edvantage Assistant</div>
                 <div style="font-size:11px;color:#6b7280;display:flex;align-items:center;gap:4px;margin-top:1px;">
                     <span style="width:6px;height:6px;background:#22c55e;border-radius:50%;display:inline-block;flex-shrink:0;"></span>
-                    Online · here to help
+                    Online 
                 </div>
             </div>
         </div>
@@ -776,10 +776,10 @@
     function cbShowWelcome() {
         var el = document.getElementById('cb-messages');
         el.innerHTML = '<div style="padding:4px 0;">' +
-            '<p style="font-size:13.5px;color:#374151;line-height:1.65;margin-bottom:14px;">Want to chat? <strong style="color:#111827;">I\'m an AI chatbot</strong> here to help you find your way.</p>' +
+            '<p style="font-size:13.5px;color:#374151;line-height:1.65;margin-bottom:14px;"> <strong style="color:#111827;">I\'m an AI chatbot</strong> here to help you find your way.</p>' +
             '<div style="display:flex;flex-wrap:wrap;gap:8px;">' +
             '<button class="cb-pill-btn" onclick="cbAsk(\'I need support\')">I need Support</button>' +
-            '<button class="cb-pill-btn" onclick="cbAsk(\'Get started for free\')">Get started for Free</button>' +
+            '<button class="cb-pill-btn" onclick="cbAsk(\'Show me all courses you have\')">Show me all courses you have</button>' +
             '<button class="cb-pill-btn" onclick="cbAsk(\'Show me popular courses\')">Popular Courses</button>' +
             '<button class="cb-pill-btn" onclick="cbAsk(\'How does the platform work?\')">How it works</button>' +
             '</div></div>';
