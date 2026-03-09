@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\PendingCourses;
-use App\Models\LiveSession;
 use App\Models\CourseLiveSession;
+use App\Models\Enrollment;
+use App\Models\LiveSession;
+use App\Models\PendingCourses;
+use App\Models\User;
+use App\Notifications\LiveClassScheduledNotification;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Log;
 
 class LiveSessionController extends Controller
@@ -100,29 +104,36 @@ class LiveSessionController extends Controller
                                     ->where('session_number', $session_number)
                                     ->firstOrFail();
 
-        // Allow going live 1 hour before the scheduled date, up to end of day
-        if ($session->date) {
-            $sessionDate = $session->date instanceof \Carbon\Carbon
-                ? $session->date
-                : \Carbon\Carbon::parse($session->date);
+        if ($session->status === 'ended') {
+            return back()->with('error', 'This session has already ended.');
+        }
 
-            $goLiveFrom  = $sessionDate->copy()->startOfDay()->subHour();
-            $goLiveUntil = $sessionDate->copy()->endOfDay();
+        // Enforce go-live window: only from scheduled start_time up to 30 mins after
+        if ($session->date && $session->start_time) {
+            $scheduledStart = \Carbon\Carbon::parse(
+    \Carbon\Carbon::parse($session->date)->toDateString() . ' ' . $session->start_time
+);
+            $goLiveUntil    = $scheduledStart->copy()->addMinutes(30);
 
-            if (now()->lt($goLiveFrom)) {
-                return back()->with('error', 'You can go live from '
-                    . $goLiveFrom->format('d M Y, h:i A')
-                    . ' (1 hour before session day).');
+            if (now()->lt($scheduledStart)) {
+                return back()->with('error',
+                    'This session is scheduled for '
+                    . $scheduledStart->format('d M Y \a\t h:i A')
+                    . '. You can go live starting from that time.');
             }
 
             if (now()->gt($goLiveUntil)) {
-                return back()->with('error', 'The scheduled date for this session was '
-                    . $sessionDate->format('d M Y') . '. Please reschedule to go live.');
+                return back()->with('error',
+                    'The go-live window for this session has passed ('
+                    . $scheduledStart->format('h:i A') . ' – '
+                    . $goLiveUntil->format('h:i A') . '). Please reschedule.');
             }
-        }
-
-        if ($session->status === 'ended') {
-            return back()->with('error', 'This session has already ended.');
+        } elseif ($session->date && !$session->start_time) {
+            return back()->with('error',
+                'Please set a start time for this session before going live.');
+        } else {
+            return back()->with('error',
+                'Please schedule this session (date + start time) before going live.');
         }
 
         // Generate a stable peer ID for this session
@@ -210,5 +221,40 @@ class LiveSessionController extends Controller
         $peerId = $session->daily_room_name;
 
         return view('Student.watch_live', compact('session', 'peerId', 'course_id', 'session_number'));
+    }
+
+        public function storeLiveHybridClass(Request $request)
+    {
+        $request->validate([
+            'course_id'        => 'required|exists:courses,id',
+            'title'            => 'required|string|max:255',
+            'date'             => 'required|date|after_or_equal:today',
+            'start_time'       => 'required|date_format:H:i',
+            'duration_minutes' => 'required|integer|min:15|max:480',
+        ]);
+
+        // Auto-assign next session_number for this course
+        $nextNumber = CourseLiveSession::where('course_id', $request->course_id)
+            ->max('session_number') + 1;
+
+        $session = CourseLiveSession::create([
+            'course_id'        => $request->course_id,
+            'session_number'   => $nextNumber,
+            'title'            => $request->title,
+            'date'             => $request->date,
+            'start_time'       => $request->start_time,
+            'duration_minutes' => $request->duration_minutes,
+            'status'           => 'scheduled',
+        ]);
+
+        // Notify enrolled students
+        $studentIds = Enrollment::where('course_id', $request->course_id)->pluck('user_id');
+        $students   = User::whereIn('id', $studentIds)->get();
+
+        if ($students->isNotEmpty()) {
+            Notification::send($students, new LiveClassScheduledNotification($session));
+        }
+
+        return back()->with('success', 'Live class scheduled successfully.');
     }
 }

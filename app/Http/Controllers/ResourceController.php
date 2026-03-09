@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Models\CourseLiveSession;
 use App\Models\Quiz;
 use App\Models\Courses;
 use App\Models\Resource;
@@ -56,6 +56,8 @@ public function showModules($course_id)
                 'status'   => $session?->status ?? 'scheduled',
                 'date'     => $session?->date,
                 'title'    => $session?->title,
+                'start_time' => $session?->start_time,        // ← add this
+                'duration'   => $session?->duration_minutes,
             ];
         }
 
@@ -65,6 +67,7 @@ public function showModules($course_id)
     // ── RECORDED COURSE ───────────────────────────────────────────────────────
     $quizModules     = collect();
     $resourceModules = collect();
+    $liveSessions = CourseLiveSession::where('course_id', $course_id)->get();
 
     if ($user->role === 3) {
         $quizModules = DB::table('quizzes')
@@ -101,7 +104,7 @@ public function showModules($course_id)
         ];
     }
 
-    return view('Resources.show_modules', compact('course', 'modules'));
+    return view('Resources.show_modules', compact('course', 'modules', 'liveSessions'));
 }
 
 

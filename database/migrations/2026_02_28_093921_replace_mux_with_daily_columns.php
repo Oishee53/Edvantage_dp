@@ -9,30 +9,24 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        // ── live_sessions ─────────────────────────────────────────────────────
-        Schema::table('live_sessions', function (Blueprint $table) {
-            // Drop Mux columns
-            $table->dropColumn(['mux_stream_id', 'mux_playback_id', 'mux_asset_id']);
+   public function up()
+{
+    Schema::table('live_sessions', function (Blueprint $table) {
 
-            // Add Daily + recording columns
-            $table->string('daily_room_name')->nullable()->after('pdf');
-            $table->string('daily_room_url')->nullable()->after('daily_room_name');
-            $table->string('recording_url')->nullable()->after('daily_room_url');
-        });
+        if (Schema::hasColumn('live_sessions', 'mux_stream_id')) {
+            $table->dropColumn('mux_stream_id');
+        }
 
-        // ── course_live_sessions ──────────────────────────────────────────────
-        Schema::table('course_live_sessions', function (Blueprint $table) {
-            // Drop Mux columns
-            $table->dropColumn(['mux_stream_id', 'mux_playback_id', 'mux_asset_id']);
+        if (Schema::hasColumn('live_sessions', 'mux_playback_id')) {
+            $table->dropColumn('mux_playback_id');
+        }
 
-            // Add Daily + recording columns
-            $table->string('daily_room_name')->nullable()->after('pdf');
-            $table->string('daily_room_url')->nullable()->after('daily_room_name');
-            $table->string('recording_url')->nullable()->after('daily_room_url');
-        });
-    }
+        if (Schema::hasColumn('live_sessions', 'mux_asset_id')) {
+            $table->dropColumn('mux_asset_id');
+        }
+
+    });
+}
 
     public function down(): void
     {

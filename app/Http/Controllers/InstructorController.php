@@ -143,26 +143,7 @@ public function showRejectedCourses()
 }
 public function liveClassForm($course_id)
 {
-    return view('courses.live_class_schedule', compact('course_id'));
+    $course = \App\Models\Courses::findOrFail($course_id);
+    return view('courses.live_class_schedule', compact('course', 'course_id'));
 }
-public function storeLiveClass(Request $request)
-{
-    $liveClass = LiveClass::create([
-        'course_id' => $request->course_id,
-        'instructor_id' => auth()->id(),
-        'title' => $request->title,
-        'schedule_datetime' => $request->schedule_datetime,
-        'meeting_link' => $request->meeting_link,
-    ]);
-
-    $students = Enrollment::where('course_id', $request->course_id)
-        ->pluck('user_id');
-
-    $users = User::whereIn('id', $students)->get();
-
-    Notification::send($users, new LiveClassScheduledNotification($liveClass));
-
-    return back()->with('success', 'Live class scheduled successfully.');
-}
-
 }
