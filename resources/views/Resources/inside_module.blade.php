@@ -15,7 +15,7 @@
         * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
         .heading-font { font-family: 'Playfair Display', Georgia, serif; }
         body { background: #f9fafb; letter-spacing: -0.01em; }
-        .main-container { display: grid; grid-template-columns: 1fr 380px; gap: 2rem; max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem; }
+        .main-container { display: grid; grid-template-columns: 1fr 360px; gap: 2rem; max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem; }
         .video-section { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
         .video-placeholder { width: 100%; aspect-ratio: 16/9; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #0d7377 0%, #14b8a6 100%); color: white; }
         .play-overlay { width: 80px; height: 80px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; margin-bottom: 1rem; }
@@ -60,63 +60,424 @@
         .empty-title { font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
         .empty-text { color: #6b7280; font-size: 0.95rem; font-weight: 500; }
 
-        /* NOTEBOOK SIDEBAR */
-        .notebook-sidebar { position: sticky; top: 2rem; height: calc(100vh - 6rem); display: flex; flex-direction: column; background: white; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
-        .nb-header { background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%); padding: 16px 18px; flex-shrink: 0; }
-        .nb-header-top { display: flex; align-items: center; justify-content: space-between; }
-        .nb-title { display: flex; align-items: center; gap: 10px; }
-        .nb-avatar { width: 34px; height: 34px; background: rgba(255,255,255,0.2); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 15px; color: white; }
-        .nb-title h3 { color: white; font-weight: 700; font-size: 15px; margin: 0; }
-        .nb-title p { color: rgba(255,255,255,0.7); font-size: 11px; margin: 0; }
-        .nb-upload-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all 0.2s; }
-        .nb-upload-btn:hover { background: rgba(255,255,255,0.28); }
-        .nb-docs-bar { background: linear-gradient(135deg, #0f766e, #0d9488); padding: 8px 14px; display: flex; flex-wrap: wrap; gap: 5px; flex-shrink: 0; border-top: 1px solid rgba(255,255,255,0.15); }
-        .nb-doc-pill { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 100px; padding: 3px 8px; display: flex; align-items: center; gap: 5px; font-size: 11px; color: white; font-weight: 500; }
-        .nb-doc-pill .del { cursor: pointer; opacity: 0.6; transition: opacity 0.15s; font-size: 10px; }
-        .nb-doc-pill .del:hover { opacity: 1; }
-        .nb-doc-pill.processing { opacity: 0.6; }
-        .nb-messages { flex: 1; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
-        .nb-welcome { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; color: #9ca3af; }
-        .nb-welcome-icon { width: 52px; height: 52px; background: linear-gradient(135deg, #ccfbf1, #99f6e4); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 12px; box-shadow: 0 4px 16px rgba(13,148,136,0.15); }
-        .nb-welcome h4 { font-size: 15px; font-weight: 700; color: #1f2937; margin: 0 0 6px; }
-        .nb-welcome p { font-size: 12px; line-height: 1.5; margin: 0; }
-        .nb-suggestions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 14px; }
-        .nb-pill { background: white; border: 1px solid #e5e7eb; border-radius: 100px; padding: 5px 11px; font-size: 11px; cursor: pointer; transition: all 0.15s; color: #374151; font-weight: 500; }
-        .nb-pill:hover { border-color: #0d9488; color: #0d9488; background: #f0fdfa; }
-        .nb-msg-row { display: flex; gap: 8px; animation: nbSlide 0.25s ease; }
-        @keyframes nbSlide { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .nb-msg-row.user { flex-direction: row-reverse; }
-        .nb-msg-avatar { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
-        .nb-msg-avatar.user { background: #0d9488; color: white; }
-        .nb-msg-avatar.ai { background: #1a1a2e; color: white; font-size: 10px; }
-        .nb-bubble { padding: 9px 12px; border-radius: 12px; font-size: 13px; line-height: 1.6; max-width: calc(100% - 40px); }
-        .nb-bubble.user { background: #0d9488; color: white; border-bottom-right-radius: 3px; }
-        .nb-bubble.ai { background: #f9fafb; border: 1px solid #e5e7eb; color: #1f2937; border-bottom-left-radius: 3px; }
-        .nb-bubble.ai strong { color: #0f766e; }
-        .nb-bubble.ai ul, .nb-bubble.ai ol { margin: 5px 0 5px 16px; }
-        .nb-bubble.ai li { margin-bottom: 2px; }
-        .nb-sources-toggle { font-size: 10px; color: #0d9488; cursor: pointer; margin-top: 5px; display: inline-flex; align-items: center; gap: 3px; font-weight: 600; }
-        .nb-sources-panel { margin-top: 5px; background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 8px; padding: 8px 10px; font-size: 11px; color: #4b5563; line-height: 1.5; }
-        .nb-typing { display: flex; gap: 4px; padding: 10px 14px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; border-bottom-left-radius: 3px; width: fit-content; }
-        .nb-dot { width: 6px; height: 6px; background: #9ca3af; border-radius: 50%; animation: nbBounce 1.2s infinite; }
-        .nb-dot:nth-child(2) { animation-delay: 0.2s; }
-        .nb-dot:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes nbBounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
-        .nb-input-bar { padding: 12px 14px; border-top: 1px solid #f3f4f6; flex-shrink: 0; background: white; }
-        .nb-input-wrap { display: flex; align-items: flex-end; gap: 8px; background: #f9fafb; border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 8px 10px; transition: border-color 0.2s; }
-        .nb-input-wrap:focus-within { border-color: #0d9488; }
-        .nb-textarea { flex: 1; border: none; background: transparent; outline: none; font-family: 'Inter', sans-serif; font-size: 13px; color: #1f2937; resize: none; line-height: 1.5; max-height: 100px; overflow-y: auto; }
-        .nb-textarea::placeholder { color: #9ca3af; }
-        .nb-send { width: 32px; height: 32px; background: #0d9488; color: white; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: background 0.15s; flex-shrink: 0; }
-        .nb-send:hover { background: #0f766e; }
-        .nb-send:disabled { background: #d1d5db; cursor: not-allowed; }
-        .nb-hint { text-align: center; font-size: 10px; color: #9ca3af; margin-top: 6px; }
-        .nb-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .nb-modal { background: white; border-radius: 18px; padding: 24px; width: 420px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
-        .nb-messages::-webkit-scrollbar { width: 4px; }
+        /* ============================================================
+           REDESIGNED AI NOTEBOOK SIDEBAR
+        ============================================================ */
+        .notebook-sidebar {
+            position: sticky;
+            top: 2rem;
+            height: calc(100vh - 6rem);
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        /* --- Header --- */
+        .nb-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fff;
+        }
+        .nb-icon-wrap {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #0d7377, #14b8a6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .nb-icon-wrap i { color: white; font-size: 15px; }
+        .nb-header-text { flex: 1; }
+        .nb-header-text h3 { font-size: 14px; font-weight: 700; color: #111827; margin: 0 0 1px; letter-spacing: -0.01em; }
+        .nb-header-text p { font-size: 11px; color: #9ca3af; margin: 0; font-weight: 500; }
+        .nb-status-dot {
+            width: 7px; height: 7px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(34,197,94,0.2);
+        }
+
+        /* --- Docs bar --- */
+        .nb-docs-bar {
+            padding: 8px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            background: #fafafa;
+            border-bottom: 1px solid #f3f4f6;
+            flex-shrink: 0;
+        }
+        .nb-doc-pill {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 100px;
+            padding: 3px 9px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #374151;
+            font-weight: 500;
+        }
+        .nb-doc-pill i { color: #0d7377; font-size: 9px; }
+        .nb-doc-pill .del {
+            cursor: pointer;
+            color: #9ca3af;
+            font-size: 10px;
+            transition: color 0.15s;
+            margin-left: 2px;
+        }
+        .nb-doc-pill .del:hover { color: #ef4444; }
+        .nb-doc-pill.processing { opacity: 0.55; }
+
+        /* --- Messages area --- */
+        .nb-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            scroll-behavior: smooth;
+        }
+        .nb-messages::-webkit-scrollbar { width: 3px; }
         .nb-messages::-webkit-scrollbar-track { background: transparent; }
         .nb-messages::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
-        @media (max-width: 1024px) { .main-container { grid-template-columns: 1fr; } .notebook-sidebar { position: static; height: 600px; } }
+
+        /* --- Welcome state --- */
+        .nb-welcome {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 12px 8px;
+        }
+        .nb-welcome-glyph {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            border: 1px solid #99f6e4;
+        }
+        .nb-welcome-glyph i { color: #0d9488; font-size: 20px; }
+        .nb-welcome h4 { font-size: 14px; font-weight: 700; color: #111827; margin: 0 0 6px; letter-spacing: -0.01em; }
+        .nb-welcome p { font-size: 12px; color: #6b7280; line-height: 1.6; margin: 0 0 18px; font-weight: 400; }
+        .nb-suggestions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+        .nb-pill {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 6px 11px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: #374151;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+        .nb-pill:hover { border-color: #0d9488; color: #0d9488; background: #f0fdfa; }
+
+        /* --- Message rows --- */
+        .nb-msg-group { display: flex; flex-direction: column; gap: 2px; }
+        .nb-msg-row { display: flex; gap: 10px; }
+        .nb-msg-row.user { flex-direction: row-reverse; }
+        @keyframes nbFadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .nb-msg-row { animation: nbFadeUp 0.2s ease; }
+
+        .nb-msg-avatar {
+            width: 26px; height: 26px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .nb-msg-avatar.user { background: #0d7377; color: white; font-size: 11px; }
+        .nb-msg-avatar.ai { background: #111827; color: white; }
+        .nb-msg-avatar.ai i { font-size: 10px; }
+
+        .nb-bubble {
+            padding: 10px 13px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.65;
+            max-width: calc(100% - 40px);
+            word-break: break-word;
+        }
+        .nb-bubble.user {
+            background: #0d7377;
+            color: white;
+            border-bottom-right-radius: 3px;
+            font-weight: 400;
+        }
+        .nb-bubble.ai {
+            background: #f9fafb;
+            border: 1px solid #e9ecef;
+            color: #1f2937;
+            border-bottom-left-radius: 3px;
+        }
+        .nb-bubble.ai strong { color: #0d7377; font-weight: 600; }
+        .nb-bubble.ai ul, .nb-bubble.ai ol { margin: 6px 0 6px 16px; }
+        .nb-bubble.ai li { margin-bottom: 3px; }
+
+        /* --- Sources --- */
+        .nb-sources-toggle {
+            font-size: 10.5px;
+            color: #0d9488;
+            cursor: pointer;
+            margin-top: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+        .nb-sources-toggle:hover { color: #0f766e; }
+        .nb-sources-panel {
+            margin-top: 6px;
+            background: #f0fdfa;
+            border: 1px solid #ccfbf1;
+            border-radius: 8px;
+            padding: 9px 11px;
+            font-size: 11px;
+            color: #374151;
+            line-height: 1.55;
+        }
+
+        /* --- Typing indicator --- */
+        .nb-typing {
+            display: flex;
+            gap: 4px;
+            padding: 11px 14px;
+            background: #f9fafb;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            border-bottom-left-radius: 3px;
+            width: fit-content;
+            animation: nbFadeUp 0.2s ease;
+        }
+        .nb-dot { width: 5px; height: 5px; background: #9ca3af; border-radius: 50%; animation: nbBounce 1.3s infinite; }
+        .nb-dot:nth-child(2) { animation-delay: 0.18s; }
+        .nb-dot:nth-child(3) { animation-delay: 0.36s; }
+        @keyframes nbBounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+
+        /* --- Input bar --- */
+        .nb-input-bar {
+            padding: 12px 16px;
+            border-top: 1px solid #f3f4f6;
+            flex-shrink: 0;
+            background: #fff;
+        }
+        .nb-input-row { display: flex; align-items: flex-end; gap: 8px; }
+        .nb-upload-trigger {
+            width: 34px; height: 34px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            flex-shrink: 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .nb-upload-trigger:hover { background: #f0fdfa; border-color: #0d9488; color: #0d9488; }
+        .nb-input-wrap {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            background: #f9fafb;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 11px;
+            padding: 8px 10px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .nb-input-wrap:focus-within {
+            border-color: #0d7377;
+            box-shadow: 0 0 0 3px rgba(13,115,119,0.08);
+            background: #fff;
+        }
+        .nb-textarea {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: #1f2937;
+            resize: none;
+            line-height: 1.55;
+            max-height: 96px;
+            overflow-y: auto;
+            font-weight: 400;
+        }
+        .nb-textarea::placeholder { color: #b0b7c3; }
+        .nb-send {
+            width: 30px; height: 30px;
+            background: #0d7377;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            transition: background 0.15s, transform 0.1s;
+            flex-shrink: 0;
+        }
+        .nb-send:hover { background: #0a5c5f; }
+        .nb-send:active { transform: scale(0.93); }
+        .nb-send:disabled { background: #d1d5db; cursor: not-allowed; transform: none; }
+        .nb-hint { text-align: center; font-size: 10px; color: #b0b7c3; margin-top: 7px; font-weight: 400; }
+
+        /* --- Upload Modal --- */
+        .nb-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .nb-modal {
+            background: white;
+            border-radius: 16px;
+            padding: 26px;
+            width: 400px;
+            max-width: 95vw;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.15);
+            border: 1px solid #e5e7eb;
+        }
+        .nb-modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+        .nb-modal-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
+            border-radius: 11px;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid #99f6e4;
+        }
+        .nb-modal-icon i { color: #0d7377; font-size: 16px; }
+        .nb-modal-header h3 { font-size: 15px; font-weight: 700; color: #111827; margin: 0; letter-spacing: -0.01em; }
+        .nb-modal-header p { font-size: 12px; color: #9ca3af; margin: 0; }
+        .nb-modal-close {
+            margin-left: auto;
+            width: 28px; height: 28px;
+            border-radius: 7px;
+            border: 1px solid #e5e7eb;
+            background: #f9fafb;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: #6b7280;
+            font-size: 13px;
+            transition: all 0.15s;
+        }
+        .nb-modal-close:hover { background: #fef2f2; border-color: #fecaca; color: #ef4444; }
+        .nb-field-label { font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 6px; display: block; letter-spacing: -0.01em; }
+        .nb-field-input {
+            width: 100%;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 9px;
+            padding: 9px 12px;
+            font-size: 13px;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            color: #1f2937;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+            font-weight: 400;
+        }
+        .nb-field-input:focus { border-color: #0d7377; box-shadow: 0 0 0 3px rgba(13,115,119,0.08); }
+        .nb-field-input::placeholder { color: #b0b7c3; }
+        .nb-progress-wrap { margin-bottom: 16px; }
+        .nb-progress-label { display: flex; justify-content: space-between; font-size: 11px; color: #6b7280; margin-bottom: 5px; font-weight: 500; }
+        .nb-progress-bar { height: 4px; background: #f3f4f6; border-radius: 100px; overflow: hidden; }
+        .nb-progress-fill { height: 100%; background: linear-gradient(90deg, #0d7377, #14b8a6); border-radius: 100px; transition: width 0.4s ease; }
+        .nb-modal-info {
+            background: #f0fdfa;
+            border: 1px solid #ccfbf1;
+            border-radius: 9px;
+            padding: 10px 12px;
+            margin-bottom: 18px;
+            font-size: 11.5px;
+            color: #0f766e;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            font-weight: 500;
+        }
+        .nb-modal-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 9px;
+            padding: 10px 12px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: #991b1b;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        .nb-modal-actions { display: flex; gap: 9px; }
+        .nb-btn-cancel {
+            flex: 1;
+            padding: 10px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4b5563;
+            cursor: pointer;
+            background: white;
+            transition: all 0.15s;
+        }
+        .nb-btn-cancel:hover { border-color: #d1d5db; background: #f9fafb; }
+        .nb-btn-upload {
+            flex: 1;
+            padding: 10px;
+            background: #0d7377;
+            color: white;
+            border: none;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .nb-btn-upload:hover { background: #0a5c5f; }
+        .nb-btn-upload:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        @media (max-width: 1024px) {
+            .main-container { grid-template-columns: 1fr; }
+            .notebook-sidebar { position: static; height: 580px; }
+        }
     </style>
 </head>
 <body class="min-h-screen px-20 pt-5">
@@ -262,36 +623,33 @@
                 </div>
             </div>
 
-            <!-- RIGHT SIDEBAR — AI NOTEBOOK -->
+            <!-- RIGHT SIDEBAR — AI NOTEBOOK (REDESIGNED) -->
             @auth
             <div x-data="notebookPanel()" x-init="init()" class="notebook-sidebar">
 
-                <!-- Header: just title + upload button, nothing else -->
+                <!-- Header -->
                 <div class="nb-header">
-                    <div class="nb-header-top">
-                        <div class="nb-title">
-                            <div class="nb-avatar">🤖</div>
-                            <div>
-                                <h3>AI Study Assistant</h3>
-                                <p>Powered by Gemini · Free</p>
-                            </div>
-                        </div>
-                        {{-- Hidden file input --}}
-                        <input type="file" x-ref="fileInput" accept=".pdf,.txt,.docx" style="display:none;" @change="handleFileSelect($event)">
-                        <button class="nb-upload-btn" @click="$refs.fileInput.click()">
-                            <i class="fas fa-file-upload"></i> Upload
-                        </button>
+                    <div class="nb-icon-wrap">
+                        <i class="fas fa-robot"></i>
                     </div>
+                    <div class="nb-header-text">
+                        <h3>AI Study Assistant</h3>
+                        <p>Powered by Gemini</p>
+                    </div>
+                    <div class="nb-status-dot" title="Online"></div>
                 </div>
+
+                <!-- Hidden file input -->
+                <input type="file" x-ref="fileInput" accept=".pdf,.txt,.docx" style="display:none;" @change="handleFileSelect($event)">
 
                 <!-- Doc pills — only visible when documents exist -->
                 <template x-if="documents.length > 0">
                     <div class="nb-docs-bar">
                         <template x-for="doc in documents" :key="doc.id">
                             <div class="nb-doc-pill" :class="{ processing: doc.status !== 'ready' }">
-                                <i :class="doc.file_type === 'pdf' ? 'fas fa-file-pdf' : 'fas fa-file-alt'" style="font-size:9px;"></i>
-                                <span x-text="doc.title.length > 16 ? doc.title.substring(0,16)+'…' : doc.title"></span>
-                                <span class="del" @click.stop="deleteDoc(doc.id)">✕</span>
+                                <i :class="doc.file_type === 'pdf' ? 'fas fa-file-pdf' : 'fas fa-file-alt'"></i>
+                                <span x-text="doc.title.length > 18 ? doc.title.substring(0,18)+'…' : doc.title"></span>
+                                <span class="del" @click.stop="deleteDoc(doc.id)"><i class="fas fa-times"></i></span>
                             </div>
                         </template>
                     </div>
@@ -301,33 +659,37 @@
                 <div class="nb-messages" x-ref="messages">
                     <template x-if="conversations.length === 0 && !isTyping">
                         <div class="nb-welcome">
-                            <div class="nb-welcome-icon">📚</div>
+                            <div class="nb-welcome-glyph">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
                             <h4>Ask About This Lecture</h4>
-                            <p>Type a question below. Upload your notes first for answers grounded in your own materials.</p>
+                            <p>Get instant answers, summaries, and study guides. Upload your notes to ground answers in your own materials.</p>
                             <div class="nb-suggestions">
-                                <div class="nb-pill" @click="ask('Summarize the key concepts')">💡 Key concepts</div>
-                                <div class="nb-pill" @click="ask('What should I focus on for the exam?')">🎯 Exam focus</div>
-                                <div class="nb-pill" @click="ask('Create a quick study guide')">📝 Study guide</div>
-                                <div class="nb-pill" @click="ask('Explain the most difficult topic')">🧠 Hard topics</div>
+                                <div class="nb-pill" @click="ask('Summarize the key concepts from this lecture')">Key concepts</div>
+                                <div class="nb-pill" @click="ask('What should I focus on for the exam?')">Exam focus</div>
+                                <div class="nb-pill" @click="ask('Create a quick study guide')">Study guide</div>
+                                <div class="nb-pill" @click="ask('Explain the most difficult topic in simple terms')">Hard topics</div>
                             </div>
                         </div>
                     </template>
 
                     <template x-for="(msg, i) in conversations" :key="i">
                         <div>
-                            <div class="nb-msg-row user" style="margin-bottom:8px;">
+                            <!-- User message -->
+                            <div class="nb-msg-row user" style="margin-bottom:10px;">
                                 <div class="nb-msg-avatar user">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
                                 <div class="nb-bubble user" x-text="msg.question"></div>
                             </div>
+                            <!-- AI message -->
                             <div class="nb-msg-row ai">
                                 <div class="nb-msg-avatar ai"><i class="fas fa-robot"></i></div>
-                                <div>
+                                <div style="max-width:calc(100% - 36px);">
                                     <div class="nb-bubble ai" x-html="fmt(msg.answer)"></div>
                                     <template x-if="msg.sources && msg.sources.length">
                                         <div>
                                             <div class="nb-sources-toggle" @click="msg.showSrc = !msg.showSrc">
-                                                <i :class="msg.showSrc ? 'fas fa-chevron-down' : 'fas fa-chevron-right'"></i>
-                                                <span x-text="msg.sources.length + ' source(s)'"></span>
+                                                <i :class="msg.showSrc ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" style="font-size:9px;"></i>
+                                                <span x-text="msg.sources.length + ' source' + (msg.sources.length > 1 ? 's' : '')"></span>
                                             </div>
                                             <div class="nb-sources-panel" x-show="msg.showSrc" x-transition>
                                                 <template x-for="(s, si) in msg.sources" :key="si">
@@ -356,84 +718,91 @@
 
                 <!-- Input bar -->
                 <div class="nb-input-bar">
-                    <div class="nb-input-wrap">
-                        <textarea class="nb-textarea" x-model="question" placeholder="Ask about this lecture..." rows="1"
-                            @keydown.enter.prevent="!$event.shiftKey && sendQuestion()"
-                            @input="autoResize($event)" :disabled="isTyping"></textarea>
-                        <button class="nb-send" @click="sendQuestion()" :disabled="!question.trim() || isTyping">
-                            <i class="fas fa-paper-plane"></i>
+                    <div class="nb-input-row">
+                        <!-- Plus / upload button — bottom left -->
+                        <button class="nb-upload-trigger" @click="$refs.fileInput.click()" title="Upload document">
+                            <i class="fas fa-plus"></i>
                         </button>
+                        <div class="nb-input-wrap">
+                            <textarea class="nb-textarea" x-model="question"
+                                placeholder="Ask anything about this lecture..."
+                                rows="1"
+                                @keydown.enter.prevent="!$event.shiftKey && sendQuestion()"
+                                @input="autoResize($event)"
+                                :disabled="isTyping"></textarea>
+                            <button class="nb-send" @click="sendQuestion()" :disabled="!question.trim() || isTyping">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
                     </div>
-                    <p class="nb-hint">Enter to send · Shift+Enter for new line</p>
+                    <p class="nb-hint">Enter to send &middot; Shift+Enter for new line</p>
                 </div>
 
-                <!-- Upload Modal inside x-data context -->
+                <!-- Upload Modal -->
                 <div class="nb-modal-overlay" x-show="showModal" x-transition
                      @click.self="closeModal()" @keydown.escape.window="showModal && closeModal()">
-                <div class="nb-modal" @click.stop>
+                    <div class="nb-modal" @click.stop>
 
-                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
-                        <div style="width:42px;height:42px;background:#f0fdfa;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;">📤</div>
-                        <div style="flex:1;">
-                            <h3 style="margin:0;font-weight:700;color:#1f2937;font-size:16px;">Upload Document</h3>
-                            <p style="margin:0;font-size:12px;color:#6b7280;" x-text="selectedFile ? selectedFile.name : ''"></p>
+                        <div class="nb-modal-header">
+                            <div class="nb-modal-icon">
+                                <i class="fas fa-file-upload"></i>
+                            </div>
+                            <div>
+                                <h3>Upload Document</h3>
+                                <p x-text="selectedFile ? selectedFile.name : ''"></p>
+                            </div>
+                            <button class="nb-modal-close" @click="closeModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
-                        <button @click="closeModal()"
-                            style="width:30px;height:30px;border-radius:50%;border:1px solid #e5e7eb;background:white;cursor:pointer;font-size:16px;color:#6b7280;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
-                    </div>
 
-                    <div style="margin-bottom:14px;">
-                        <label style="display:block;font-size:13px;font-weight:600;color:#1f2937;margin-bottom:6px;">Document Title</label>
-                        <input type="text" x-model="uploadTitle"
-                            style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:10px 12px;font-size:13px;outline:none;font-family:inherit;box-sizing:border-box;"
-                            placeholder="e.g. Week 3 Lecture Notes"
-                            @focus="$event.target.style.borderColor='#0d9488'"
-                            @blur="$event.target.style.borderColor='#e5e7eb'">
-                    </div>
-
-                    <!-- Progress bar -->
-                    <div x-show="uploading" style="margin-bottom:14px;">
-                        <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:4px;">
-                            <span x-text="uploadStatus"></span>
-                            <span x-text="uploadPct + '%'"></span>
+                        <div style="margin-bottom:14px;">
+                            <label class="nb-field-label">Document title</label>
+                            <input type="text" x-model="uploadTitle" class="nb-field-input"
+                                placeholder="e.g. Week 3 Lecture Notes">
                         </div>
-                        <div style="height:6px;background:#f3f4f6;border-radius:100px;overflow:hidden;">
-                            <div style="height:100%;background:#0d9488;border-radius:100px;transition:width 0.4s;" :style="'width:'+uploadPct+'%'"></div>
+
+                        <div class="nb-progress-wrap" x-show="uploading">
+                            <div class="nb-progress-label">
+                                <span x-text="uploadStatus"></span>
+                                <span x-text="uploadPct + '%'"></span>
+                            </div>
+                            <div class="nb-progress-bar">
+                                <div class="nb-progress-fill" :style="'width:'+uploadPct+'%'"></div>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Inline error -->
-                    <div x-show="uploadError" style="margin-bottom:14px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:10px 12px;font-size:12px;color:#991b1b;display:flex;gap:8px;">
-                        <i class="fas fa-exclamation-triangle" style="margin-top:1px;flex-shrink:0;"></i>
-                        <span x-text="uploadError"></span>
-                    </div>
+                        <div class="nb-modal-error" x-show="uploadError">
+                            <i class="fas fa-exclamation-circle" style="margin-top:1px;flex-shrink:0;"></i>
+                            <span x-text="uploadError"></span>
+                        </div>
 
-                    <div style="background:#f0fdfa;border:1px solid #ccfbf1;border-radius:10px;padding:10px 12px;margin-bottom:16px;font-size:12px;color:#0f766e;display:flex;gap:8px;">
-                        <i class="fas fa-info-circle" style="margin-top:1px;"></i>
-                        <span>PDF, TXT, DOCX · max 20MB · Processing takes 10–30s</span>
-                    </div>
+                        <div class="nb-modal-info">
+                            <i class="fas fa-info-circle" style="margin-top:1px;flex-shrink:0;"></i>
+                            <span>Supports PDF, TXT, DOCX &middot; Max 20 MB &middot; Processing takes 10–30s</span>
+                        </div>
 
-                    <div style="display:flex;gap:10px;">
-                        <button @click="closeModal()"
-                            style="flex:1;padding:10px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:13px;font-weight:600;color:#4b5563;cursor:pointer;background:white;">Cancel</button>
-                        <button @click="doUpload()" :disabled="!uploadTitle.trim() || uploading"
-                            :style="(!uploadTitle.trim()||uploading)?'opacity:0.55;cursor:not-allowed;':''"
-                            style="flex:1;padding:10px;background:#0d9488;color:white;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">
-                            <i class="fas fa-upload" style="margin-right:5px;"></i>
-                            <span x-text="uploading ? 'Processing...' : 'Upload & Process'"></span>
-                        </button>
+                        <div class="nb-modal-actions">
+                            <button class="nb-btn-cancel" @click="closeModal()">Cancel</button>
+                            <button class="nb-btn-upload" @click="doUpload()"
+                                :disabled="!uploadTitle.trim() || uploading">
+                                <i class="fas fa-upload"></i>
+                                <span x-text="uploading ? 'Processing...' : 'Upload & Process'"></span>
+                            </button>
+                        </div>
+
                     </div>
                 </div>
-                </div>{{-- end modal overlay --}}
 
-            </div>{{-- end x-data notebook sidebar --}}
-
+            </div>
             @else
-            <div class="notebook-sidebar" style="align-items:center;justify-content:center;text-align:center;padding:30px;">
-                <div style="width:52px;height:52px;background:#f0fdfa;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 14px;">🔒</div>
-                <h4 style="font-weight:700;color:#1f2937;margin:0 0 8px;">AI Study Assistant</h4>
-                <p style="font-size:13px;color:#6b7280;margin:0 0 16px;">Log in to access your personal AI notebook.</p>
-                <a href="/login" style="display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:#0d9488;color:white;border-radius:9px;font-weight:600;font-size:13px;text-decoration:none;">
+            <div class="notebook-sidebar" style="align-items:center;justify-content:center;text-align:center;padding:32px;">
+                <div style="width:44px;height:44px;background:linear-gradient(135deg,#f0fdfa,#ccfbf1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;border:1px solid #99f6e4;">
+                    <i class="fas fa-lock" style="color:#0d7377;font-size:16px;"></i>
+                </div>
+                <h4 style="font-weight:700;color:#111827;margin:0 0 6px;font-size:14px;letter-spacing:-0.01em;">AI Study Assistant</h4>
+                <p style="font-size:12px;color:#9ca3af;margin:0 0 18px;line-height:1.6;">Log in to access your personal AI study notebook.</p>
+                <a href="/login" style="display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:#0d7377;color:white;border-radius:9px;font-weight:600;font-size:13px;text-decoration:none;transition:background 0.15s;">
                     <i class="fas fa-sign-in-alt"></i> Log In
                 </a>
             </div>
@@ -505,7 +874,7 @@
 
                 autoResize(e) {
                     e.target.style.height = 'auto';
-                    e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px';
+                    e.target.style.height = Math.min(e.target.scrollHeight, 96) + 'px';
                 },
 
                 scrollBottom() {
@@ -535,10 +904,10 @@
                         });
                         const data = await res.json();
                         const last = this.conversations[this.conversations.length - 1];
-                        last.answer  = data.success ? data.answer : '⚠️ ' + (data.message || 'Something went wrong.');
+                        last.answer  = data.success ? data.answer : 'Error: ' + (data.message || 'Something went wrong.');
                         last.sources = data.success ? (data.sources || []) : [];
                     } catch (e) {
-                        this.conversations[this.conversations.length - 1].answer = '⚠️ Network error. Please try again.';
+                        this.conversations[this.conversations.length - 1].answer = 'Network error. Please try again.';
                     } finally {
                         this.isTyping = false;
                         this.scrollBottom();
@@ -546,7 +915,7 @@
                 },
 
                 fmt(text) {
-                    if (!text) return '<span style="color:#9ca3af;font-style:italic;">Generating answer...</span>';
+                    if (!text) return '<span style="color:#9ca3af;font-style:italic;font-size:12px;">Generating answer...</span>';
                     return text
                         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                         .replace(/\*(.*?)\*/g, '<em>$1</em>')
@@ -622,7 +991,6 @@
                             this.documents.push(data.document);
                             setTimeout(() => this.closeModal(), 900);
                         } else {
-                            // Handle Laravel validation errors (errors object) and plain message
                             let msg = data.message || '';
                             if (data.errors) {
                                 const firstKey = Object.keys(data.errors)[0];
