@@ -32,8 +32,11 @@ class CourseController extends Controller
         ])->findOrFail($id);
 
         $user = auth()->user();
+        $liveSessions = \App\Models\CourseLiveSession::where('course_id', $id)
+                    ->orderBy('date')
+                    ->get();
 
-        return view('courses.course_details', compact('course', 'user'));
+        return view('courses.course_details', compact('course', 'user', 'liveSessions'));
     }
 
     public function create()
