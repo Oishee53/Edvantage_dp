@@ -29,65 +29,404 @@
             color: #333;
         }
 
-        /* Chatbot Animations */
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 6px 24px rgba(13,148,136,0.4); }
-            50% { box-shadow: 0 6px 32px rgba(13,148,136,0.6), 0 0 0 8px rgba(13,148,136,0.1); }
+        /* ===== NEW CHATBOT STYLES ===== */
+
+        /* Floating button pulse */
+        @keyframes chatPulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(13,148,136,0.45); }
+            50% { box-shadow: 0 4px 28px rgba(13,148,136,0.7), 0 0 0 10px rgba(13,148,136,0.08); }
         }
 
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        @keyframes bounce-small {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        @keyframes bounce-dot {
+        @keyframes bounceDot {
             0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-6px); }
+            30% { transform: translateY(-5px); }
         }
 
-        /* FIXED: Scrollable Messages Area */
-        .chatbot-messages-scroll {
-            overflow-y: auto !important;
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(12px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes fadeSlideDown {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to   { opacity: 0; transform: translateY(12px) scale(0.97); }
+        }
+
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Floating trigger button */
+        .cb-trigger {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 9999;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: #0d9488;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            animation: chatPulse 2.5s ease-in-out infinite;
+            transition: transform 0.2s ease, background 0.2s;
+        }
+        .cb-trigger:hover { transform: scale(1.08); background: #0f766e; }
+        .cb-trigger.open { animation: none; background: #1f2937; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+
+        /* Unread badge */
+        .cb-badge {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            width: 14px;
+            height: 14px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* Chat window */
+        .cb-window {
+            position: fixed;
+            bottom: 100px;
+            right: 28px;
+            z-index: 9998;
+            width: 340px;
+            max-width: calc(100vw - 56px);
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.16), 0 4px 16px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.06);
+            animation: fadeSlideUp 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        .cb-window.closing {
+            animation: fadeSlideDown 0.2s ease forwards;
+        }
+
+        /* Header */
+        .cb-header {
+            padding: 18px 20px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .cb-header-left {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+        .cb-avatar {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #0d9488, #14b8a6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .cb-header-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #111827;
+            letter-spacing: -0.01em;
+        }
+        .cb-header-sub {
+            font-size: 11px;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 1px;
+        }
+        .cb-online-dot {
+            width: 7px;
+            height: 7px;
+            background: #22c55e;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .cb-header-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .cb-header-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: #f9fafb;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 13px;
+            transition: background 0.15s, color 0.15s;
+        }
+        .cb-header-btn:hover { background: #f3f4f6; color: #374151; }
+
+        /* Messages */
+        .cb-messages {
+            flex: 1;
+            overflow-y: auto;
             overflow-x: hidden;
-            max-height: 100%;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            max-height: 340px;
+            min-height: 200px;
+            background: #ffffff;
             scroll-behavior: smooth;
         }
-        
-        .chatbot-messages-scroll::-webkit-scrollbar {
-            width: 6px;
+        .cb-messages::-webkit-scrollbar { width: 4px; }
+        .cb-messages::-webkit-scrollbar-track { background: transparent; }
+        .cb-messages::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 4px; }
+
+        /* Welcome state */
+        .cb-welcome {
+            text-align: left;
+            padding: 4px 0;
+            animation: msgIn 0.3s ease forwards;
         }
-        
-        .chatbot-messages-scroll::-webkit-scrollbar-track {
-            background: #f3f4f6;
-            border-radius: 10px;
+        .cb-welcome-text {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.65;
+            margin-bottom: 16px;
         }
-        
-        .chatbot-messages-scroll::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
+        .cb-welcome-text strong { color: #111827; }
+
+        /* Quick reply pills */
+        .cb-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
         }
-        
-        .chatbot-messages-scroll::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+        .cb-pill {
+            border: 1.5px solid #e5e7eb;
+            background: white;
+            border-radius: 100px;
+            padding: 8px 16px;
+            font-size: 12.5px;
+            font-weight: 500;
+            color: #374151;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+        }
+        .cb-pill:hover {
+            border-color: #0d9488;
+            color: #0d9488;
+            background: #f0fdfa;
         }
 
-        /* Mobile Responsive for Chatbot */
-        @media (max-width: 640px) {
-            .chatbot-head {
-                bottom: 16px !important;
-                right: 16px !important;
-            }
-            .chatbot-window {
-                width: calc(100vw - 32px) !important;
-                right: 16px !important;
-                bottom: 90px !important;
-                height: 500px !important;
-            }
+        /* Message bubbles */
+        .cb-msg-pair {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            animation: msgIn 0.25s ease forwards;
+        }
+        .cb-msg-user {
+            align-self: flex-end;
+            background: #111827;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 16px;
+            border-bottom-right-radius: 4px;
+            font-size: 13px;
+            max-width: 78%;
+            line-height: 1.55;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+        .cb-msg-bot-row {
+            display: flex;
+            gap: 9px;
+            align-items: flex-start;
+            width: 100%;
+        }
+        .cb-msg-bot-avatar {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
+            border: 1.5px solid #99f6e4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .cb-msg-bot-bubble {
+            background: #f9fafb;
+            border: 1px solid #f3f4f6;
+            color: #1f2937;
+            padding: 10px 14px;
+            border-radius: 16px;
+            border-bottom-left-radius: 4px;
+            font-size: 13px;
+            max-width: calc(100% - 42px);
+            line-height: 1.6;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+
+        /* Typing indicator */
+        .cb-typing {
+            display: flex;
+            gap: 9px;
+            align-items: flex-start;
+            animation: msgIn 0.2s ease forwards;
+        }
+        .cb-typing-dots {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            padding: 12px 16px;
+            border-radius: 16px;
+            border-bottom-left-radius: 4px;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .cb-dot {
+            width: 6px;
+            height: 6px;
+            background: #9ca3af;
+            border-radius: 50%;
+            animation: bounceDot 1.3s ease-in-out infinite;
+        }
+        .cb-dot:nth-child(2) { animation-delay: 0.18s; }
+        .cb-dot:nth-child(3) { animation-delay: 0.36s; }
+
+        /* Input area */
+        .cb-input-area {
+            padding: 14px 16px 16px;
+            border-top: 1px solid #f3f4f6;
+            background: white;
+        }
+        .cb-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f9fafb;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 100px;
+            padding: 8px 8px 8px 16px;
+            transition: border-color 0.2s;
+        }
+        .cb-input-row:focus-within {
+            border-color: #0d9488;
+            background: white;
+        }
+        .cb-input-row textarea {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            font-family: 'Montserrat', sans-serif;
+            color: #1f2937;
+            outline: none;
+            resize: none;
+            max-height: 72px;
+            line-height: 1.5;
+        }
+        .cb-input-row textarea::placeholder { color: #9ca3af; }
+        .cb-send-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #0d9488;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 13px;
+            flex-shrink: 0;
+            transition: background 0.18s, transform 0.15s;
+        }
+        .cb-send-btn:hover:not(:disabled) { background: #0f766e; transform: scale(1.05); }
+        .cb-send-btn:disabled { background: #d1d5db; cursor: not-allowed; }
+        .cb-input-hint {
+            text-align: center;
+            font-size: 10px;
+            color: #d1d5db;
+            margin-top: 8px;
+            letter-spacing: 0.02em;
+        }
+
+        /* Emoji + attach icons */
+        .cb-input-extras {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-right: 4px;
+        }
+        .cb-input-icon {
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 15px;
+            border-radius: 6px;
+            transition: color 0.15s;
+        }
+        .cb-input-icon:hover { color: #374151; }
+
+        /* Tooltip bubble */
+        .cb-tooltip {
+            position: absolute;
+            right: 70px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1f2937;
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 7px 12px;
+            border-radius: 10px;
+            white-space: nowrap;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+            pointer-events: none;
+        }
+        .cb-tooltip::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 6px solid transparent;
+            border-right: none;
+            border-left-color: #1f2937;
+        }
+
+        /* Mobile */
+        @media (max-width: 480px) {
+            .cb-trigger { bottom: 18px; right: 18px; }
+            .cb-window { width: calc(100vw - 28px); right: 14px; bottom: 90px; max-width: calc(100vw - 28px); }
         }
     </style>
 </head>
@@ -125,19 +464,16 @@
 
                         <!-- Content -->
                         <div class="p-4 space-y-3">
-                            <!-- Category Badge -->
                             @if($course->category)
                                 <span class="inline-block bg-teal-100 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full">
                                     {{ $course->category }}
                                 </span>
                             @endif
 
-                            <!-- Title -->
                             <h3 class="font-bold text-lg text-gray-900 line-clamp-2 min-h-[3.5rem]">
                                 {{ $course->title }}
                             </h3>
 
-                            <!-- Rating -->
                             @if($course->ratings->count())
                             <div class="flex items-center gap-2">
                                 <div class="flex items-center">
@@ -158,7 +494,6 @@
                             </div>
                             @endif
 
-                            <!-- Price -->
                             <div class="pt-2">
                                 <div class="flex items-baseline gap-1">
                                     <span class="text-2xl font-bold text-gray-900">৳</span>
@@ -166,17 +501,13 @@
                                 </div>
                             </div>
 
-                            <!-- Actions -->
                             <div class="flex gap-2 pt-2">
-                                <!-- Details Button -->
                                 <a href="{{ route('courses.details', $course->id) }}" 
                                    class="flex-1 px-2 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-center text-sm font-semibold rounded-md transition-colors">
                                     Details
                                 </a>
                                 
-                                <!-- Action Buttons Row -->
                                 <div class="flex gap-2">
-                                    <!-- Wishlist Button -->
                                     <form method="POST" action="{{ route('wishlist.add', $course->id) }}" class="flex-1">
                                         @csrf
                                         <input type="hidden" name="course_id" value="{{ $course->id }}">
@@ -189,7 +520,6 @@
                                         </button>
                                     </form>
                                     
-                                    <!-- Cart Button -->
                                     <form method="POST" action="{{ route('cart.add', $course->id) }}" class="flex-1">
                                         @csrf
                                         <input type="hidden" name="course_id" value="{{ $course->id }}">
@@ -217,152 +547,344 @@
 @include('layouts.featured-course')
 
 
-{{-- ================= FIXED CHATBOT WIDGET ================= --}}
-<div x-data="landingChatbot()" x-init="init()" class="landing-chatbot">
-    
-    <!-- Chat Head Button -->
-    <div @click="toggleChat()" 
-         class="chatbot-head"
-         :class="{ 'chat-open': isOpen }"
-         style="position: fixed; bottom: 24px; right: 24px; z-index: 9999; cursor: pointer;">
-        
-        <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); box-shadow: 0 6px 24px rgba(13,148,136,0.4); display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative;"
-             :style="isOpen ? 'transform: scale(0.9);' : 'transform: scale(1); animation: pulse 2s infinite;'">
-            
-            <div style="color: white; font-size: 28px; transition: all 0.3s;" x-show="!isOpen">
-                <i class="fas fa-comments"></i>
-            </div>
-            <div style="color: white; font-size: 24px; transition: all 0.3s;" x-show="isOpen">
-                <i class="fas fa-times"></i>
-            </div>
+{{-- ================= REDESIGNED CHATBOT WIDGET ================= --}}
 
-            <div x-show="hasUnread && !isOpen" 
-                 style="position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: #ef4444; border-radius: 50%; border: 3px solid white; animation: bounce-small 1s infinite;"></div>
+<style>
+@keyframes cbBounce {
+    0%,60%,100%{transform:translateY(0)}
+    30%{transform:translateY(-5px)}
+}
+@keyframes cbPulse {
+    0%,100%{box-shadow:0 4px 20px rgba(13,148,136,0.45)}
+    50%{box-shadow:0 4px 28px rgba(13,148,136,0.7),0 0 0 10px rgba(13,148,136,0.08)}
+}
+#cb-window {
+    position: fixed !important;
+    bottom: 100px !important;
+    right: 24px !important;
+    width: 330px !important;
+    height: 500px !important;
+    z-index: 99999 !important;
+    background: #fff !important;
+    border-radius: 20px !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 4px 20px rgba(0,0,0,0.1) !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    display: none !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+#cb-window.cb-open {
+    display: flex !important;
+}
+#cb-trigger {
+    position: fixed !important;
+    bottom: 28px !important;
+    right: 28px !important;
+    z-index: 99999 !important;
+    width: 56px !important;
+    height: 56px !important;
+    border-radius: 50% !important;
+    background: #0d9488 !important;
+    border: none !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: white !important;
+    font-size: 22px !important;
+    animation: cbPulse 2.5s ease-in-out infinite !important;
+    transition: background 0.2s !important;
+}
+#cb-trigger:hover { background: #0f766e !important; }
+#cb-messages {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #fff;
+    scroll-behavior: smooth;
+}
+#cb-messages::-webkit-scrollbar { width: 4px; }
+#cb-messages::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 4px; }
+.cb-user-bubble {
+    align-self: flex-end;
+    background: #111827;
+    color: white;
+    padding: 9px 13px;
+    border-radius: 16px;
+    border-bottom-right-radius: 4px;
+    font-size: 13px;
+    max-width: 78%;
+    line-height: 1.55;
+    word-break: break-word;
+    font-family: 'Montserrat', sans-serif;
+}
+.cb-bot-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+.cb-bot-avatar {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg,#f0fdfa,#ccfbf1);
+    border: 1.5px solid #99f6e4;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.cb-bot-bubble {
+    background: #f9fafb;
+    border: 1px solid #f0f0f0;
+    color: #1f2937;
+    padding: 9px 13px;
+    border-radius: 16px;
+    border-bottom-left-radius: 4px;
+    font-size: 13px;
+    line-height: 1.6;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    flex: 1;
+    min-width: 0;
+    font-family: 'Montserrat', sans-serif;
+}
+.cb-pill-btn {
+    border: 1.5px solid #e5e7eb;
+    background: white;
+    border-radius: 100px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    transition: all 0.18s;
+}
+.cb-pill-btn:hover {
+    border-color: #0d9488;
+    color: #0d9488;
+    background: #f0fdfa;
+}
+</style>
+
+<!-- Floating Trigger -->
+<button id="cb-trigger" onclick="cbToggle()">
+    <span id="cb-icon-open"><i class="fas fa-comments"></i></span>
+    <span id="cb-icon-close" style="display:none;"><i class="fas fa-chevron-down"></i></span>
+    <span id="cb-badge" style="display:none;position:absolute;top:3px;right:3px;width:14px;height:14px;background:#ef4444;border-radius:50%;border:2px solid white;"></span>
+</button>
+
+<!-- Chat Window -->
+<div id="cb-window">
+
+    <!-- Header -->
+    <div style="padding:15px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f3f4f6;flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:10px;">
+
+            <div>
+                <div style="font-size:14px;font-weight:700;color:#111827;">Edvantage Assistant</div>
+                <div style="font-size:11px;color:#6b7280;display:flex;align-items:center;gap:4px;margin-top:1px;">
+                    <span style="width:6px;height:6px;background:#22c55e;border-radius:50%;display:inline-block;flex-shrink:0;"></span>
+                    Online 
+                </div>
+            </div>
         </div>
-
-        <div x-show="!isOpen" 
-             style="position: absolute; right: 76px; top: 50%; transform: translateY(-50%); background: #1f2937; color: white; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.15); pointer-events: none;"
-             x-transition>
-            💬 Need help? Chat with us!
+        <div style="display:flex;gap:6px;">
+            <button style="width:28px;height:28px;border:none;background:#f9fafb;border-radius:8px;cursor:pointer;color:#9ca3af;font-size:12px;" title="Options"><i class="fas fa-ellipsis-h"></i></button>
+            <button onclick="cbToggle()" style="width:28px;height:28px;border:none;background:#f9fafb;border-radius:8px;cursor:pointer;color:#9ca3af;font-size:12px;" title="Minimize"><i class="fas fa-chevron-down"></i></button>
         </div>
     </div>
 
-    <!-- Chat Window -->
-    <div x-show="isOpen" 
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 transform translate-y-4 scale-95"
-         x-transition:enter-end="opacity-100 transform translate-y-0 scale-100"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100 transform translate-y-0 scale-100"
-         x-transition:leave-end="opacity-0 transform translate-y-4 scale-95"
-         class="chatbot-window"
-         style="position: fixed; bottom: 100px; right: 24px; z-index: 9998; width: 380px; height: 550px; background: white; border-radius: 16px; box-shadow: 0 12px 48px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #e5e7eb;">
+    <!-- Messages -->
+    <div id="cb-messages">
+        <!-- Welcome shown by JS -->
+    </div>
 
-        <!-- Header (Fixed) -->
-        <div style="background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); padding: 18px 20px; display: flex; align-items: center; gap: 12px; color: white; flex-shrink: 0;">
-            <div style="width: 44px; height: 44px; background: rgba(255,255,255,0.25); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px;">
-                🤖
+    <!-- Input -->
+    <div style="padding:12px 14px 14px;border-top:1px solid #f3f4f6;background:white;flex-shrink:0;">
+        <div id="cb-input-wrap" style="display:flex;align-items:center;gap:8px;background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:100px;padding:7px 7px 7px 14px;transition:border-color 0.2s;">
+            <textarea id="cb-input"
+                      placeholder="Write a message..."
+                      rows="1"
+                      style="flex:1;border:none;background:transparent;font-size:13px;font-family:'Montserrat',sans-serif;color:#1f2937;outline:none;resize:none;max-height:72px;line-height:1.5;"
+                      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();cbSend();}"
+                      oninput="cbAutoResize(this)"
+                      onfocus="document.getElementById('cb-input-wrap').style.borderColor='#0d9488';document.getElementById('cb-input-wrap').style.background='white';"
+                      onblur="document.getElementById('cb-input-wrap').style.borderColor='#e5e7eb';document.getElementById('cb-input-wrap').style.background='#f9fafb';"></textarea>
+            <div style="display:flex;gap:4px;align-items:center;flex-shrink:0;">
+                <span style="color:#9ca3af;font-size:15px;cursor:pointer;">☺</span>
+                <span style="color:#9ca3af;font-size:13px;cursor:pointer;">📎</span>
             </div>
-            <div style="flex: 1;">
-                <h3 style="margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.02em;">Edvantage Assistant</h3>
-                <p style="margin: 0; font-size: 12px; opacity: 0.95;">Here to help you find courses!</p>
-            </div>
-            <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: pulse-dot 2s infinite;"></div>
+            <button id="cb-send-btn" onclick="cbSend()" style="width:32px;height:32px;border-radius:50%;background:#0d9488;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;flex-shrink:0;transition:background 0.18s;">
+                <i class="fas fa-paper-plane"></i>
+            </button>
         </div>
-
-        <!-- Messages Area (Scrollable) -->
-        <div x-ref="messages" 
-             class="chatbot-messages-scroll"
-             style="flex: 1; padding: 16px; background: #f9fafb; display: flex; flex-direction: column; gap: 12px;">
-
-            <!-- Welcome Message -->
-            <template x-if="messages.length === 0 && !isTyping">
-                <div style="text-align: center; padding: 20px 16px;">
-                    <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #ccfbf1, #99f6e4); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(13,148,136,0.15);">
-                        👋
-                    </div>
-                    <h4 style="margin: 0 0 6px; font-size: 15px; font-weight: 700; color: #1f2937;">Hi there!</h4>
-                    <p style="margin: 0 0 16px; font-size: 12px; color: #6b7280; line-height: 1.5;">I can help you find courses, answer questions, and more!</p>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <button @click="askQuestion('Do you have machine learning courses?')"
-                                style="background: white; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #374151; cursor: pointer; text-align: left; transition: all 0.2s; font-weight: 500; display: flex; align-items: center; gap: 8px;">
-                            <span style="width: 28px; height: 28px; background: #f0fdfa; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">🔍</span>
-                            <span>Find ML courses</span>
-                        </button>
-                        <button @click="askQuestion('Show me popular courses')"
-                                style="background: white; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #374151; cursor: pointer; text-align: left; transition: all 0.2s; font-weight: 500; display: flex; align-items: center; gap: 8px;">
-                            <span style="width: 28px; height: 28px; background: #fef3c7; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">⭐</span>
-                            <span>Popular courses</span>
-                        </button>
-                        <button @click="askQuestion('How does the platform work?')"
-                                style="background: white; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #374151; cursor: pointer; text-align: left; transition: all 0.2s; font-weight: 500; display: flex; align-items: center; gap: 8px;">
-                            <span style="width: 28px; height: 28px; background: #dbeafe; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">ℹ️</span>
-                            <span>How it works</span>
-                        </button>
-                    </div>
-                </div>
-            </template>
-
-            <!-- Conversation Messages -->
-            <template x-for="(msg, index) in messages" :key="index">
-                <div>
-                    <!-- User Message -->
-                    <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-                        <div style="background: #0d9488; color: white; padding: 9px 13px; border-radius: 14px; border-bottom-right-radius: 3px; max-width: 75%; font-size: 13px; line-height: 1.5; word-break: break-word;" x-text="msg.user"></div>
-                    </div>
-
-                    <!-- Bot Message -->
-                    <div style="display: flex; gap: 8px; align-items: flex-start;">
-                        <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #1a1a2e, #2d2d5e); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;">
-                            🤖
-                        </div>
-                        <div style="background: white; padding: 9px 13px; border-radius: 14px; border-bottom-left-radius: 3px; max-width: 75%; border: 1px solid #e5e7eb; font-size: 13px; line-height: 1.6; color: #1f2937; word-break: break-word;" x-html="formatMessage(msg.bot)"></div>
-                    </div>
-                </div>
-            </template>
-
-            <!-- Typing Indicator -->
-            <template x-if="isTyping">
-                <div style="display: flex; gap: 8px; align-items: flex-start;">
-                    <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #1a1a2e, #2d2d5e); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0;">
-                        🤖
-                    </div>
-                    <div style="background: white; padding: 11px 14px; border-radius: 14px; border-bottom-left-radius: 3px; border: 1px solid #e5e7eb; display: flex; gap: 3px;">
-                        <div style="width: 7px; height: 7px; background: #9ca3af; border-radius: 50%; animation: bounce-dot 1.2s infinite;"></div>
-                        <div style="width: 7px; height: 7px; background: #9ca3af; border-radius: 50%; animation: bounce-dot 1.2s infinite 0.2s;"></div>
-                        <div style="width: 7px; height: 7px; background: #9ca3af; border-radius: 50%; animation: bounce-dot 1.2s infinite 0.4s;"></div>
-                    </div>
-                </div>
-            </template>
-        </div>
-
-        <!-- Input Area (Fixed at Bottom) -->
-        <div style="padding: 12px 14px; border-top: 1px solid #e5e7eb; background: white; flex-shrink: 0;">
-            <form @submit.prevent="sendMessage()" style="display: flex; gap: 8px; align-items: flex-end;">
-                <textarea x-model="input" 
-                          x-ref="inputField"
-                          placeholder="Ask me anything..."
-                          @keydown.enter.prevent="!$event.shiftKey && sendMessage()"
-                          rows="1"
-                          style="flex: 1; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 9px 12px; font-size: 13px; outline: none; resize: none; max-height: 80px; font-family: 'Montserrat', sans-serif; transition: border-color 0.2s;"
-                          :disabled="isTyping"
-                          @focus="$event.target.style.borderColor='#0d9488'"
-                          @blur="$event.target.style.borderColor='#e5e7eb'"
-                          @input="autoResize($event)"></textarea>
-                <button type="submit" 
-                        :disabled="!input.trim() || isTyping"
-                        style="width: 38px; height: 38px; background: #0d9488; color: white; border: none; border-radius: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: all 0.2s; flex-shrink: 0;"
-                        :style="(!input.trim() || isTyping) ? 'background: #cbd5e1; cursor: not-allowed;' : ''"
-                        @mouseover="!(!input.trim() || isTyping) && ($event.target.style.background='#0f766e')"
-                        @mouseout="!(!input.trim() || isTyping) && ($event.target.style.background='#0d9488')">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
-            </form>
-            <p style="text-align: center; font-size: 10px; color: #9ca3af; margin: 6px 0 0;">Powered by AI</p>
-        </div>
+        <p style="text-align:center;font-size:10px;color:#d1d5db;margin-top:7px;letter-spacing:0.02em;">Powered by Edvantage AI ✦</p>
     </div>
 </div>
+
+<script>
+(function() {
+    var isOpen = false;
+    var isTyping = false;
+    var messages = [];
+    var conversationHistory = [];
+    var hasShownWelcome = false;
+    var csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+    // Show unread badge after 3s
+    setTimeout(function() {
+        if (!isOpen) {
+            document.getElementById('cb-badge').style.display = 'block';
+        }
+    }, 3000);
+
+    window.cbToggle = function() {
+        isOpen = !isOpen;
+        var win = document.getElementById('cb-window');
+        var iconOpen = document.getElementById('cb-icon-open');
+        var iconClose = document.getElementById('cb-icon-close');
+        var badge = document.getElementById('cb-badge');
+
+        if (isOpen) {
+            win.classList.add('cb-open');
+            iconOpen.style.display = 'none';
+            iconClose.style.display = 'block';
+            badge.style.display = 'none';
+            if (!hasShownWelcome) {
+                cbShowWelcome();
+                hasShownWelcome = true;
+            }
+            setTimeout(function() {
+                document.getElementById('cb-input').focus();
+                cbScrollToBottom();
+            }, 50);
+        } else {
+            win.classList.remove('cb-open');
+            iconOpen.style.display = 'block';
+            iconClose.style.display = 'none';
+        }
+    };
+
+    function cbShowWelcome() {
+        var el = document.getElementById('cb-messages');
+        el.innerHTML = '<div style="padding:4px 0;">' +
+            '<p style="font-size:13.5px;color:#374151;line-height:1.65;margin-bottom:14px;"> <strong style="color:#111827;">I\'m an AI chatbot</strong> here to help you find your way.</p>' +
+            '<div style="display:flex;flex-wrap:wrap;gap:8px;">' +
+            '<button class="cb-pill-btn" onclick="cbAsk(\'I need support\')">I need Support</button>' +
+            '<button class="cb-pill-btn" onclick="cbAsk(\'Show me all courses you have\')">Show me all courses you have</button>' +
+            '<button class="cb-pill-btn" onclick="cbAsk(\'Show me popular courses\')">Popular Courses</button>' +
+            '<button class="cb-pill-btn" onclick="cbAsk(\'How does the platform work?\')">How it works</button>' +
+            '</div></div>';
+    }
+
+    window.cbAsk = function(question) {
+        document.getElementById('cb-input').value = question;
+        cbSend();
+    };
+
+    window.cbSend = function() {
+        var input = document.getElementById('cb-input');
+        var msg = input.value.trim();
+        if (!msg || isTyping) return;
+
+        input.value = '';
+        input.style.height = 'auto';
+        isTyping = true;
+
+        // Clear welcome if first message
+        var el = document.getElementById('cb-messages');
+        if (messages.length === 0) el.innerHTML = '';
+
+        // Add user bubble
+        var pair = document.createElement('div');
+        pair.style.cssText = 'display:flex;flex-direction:column;gap:10px;';
+        pair.innerHTML =
+            '<div style="display:flex;justify-content:flex-end;"><div class="cb-user-bubble">' + cbEscape(msg) + '</div></div>' +
+            '<div class="cb-bot-row"><div class="cb-bot-avatar">🤖</div><div class="cb-bot-bubble" id="cb-bot-' + messages.length + '">...</div></div>';
+        el.appendChild(pair);
+        messages.push({ user: msg, bot: '', el: pair });
+        cbScrollToBottom();
+
+        // Add typing dots
+        var typingEl = document.createElement('div');
+        typingEl.id = 'cb-typing';
+        typingEl.className = 'cb-bot-row';
+        typingEl.innerHTML = '<div class="cb-bot-avatar">🤖</div>' +
+            '<div style="background:#f3f4f6;border:1px solid #e5e7eb;padding:11px 14px;border-radius:16px;border-bottom-left-radius:4px;display:flex;gap:4px;align-items:center;">' +
+            '<div style="width:6px;height:6px;background:#9ca3af;border-radius:50%;animation:cbBounce 1.3s infinite;"></div>' +
+            '<div style="width:6px;height:6px;background:#9ca3af;border-radius:50%;animation:cbBounce 1.3s 0.18s infinite;"></div>' +
+            '<div style="width:6px;height:6px;background:#9ca3af;border-radius:50%;animation:cbBounce 1.3s 0.36s infinite;"></div>' +
+            '</div>';
+        el.appendChild(typingEl);
+        cbScrollToBottom();
+
+        fetch('/chatbot/ask', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrf,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ message: msg, history: conversationHistory }),
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            var idx = messages.length - 1;
+            var botBubble = document.getElementById('cb-bot-' + idx);
+            var reply = (data.success ? data.message : (data.message || 'Sorry, something went wrong.'));
+            if (botBubble) botBubble.innerHTML = cbFormat(reply);
+            messages[idx].bot = reply;
+            conversationHistory.push({ role: 'user', content: msg });
+            conversationHistory.push({ role: 'model', content: reply });
+            if (conversationHistory.length > 20) conversationHistory = conversationHistory.slice(-20);
+        })
+        .catch(function() {
+            var idx = messages.length - 1;
+            var botBubble = document.getElementById('cb-bot-' + idx);
+            if (botBubble) botBubble.innerHTML = 'Sorry, I encountered an error. Please try again.';
+        })
+        .finally(function() {
+            isTyping = false;
+            var t = document.getElementById('cb-typing');
+            if (t) t.remove();
+            cbScrollToBottom();
+        });
+    };
+
+    window.cbAutoResize = function(el) {
+        el.style.height = 'auto';
+        el.style.height = Math.min(el.scrollHeight, 72) + 'px';
+    };
+
+    function cbScrollToBottom() {
+        setTimeout(function() {
+            var el = document.getElementById('cb-messages');
+            if (el) el.scrollTop = el.scrollHeight;
+        }, 30);
+    }
+
+    function cbEscape(str) {
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function cbFormat(text) {
+        if (!text) return '';
+        text = text.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank" style="color:#0d9488;font-weight:600;text-decoration:underline;">$1</a>');
+        text = text.replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#111827;font-weight:600;">$1</strong>');
+        text = text.replace(/\n/g, '<br>');
+        return text;
+    }
+})();
+</script>
+
 {{-- ================= END CHATBOT WIDGET ================= --}}
 
 
@@ -388,9 +910,7 @@
       e.preventDefault();
       const target = document.querySelector(this.getAttribute('href'));
       if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth'
-          });
+          target.scrollIntoView({ behavior: 'smooth' });
       }
     });
   });
@@ -418,135 +938,10 @@
     }
   @endif
 
-  // Chatbot Alpine.js Component
-  function landingChatbot() {
-        return {
-            isOpen: false,
-            isTyping: false,
-            hasUnread: false,
-            input: '',
-            messages: [],
-            conversationHistory: [],
-            csrf: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+  // Chatbot is now handled by vanilla JS above
 
-            init() {
-                setTimeout(() => {
-                    if (!this.isOpen && this.messages.length === 0) {
-                        this.hasUnread = true;
-                    }
-                }, 3000);
-            },
-
-            toggleChat() {
-                this.isOpen = !this.isOpen;
-                this.hasUnread = false;
-                if (this.isOpen) {
-                    this.$nextTick(() => {
-                        this.scrollToBottom();
-                        if (this.$refs.inputField) {
-                            this.$refs.inputField.focus();
-                        }
-                    });
-                }
-            },
-
-            askQuestion(question) {
-                this.input = question;
-                this.sendMessage();
-            },
-
-            autoResize(event) {
-                event.target.style.height = 'auto';
-                event.target.style.height = Math.min(event.target.scrollHeight, 80) + 'px';
-            },
-
-            async sendMessage() {
-                const msg = this.input.trim();
-                if (!msg || this.isTyping) return;
-
-                this.input = '';
-                if (this.$refs.inputField) {
-                    this.$refs.inputField.style.height = 'auto';
-                }
-                
-                this.isTyping = true;
-
-                this.messages.push({
-                    user: msg,
-                    bot: '',
-                });
-
-                this.scrollToBottom();
-
-                try {
-                    const res = await fetch('/chatbot/ask', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': this.csrf,
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            message: msg,
-                            history: this.conversationHistory,
-                        }),
-                    });
-
-                    const data = await res.json();
-
-                    if (data.success) {
-                        this.messages[this.messages.length - 1].bot = data.message;
-
-                        this.conversationHistory.push({
-                            role: 'user',
-                            content: msg,
-                        });
-                        this.conversationHistory.push({
-                            role: 'model',
-                            content: data.message,
-                        });
-
-                        if (this.conversationHistory.length > 20) {
-                            this.conversationHistory = this.conversationHistory.slice(-20);
-                        }
-                    } else {
-                        this.messages[this.messages.length - 1].bot = data.message || 'Sorry, something went wrong.';
-                    }
-
-                } catch (error) {
-                    console.error('Chatbot error:', error);
-                    this.messages[this.messages.length - 1].bot = 'Sorry, I encountered an error. Please try again.';
-                } finally {
-                    this.isTyping = false;
-                    this.scrollToBottom();
-
-                    if (!this.isOpen) {
-                        this.hasUnread = true;
-                    }
-                }
-            },
-
-            formatMessage(text) {
-                if (!text) return '';
-                
-                text = text.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank" style="color: #0d9488; font-weight: 600; text-decoration: underline;">$1</a>');
-                text = text.replace(/\*\*([^*]+)\*\*/g, '<strong style="color: #0f766e; font-weight: 600;">$1</strong>');
-                text = text.replace(/\n/g, '<br>');
-                
-                return text;
-            },
-
-            scrollToBottom() {
-                this.$nextTick(() => {
-                    const el = this.$refs.messages;
-                    if (el) {
-                        el.scrollTop = el.scrollHeight;
-                    }
-                });
-            },
-        };
-    }
 </script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const loadMoreBtn = document.getElementById('loadMoreBtn');
@@ -559,21 +954,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     loadMoreBtn.addEventListener('click', function () {
         let shown = 0;
-
         for (let i = visible; i < cards.length && shown < increment; i++) {
             cards[i].style.display = 'flex';
             shown++;
         }
-
         visible += shown;
-
         if (visible >= cards.length) {
             loadMoreBtn.style.display = 'none';
         }
     });
 });
 </script>
-
 
 </body>
 </html>
