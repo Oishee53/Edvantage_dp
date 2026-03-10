@@ -62,7 +62,8 @@ if ($submission->wasRecentlyCreated) {
         ]);
     }
 
-    return back()->with('success', 'Files uploaded successfully.');
+    return redirect('/my-courses/' . $assignment->course_id)
+       ->with('success','Assignment submitted successfully');
 }
    public function show($id)
 {
