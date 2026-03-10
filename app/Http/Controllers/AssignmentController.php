@@ -24,7 +24,9 @@ public function store(Request $request)
         'title' => 'required',
         'description' => 'required',
         'marks' => 'required|integer|min:1',
-        'deadline' => 'required|date'
+        'deadline' => 'required|date' ,
+        'attachment' => 'nullable|file|mimes:pdf,ppt,pptx,doc,docx,png,jpg,jpeg,zip|max:10240'
+
     ]);
 
     $assignment = Assignment::create([
@@ -35,6 +37,12 @@ public function store(Request $request)
         'marks'      => $request->marks,   
         'deadline'   => $request->deadline
     ]);
+    // OPTIONAL ATTACHMENT
+if ($request->hasFile('attachment')) {
+    $path = $request->file('attachment')->store('assignments', 'public');
+    $assignment->attachment = $path;
+    $assignment->save();
+}
 
     $enrollments = Enrollment::where('course_id', $request->course_id)->get();
 
@@ -141,4 +149,6 @@ public function update(Request $request, $id)
 
     return redirect()->back()->with('success', 'Deadline updated successfully!');
 }
+
+
 }
