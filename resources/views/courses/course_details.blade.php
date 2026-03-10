@@ -93,27 +93,31 @@
                                 </div>
                                 <div class="flex items-center gap-3 text-gray-700">
                                     <span class="text-xl">🎥</span>
+                                    @if($course->course_type == 'recorded')
                                     <span class="text-sm">{{ $course->approx_video_length }} min Avg Video Length</span>
+                                    @elseif($course->course_type == 'live')
+                                    <span class="text-sm">{{ $course->approx_video_length }} min Avg Session Length</span>
+                                    @endif
                                 </div>
                                 <div class="flex items-center gap-3 text-gray-700">
-    <span class="text-xl">📅</span>
-    <span class="text-sm">{{ $course->updated_at->format('M d, Y') }} Last Updated</span>
-</div>
+                                    <span class="text-xl">📅</span>
+                                    <span class="text-sm">{{ $course->updated_at->format('M d, Y') }} Last Updated</span>
+                                </div>
 
-@if(isset($liveSessions) && $liveSessions->count() > 0)
-<div class="flex items-center gap-3 text-gray-700">
-    <span class="text-xl">📡</span>
-    <span class="text-sm">
-        @foreach($liveSessions as $session)
-            {{ \Carbon\Carbon::parse($session->date)->format('M d, Y') }} |
-            ⏰ {{ \Carbon\Carbon::parse($session->start_time)->format('h:i A') }}
-             | Live Class
-        @endforeach
-    </span>
-</div>
-@endif
+                                @if(isset($liveSessions) && $liveSessions->count() > 0)
+                                <div class="flex items-center gap-3 text-gray-700">
+                                    <span class="text-xl">📡</span>
+                                    <span class="text-sm">
+                                        @foreach($liveSessions as $session)
+                                            {{ \Carbon\Carbon::parse($session->date)->format('M d, Y') }} |
+                                            ⏰ {{ \Carbon\Carbon::parse($session->start_time)->format('h:i A') }}
+                                            | Live Class
+                                        @endforeach
+                                    </span>
+                                </div>
+                                @endif
 
-         </div>
+                            </div>
                             
                             <!-- What's Included -->
                             <div class="mb-6 pb-6 border-b border-gray-200">
@@ -123,7 +127,11 @@
                                         <svg class="w-5 h-5 text-teal-600" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                                         </svg>
+                                        @if($course->course_type == 'recorded')
                                         {{ $course->video_count }} video lectures
+                                        @elseif($course->course_type == 'live')
+                                        {{ $course->video_count }} live sessions
+                                        @endif
                                     </li>
                                     <li class="flex items-center gap-2 text-sm text-gray-700">
                                         <svg class="w-5 h-5 text-teal-600" fill="currentColor" viewBox="0 0 20 20">
@@ -304,7 +312,33 @@
                             </div>
                         @endif
                     </div>
-                </div>
+
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 md:p-8">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                            <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
+                                <i class="fa-solid fa-calendar text-teal-600"></i>
+                            </div>
+                            Course Schedule
+                        </h3>
+
+
+                            <div class="space-y-6">
+                                @foreach($liveSessions as $class)
+                                    <div class="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
+                                        <div class="flex items-start justify-between mb-3">
+                                            <div class="flex items-center gap-5 ml-15">
+                                                <div class="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center text-white font-bold">
+                                                    {{ $loop->iteration }}
+                                                </div>
+
+                                                {{ \Carbon\Carbon::parse($class->date)->format('M d, Y') }} |
+                                                {{ \Carbon\Carbon::parse($class->start_time)->format('h:i A') }}
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
 
                 <!-- Right Column - Empty spacer for desktop to maintain grid -->
                 <div class="hidden lg:block lg:col-span-1"></div>
