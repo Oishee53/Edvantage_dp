@@ -61,6 +61,17 @@
             $isInstructor = $userRole === 3;
             $isStudent    = !$isAdmin && !$isInstructor;
             $isLiveCourse = $course->course_type === 'live';
+
+            // Publish Certificates button visibility (live courses only)
+            $canPublishCertificates  = false;
+            $certificatesAlreadySent = false;
+            if ($isLiveCourse && ($isInstructor || $isAdmin)) {
+                $totalSessions = (int) $course->video_count;
+                $endedSessions = \App\Models\CourseLiveSession::where('course_id', $course->id)
+                    ->where('status', 'ended')->count();
+                $canPublishCertificates  = $totalSessions > 0 && $endedSessions >= $totalSessions;
+                $certificatesAlreadySent = \App\Models\Certificate::where('course_id', $course->id)->exists();
+            }
         @endphp
 
         <div x-data="{ sidebarOpen: window.innerWidth >= 1024, sidebarCollapsed: false }"
@@ -101,6 +112,39 @@
                                     </span>
                                 @endif
                             </h2>
+
+                            {{-- Publish Certificates button --}}
+                            @if($isLiveCourse && ($isInstructor || $isAdmin))
+                                <div class="mt-3">
+                                    @if($certificatesAlreadySent)
+                                        <span class="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm font-semibold">
+                                            <i class="fas fa-check-circle text-green-500"></i>
+                                            Certificates Published
+                                        </span>
+                                    @elseif($canPublishCertificates)
+                                        <form method="POST"
+                                              action="{{ route('live.certificates.publish', ['course_id' => $course->id]) }}"
+                                              onsubmit="return confirm('This will generate certificates for all eligible students. Continue?')">
+                                            @csrf
+                                            <button type="submit"
+                                                    class="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-xl text-sm font-semibold hover:bg-teal-700 transition-all">
+                                                <i class="fas fa-certificate"></i>
+                                                Publish Certificates
+                                            </button>
+                                        </form>
+                                    @else
+                                        @php
+                                            $totalSessions = (int) $course->video_count;
+                                            $endedSessions = \App\Models\CourseLiveSession::where('course_id', $course->id)->where('status','ended')->count();
+                                        @endphp
+                                        <span class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-400 rounded-xl text-sm font-medium cursor-not-allowed"
+                                              title="All {{ $totalSessions }} sessions must be completed first ({{ $endedSessions }}/{{ $totalSessions }} ended)">
+                                            <i class="fas fa-lock text-xs"></i>
+                                            Publish Certificates
+                                        </span>
+                                    @endif
+                                </div>
+                            @endif
                         </div>
 
                         {{-- Progress bar only for recorded courses --}}
@@ -191,6 +235,14 @@
                                                         $hlWindowMsg = 'Set a start time to enable Go Live';
                                                     }
                                                 @endphp
+
+                                                {{-- DEBUG: remove after testing --}}
+                                                <div class="px-5 py-1 text-[10px] text-gray-400 bg-gray-50 font-mono">
+                                                    now={{ now()->format('Y-m-d H:i:s') }}
+                                                    | start={{ $ls->date ? \Carbon\Carbon::parse($ls->date)->toDateString() . ' ' . $ls->start_time : 'null' }}
+                                                    | inWindow={{ $hlInWindow ? 'YES' : 'NO' }}
+                                                    | msg={{ $hlWindowMsg }}
+                                                </div>
 
                                                 <div class="px-5 py-4 flex items-center justify-between gap-4 flex-wrap {{ $hlIsLive ? 'bg-red-50' : '' }}">
                                                     <div class="flex items-center gap-3">

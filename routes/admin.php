@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseNotificatioController;
 use App\Http\Controllers\InstructorController;
@@ -248,3 +249,12 @@ Route::post('/instructor/live-class/store', [LiveSessionController::class, 'stor
 Route::get('/courses/{id}', [CourseController::class, 'show'])
     ->name('courses.details');
     Route::get('/instructor/live-class/{course_id}', [InstructorController::class, 'liveClassForm'])->name('live.class.form');
+
+Route::post('/instructor/courses/{course_id}/publish-certificates',
+    [CertificateController::class, 'publishCertificates'])
+    ->name('live.certificates.publish');
+
+// Also allow admin to publish
+Route::post('/admin_panel/courses/{course_id}/publish-certificates',
+    [CertificateController::class, 'publishCertificates'])
+    ->name('admin.live.certificates.publish');

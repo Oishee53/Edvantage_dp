@@ -216,10 +216,11 @@
                         <i class="fas {{ $isLiveCourse ? 'fa-broadcast-tower' : 'fa-book-open' }}" style="margin-right:0.5rem;"></i>
                         {{ $isLiveCourse ? 'Sessions' : 'Lectures' }}
                     </button>
-                
+                        @if($isHybrid)
                         <button class="tab" data-tab="live-sessions">
                             <i class="fas fa-broadcast-tower" style="margin-right:0.5rem;"></i>Live Classes
                         </button>
+                        @endif
                         <button class="tab" data-tab="final-exam">
                             <i class="fas fa-file-alt" style="margin-right:0.5rem;"></i>Final Exam
                         </button>

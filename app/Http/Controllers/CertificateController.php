@@ -2,21 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Quiz;
+use App\Models\Courses;
+use App\Models\User;
+use App\Models\Certificate;
+use App\Models\VideoProgress;
+use App\Models\QuizSubmission;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
-use App\Models\Certificate;
-use App\Models\Courses;
 use App\Models\FinalExam;
 use App\Models\FinalExamSubmission;
-use App\Models\QuizSubmission;
-use App\Models\VideoProgress;
+use App\Models\CourseLiveSession;
+use App\Models\Enrollment;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
-use Log;
+use App\Models\Certificates;
 
 class CertificateController extends Controller
 {
+    // ──────────────────────────────────────────────────────────────────────────
+    // Verify a certificate by its ID (public)
+    // ──────────────────────────────────────────────────────────────────────────
     public function verify($certificate_id)
     {
         $certificate = Certificate::with(['user', 'course'])
@@ -26,6 +35,9 @@ class CertificateController extends Controller
         return view('certificate.verify', compact('certificate', 'certificate_id'));
     }
 
+    // ──────────────────────────────────────────────────────────────────────────
+    // Student downloads their own certificate
+    // ──────────────────────────────────────────────────────────────────────────
     public function generate($userId, $courseId)
     {
         $user = auth()->user();
@@ -36,127 +48,172 @@ class CertificateController extends Controller
 
         $course = Courses::findOrFail($courseId);
 
-        // ──────────────────────────────────────────────────────────────────────
-        // LIVE COURSE — eligibility based on assignments + final exam
-        // ──────────────────────────────────────────────────────────────────────
         if ($course->course_type === 'live') {
             return $this->generateLiveCertificate($user, $course);
         }
 
-        // ──────────────────────────────────────────────────────────────────────
-        // RECORDED COURSE — existing logic unchanged
-        // ──────────────────────────────────────────────────────────────────────
         return $this->generateRecordedCertificate($user, $course);
     }
 
     // ──────────────────────────────────────────────────────────────────────────
-    // LIVE COURSE CERTIFICATE
+    // INSTRUCTOR: Show publish certificate button / trigger bulk generation
+    // GET  → instructor.live_session.publish_certificates_form
+    // POST → instructor.live_session.publish_certificates
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Bulk-generate certificates for all eligible students.
+     * Triggered by instructor after all sessions are ended.
+     */
+    public function publishCertificates(Request $request, $course_id)
+    {
+        $course = Courses::findOrFail($course_id);
+
+        // Guard: only live courses
+        if ($course->course_type !== 'live') {
+            return back()->with('error', 'Certificates can only be published for live courses.');
+        }
+
+        // Guard: all sessions must be ended
+        $totalSessions   = (int) $course->video_count;
+        $endedSessions   = CourseLiveSession::where('course_id', $course_id)
+                               ->where('status', 'ended')
+                               ->count();
+
+        if ($endedSessions < $totalSessions) {
+            return back()->with('error',
+                "All {$totalSessions} sessions must be completed before publishing certificates. "
+                . "{$endedSessions} ended so far.");
+        }
+
+        // Published assessments — ONLY consider published ones
+        $publishedFinalExam  = FinalExam::where('course_id', $course_id)
+                                   ->where('status', 'published')
+                                   ->first();
+
+        $publishedAssignments = Assignment::where('course_id', $course_id)->get();
+
+        // Enrolled students
+        $studentIds = Enrollment::where('course_id', $course_id)->pluck('user_id');
+        $students   = User::whereIn('id', $studentIds)->get();
+
+        $issued  = 0;
+        $skipped = 0;
+        $reasons = [];
+
+        foreach ($students as $student) {
+            [$eligible, $reason, $averageScore] = $this->checkLiveEligibility(
+                $student, $course_id, $publishedFinalExam, $publishedAssignments
+            );
+
+            if (!$eligible) {
+                $skipped++;
+                $reasons[] = "{$student->name}: {$reason}";
+                continue;
+            }
+
+            // Issue certificate (idempotent — won't duplicate)
+            Certificate::firstOrCreate(
+                [
+                    'user_id'   => $student->id,
+                    'course_id' => $course->id,
+                ],
+                [
+                    'certificate_id'  => strtoupper(uniqid('CERT-')),
+                    'average_score'   => $averageScore,
+                    'completion_date' => now(),
+                ]
+            );
+
+            $issued++;
+        }
+
+        $message = "Certificates published. Issued: {$issued}, Skipped: {$skipped}.";
+        if (!empty($reasons)) {
+            $message .= ' Skipped reasons: ' . implode('; ', array_slice($reasons, 0, 5));
+            if (count($reasons) > 5) {
+                $message .= ' ...and ' . (count($reasons) - 5) . ' more.';
+            }
+        }
+
+        return back()->with('success', $message);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // LIVE COURSE — student downloads their certificate
+    // (certificate must already exist — created by publishCertificates)
     // ──────────────────────────────────────────────────────────────────────────
     private function generateLiveCertificate($user, $course)
     {
-        // ── 1. Check final exam is graded and passed ───────────────────────
-        $finalExam = FinalExam::where('course_id', $course->id)
-            ->where('status', 'published')
+        $certificate = Certificate::where('user_id', $user->id)
+            ->where('course_id', $course->id)
             ->first();
 
-        if (!$finalExam) {
+        if (!$certificate) {
             return back()->with('error',
-                'No published final exam found for this course. Please contact your instructor.');
+                'You are not eligible for a certificate for this course. '
+                . 'Certificates are issued by your instructor after all sessions are completed and assessments are graded.');
         }
 
-        $finalExamSubmission = FinalExamSubmission::where('final_exam_id', $finalExam->id)
-            ->where('user_id', $user->id)
-            ->first();
+        return $this->streamCertificatePdf($user, $course, $certificate);
+    }
 
-        if (!$finalExamSubmission) {
-            return back()->with('error',
-                'You have not submitted the final exam yet.');
-        }
+    // ──────────────────────────────────────────────────────────────────────────
+    // Helper: check if a student is eligible for a live course certificate
+    // Returns [bool $eligible, string $reason, float $averageScore]
+    // ──────────────────────────────────────────────────────────────────────────
+    private function checkLiveEligibility($student, $courseId, $publishedFinalExam, $publishedAssignments): array
+    {
+        $scores = collect();
 
-        if ($finalExamSubmission->status !== 'graded') {
-            return back()->with('error',
-                'Your final exam has not been graded yet. Please check back later.');
-        }
-
-        $finalExamPercentage = round($finalExamSubmission->percentage, 2);
-
-        if ($finalExamPercentage < 70) {
-            return back()->with('error',
-                "You need at least 70% on the final exam to earn a certificate. "
-                . "Your score: {$finalExamPercentage}%.");
-        }
-
-        // ── 2. Check all assignments are graded and each scored ≥ 70% ──────
-        $assignments = Assignment::where('course_id', $course->id)->get();
-
-        foreach ($assignments as $assignment) {
-            $submission = AssignmentSubmission::where('assignment_id', $assignment->id)
-                ->where('student_id', $user->id)
+        // ── Final exam (only if published) ────────────────────────────────────
+        if ($publishedFinalExam) {
+            $sub = FinalExamSubmission::where('final_exam_id', $publishedFinalExam->id)
+                ->where('user_id', $student->id)
                 ->first();
 
-            if (!$submission) {
-                return back()->with('error',
-                    "Assignment {$assignment->title} has not been submitted yet.");
+            if (!$sub) {
+                return [false, 'Final exam not submitted', 0];
+            }
+            if ($sub->status !== 'graded') {
+                return [false, 'Final exam not graded yet', 0];
+            }
+            if ($sub->percentage < 70) {
+                return [false, "Final exam score {$sub->percentage}% < 70%", 0];
             }
 
-            if ($submission->status !== 'graded') {
-                return back()->with('error',
-                    "Assignment {$assignment->title} has not been graded yet. Please check back later.");
-            }
-
-            $totalMarks  = $assignment->marks ?? 0;
-            $assignmentPct = $totalMarks > 0
-                ? round(($submission->score / $totalMarks) * 100, 2)
-                : 0;
-
-            if ($assignmentPct < 70) {
-                return back()->with('error',
-                    "You need at least 70% on all assignments to earn a certificate. "
-                    . "Assignment '{$assignment->title}': {$assignmentPct}%.");
-            }
+            $scores->push($sub->percentage);
         }
 
-        // ── 3. Compute overall average for the certificate record ──────────
-        // Average of all assignment percentages + final exam percentage
-        $assignmentPercentages = $assignments->map(function ($assignment) use ($user) {
-            $submission = AssignmentSubmission::where('assignment_id', $assignment->id)
-                ->where('student_id', $user->id)
+        // ── Assignments (only if any exist for this course) ───────────────────
+        foreach ($publishedAssignments as $assignment) {
+            $sub = AssignmentSubmission::where('assignment_id', $assignment->id)
+                ->where('student_id', $student->id)
                 ->first();
+
+            if (!$sub || $sub->status !== 'graded') {
+                // Assignment exists but not submitted/graded — skip student
+                $reason = !$sub ? "Assignment '{$assignment->title}' not submitted"
+                                : "Assignment '{$assignment->title}' not graded yet";
+                return [false, $reason, 0];
+            }
+
             $totalMarks = $assignment->marks ?? 0;
-            return $totalMarks > 0
-                ? ($submission->score / $totalMarks) * 100
+            $pct        = $totalMarks > 0
+                ? round(($sub->score / $totalMarks) * 100, 2)
                 : 0;
-        });
 
-        $allScores    = $assignmentPercentages->push($finalExamPercentage);
-        $averageScore = round($allScores->avg(), 2);
+            if ($pct < 70) {
+                return [false, "Assignment '{$assignment->title}' score {$pct}% < 70%", 0];
+            }
 
-        // ── 4. Create or fetch certificate record ──────────────────────────
-        $certificate = Certificate::firstOrCreate(
-            [
-                'user_id'   => $user->id,
-                'course_id' => $course->id,
-            ],
-            [
-                'certificate_id'  => strtoupper(uniqid('CERT-')),
-                'average_score'   => $averageScore,
-                'completion_date' => now(),
-            ]
-        );
+            $scores->push($pct);
+        }
 
-        // ── 5. Generate PDF ────────────────────────────────────────────────
-        $width  = 900 * 0.75;
-        $height = 650 * 0.75;
+        // If no published assessments at all, still eligible (instructor discretion)
+        $averageScore = $scores->count() > 0 ? round($scores->avg(), 2) : 100.0;
 
-        $pdf = Pdf::loadView('Resources.certificate', [
-            'user'        => $user,
-            'course'      => $course,
-            'certificate' => $certificate,
-        ]);
-
-        $pdf->setPaper([0, 0, $width, $height]);
-
-        return $pdf->stream('certificate_' . $course->title . '.pdf');
+        return [true, '', $averageScore];
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -173,9 +230,9 @@ class CertificateController extends Controller
         $resourceColumns = DB::getSchemaBuilder()->getColumnListing('resources');
 
         \Log::info("Database Structure Debug", [
-            'resource_columns'    => $resourceColumns,
-            'sample_resource_data'=> $sampleResource->toArray(),
-            'course_id'           => $course->id,
+            'resource_columns'     => $resourceColumns,
+            'sample_resource_data' => $sampleResource->toArray(),
+            'course_id'            => $course->id,
         ]);
 
         $totalVideos = 0;
@@ -201,8 +258,8 @@ class CertificateController extends Controller
             ? round(($completedVideos / $totalVideos) * 100)
             : 0;
 
-        $courseQuizzes    = $course->quizzes()->pluck('id');
-        $quizSubmissions  = QuizSubmission::where('user_id', $user->id)
+        $courseQuizzes   = $course->quizzes()->pluck('id');
+        $quizSubmissions = QuizSubmission::where('user_id', $user->id)
             ->whereIn('quiz_id', $courseQuizzes)
             ->with('quiz')
             ->get();
@@ -225,7 +282,6 @@ class CertificateController extends Controller
             'average_percentage' => $averageScore,
         ]);
 
-        // Check all assignments submitted
         $assignments = $course->assignments;
         foreach ($assignments as $assignment) {
             $submitted = AssignmentSubmission::where('assignment_id', $assignment->id)
@@ -257,6 +313,14 @@ class CertificateController extends Controller
             ]
         );
 
+        return $this->streamCertificatePdf($user, $course, $certificate);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Shared PDF stream helper
+    // ──────────────────────────────────────────────────────────────────────────
+    private function streamCertificatePdf($user, $course, $certificate)
+    {
         $width  = 900 * 0.75;
         $height = 650 * 0.75;
 

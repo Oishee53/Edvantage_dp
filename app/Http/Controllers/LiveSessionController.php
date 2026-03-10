@@ -255,6 +255,6 @@ class LiveSessionController extends Controller
             Notification::send($students, new LiveClassScheduledNotification($session));
         }
 
-        return back()->with('success', 'Live class scheduled successfully.');
+        return redirect()->route('modules.show', ['course_id' => $request->course_id]);
     }
 }

@@ -74,6 +74,11 @@ public function showModules($course_id)
             ->where('course_id', $course_id)
             ->pluck('module_number');
 
+        $resourceModules = DB::table('resources')
+        ->where('courseId', $course_id)
+        ->pluck('moduleId');
+
+
         $user->unreadNotifications()
             ->where('type', 'App\\Notifications\\approveCourseNotification')
             ->where('data->course_id', $course_id)
