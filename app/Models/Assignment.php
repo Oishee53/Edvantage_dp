@@ -14,7 +14,8 @@ class Assignment extends Model
         'title',
         'description',
         'marks',
-        'deadline'
+        'deadline',
+        'attachment'
     ];
 
     public function course()

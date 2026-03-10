@@ -118,7 +118,7 @@
                 <!-- Form -->
                 <div class="p-6">
 
-                    <form method="POST" action="{{ url('/assignment/store') }}" class="space-y-5">
+                    <form method="POST" action="{{ url('/assignment/store') }}" enctype="multipart/form-data" class="space-y-5">
                         @csrf
                         <input type="hidden" name="course_id" value="{{ $courseId }}">
 
@@ -133,6 +133,12 @@
                             <label for="description">Description</label>
                             <textarea id="description" name="description" required placeholder="Enter assignment description..."></textarea>
                         </div>
+                        <div class="form-group">
+    <label>Optional File (PDF, PPTX, Image, etc)</label>
+    <input type="file" name="attachment"
+           accept=".pdf,.ppt,.pptx,.doc,.docx,.png,.jpg,.jpeg,.zip"
+           class="w-full border border-gray-300 rounded-lg p-2">
+</div>
 
                         <!-- Total Marks -->
                         <div class="form-group">

@@ -41,6 +41,18 @@
                                 <i class="fas fa-calendar-alt text-teal-500 text-xs"></i>
                                 <span>Deadline: {{ \Carbon\Carbon::parse($assignment->deadline)->format('d M Y h:i A') }}</span>
                             </div>
+                            @if($assignment->description)
+<p class="mt-3 text-sm text-gray-600">
+    {{ $assignment->description }}
+</p>
+@endif
+@if($assignment->attachment)
+<a href="{{ asset('storage/'.$assignment->attachment) }}"
+   target="_blank"
+   class="inline-block mt-3 text-teal-600 font-medium">
+    Download Assignment File
+</a>
+@endif
                         </div>
                     </div>
 
@@ -116,36 +128,48 @@
                         Submit Your Assignment
                     </h2>
 
-                    <form method="POST" action="{{ url('/assignment/submit') }}" enctype="multipart/form-data">
-                        @csrf
-                        <input type="hidden" name="assignment_id" value="{{ $assignment->id }}">
+                   <form method="POST" action="{{ url('/assignment/submit') }}" enctype="multipart/form-data" id="assignment-form">
+    @csrf
+    <input type="hidden" name="assignment_id" value="{{ $assignment->id }}">
 
-                        <!-- File Upload Area -->
-                        <div class="mb-5">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                Upload PDF(s)
-                            </label>
+    <!-- File Upload Area -->
+    <div class="mb-5">
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Upload PDF(s)</label>
 
-                            <label for="fileInput"
-                                   class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:border-teal-400 hover:bg-teal-50 transition group">
-                                <div class="text-center">
-                                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-300 group-hover:text-teal-400 transition mb-2 block"></i>
-                                    <p class="text-sm font-semibold text-gray-500 group-hover:text-teal-600 transition">Click to upload PDF files</p>
-                                    <p class="text-xs text-gray-400 mt-1">PDF only · Multiple files allowed</p>
-                                </div>
-                                <input type="file" id="fileInput" name="files[]" accept="application/pdf" multiple required class="hidden">
-                            </label>
+        <label for="fileInput"
+               class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:border-teal-400 hover:bg-teal-50 transition group">
+            <div class="text-center">
+                <i class="fas fa-cloud-upload-alt text-3xl text-gray-300 group-hover:text-teal-400 transition mb-2 block"></i>
+                <p class="text-sm font-semibold text-gray-500 group-hover:text-teal-600 transition">Click to upload PDF files</p>
+                <p class="text-xs text-gray-400 mt-1">PDF only · Multiple files allowed</p>
+            </div>
+            <input type="file" id="fileInput" name="files[]" accept="application/pdf" multiple required class="hidden">
+        </label>
 
-                            <!-- File List -->
-                            <ul id="fileList" class="mt-3 space-y-2"></ul>
-                        </div>
+        <!-- File List -->
+        <ul id="fileList" class="mt-3 space-y-2"></ul>
+    </div>
 
-                        <button type="submit"
-                                class="inline-flex items-center gap-2 px-6 py-2.5 bg-teal-600 text-white rounded-lg font-semibold text-sm hover:bg-teal-800 transition shadow-sm">
-                            <i class="fas fa-paper-plane"></i>
-                            Submit Assignment
-                        </button>
-                    </form>
+    <!-- Progress Bar (hidden by default) -->
+    <div id="progress-container" class="hidden mb-5 p-4 bg-teal-50 border border-teal-200 rounded-xl">
+        <div class="flex justify-between items-center mb-2">
+            <span id="progress-label" class="text-sm font-semibold text-teal-800">Uploading...</span>
+            <span id="progress-percent" class="text-sm font-bold text-teal-800">0%</span>
+        </div>
+        <div class="w-full bg-teal-100 rounded-full h-3 overflow-hidden">
+            <div id="progress-bar"
+                 class="h-full rounded-full transition-all duration-300"
+                 style="width:0%; background: linear-gradient(90deg, #0d9488, #14b8a6);"></div>
+        </div>
+        <p id="progress-status" class="text-xs text-teal-600 mt-2 text-center">Please do not close this page</p>
+    </div>
+
+    <button type="submit" id="submit-btn"
+            class="inline-flex items-center gap-2 px-6 py-2.5 bg-teal-600 text-white rounded-lg font-semibold text-sm hover:bg-teal-800 transition shadow-sm">
+        <i class="fas fa-paper-plane"></i>
+        Submit Assignment
+    </button>
+</form>
                 </div>
             @endif
 
@@ -153,44 +177,115 @@
     </div>
 
     <script>
-        const input = document.getElementById('fileInput');
-        const fileList = document.getElementById('fileList');
+    const input    = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
 
-        if (input) {
-            input.addEventListener('change', function () {
-                fileList.innerHTML = '';
-                const dt = new DataTransfer();
+    if (input) {
+        input.addEventListener('change', function () {
+            fileList.innerHTML = '';
+            const dt = new DataTransfer();
 
-                Array.from(this.files).forEach((file, index) => {
-                    dt.items.add(file);
+            Array.from(this.files).forEach((file, index) => {
+                dt.items.add(file);
 
-                    const li = document.createElement('li');
-                    li.className = 'flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm';
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm';
 
-                    const nameSpan = document.createElement('span');
-                    nameSpan.className = 'flex items-center gap-2 text-gray-700 font-medium';
-                    nameSpan.innerHTML = `<i class="fas fa-file-pdf text-red-400"></i> ${file.name}`;
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'flex items-center gap-2 text-gray-700 font-medium';
+                nameSpan.innerHTML = `<i class="fas fa-file-pdf text-red-400"></i> ${file.name}`;
 
-                    const removeBtn = document.createElement('button');
-                    removeBtn.type = 'button';
-                    removeBtn.className = 'inline-flex items-center gap-1 px-3 py-1 bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-semibold hover:bg-red-600 hover:text-white hover:border-red-600 transition';
-                    removeBtn.innerHTML = '<i class="fas fa-times text-xs"></i> Remove';
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'inline-flex items-center gap-1 px-3 py-1 bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-semibold hover:bg-red-600 hover:text-white hover:border-red-600 transition';
+                removeBtn.innerHTML = '<i class="fas fa-times text-xs"></i> Remove';
+                removeBtn.onclick = function () {
+                    dt.items.remove(index);
+                    input.files = dt.files;
+                    input.dispatchEvent(new Event('change'));
+                };
 
-                    removeBtn.onclick = function () {
-                        dt.items.remove(index);
-                        input.files = dt.files;
-                        input.dispatchEvent(new Event('change'));
-                    };
-
-                    li.appendChild(nameSpan);
-                    li.appendChild(removeBtn);
-                    fileList.appendChild(li);
-                });
-
-                input.files = dt.files;
+                li.appendChild(nameSpan);
+                li.appendChild(removeBtn);
+                fileList.appendChild(li);
             });
-        }
-    </script>
+
+            input.files = dt.files;
+        });
+    }
+
+    document.getElementById('assignment-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const form       = this;
+        const btn        = document.getElementById('submit-btn');
+        const container  = document.getElementById('progress-container');
+        const bar        = document.getElementById('progress-bar');
+        const percent    = document.getElementById('progress-percent');
+        const label      = document.getElementById('progress-label');
+        const status     = document.getElementById('progress-status');
+
+        // Show progress bar, disable button
+        container.classList.remove('hidden');
+        btn.disabled          = true;
+        btn.innerHTML         = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+        btn.style.opacity     = '0.65';
+        btn.style.cursor      = 'not-allowed';
+
+        const xhr  = new XMLHttpRequest();
+        const data = new FormData(form);
+
+        xhr.upload.addEventListener('progress', function (e) {
+            if (e.lengthComputable) {
+                const pct = Math.round((e.loaded / e.total) * 100);
+                bar.style.width       = pct + '%';
+                percent.textContent   = pct + '%';
+                if (pct < 100) {
+                    label.textContent  = 'Uploading files...';
+                    status.textContent = 'Please do not close this page';
+                } else {
+                    label.textContent  = 'Processing...';
+                    status.textContent = 'Almost done, please wait';
+                }
+            }
+        });
+
+        xhr.addEventListener('load', function () {
+            if (xhr.status >= 200 && xhr.status < 400) {
+                bar.style.width        = '100%';
+                percent.textContent    = '100%';
+                label.textContent      = '✅ Submitted Successfully!';
+                status.textContent     = 'Redirecting...';
+                bar.style.background   = 'linear-gradient(90deg,#059669,#10b981)';
+                container.className    = container.className.replace('border-teal-200 bg-teal-50', 'border-green-200 bg-green-50');
+                setTimeout(function () {
+                    window.location.href = xhr.responseURL || '/my-courses';
+                }, 800);
+            } else {
+                label.textContent    = '❌ Submission Failed';
+                status.textContent   = 'Something went wrong. Please try again.';
+                bar.style.background = '#dc2626';
+                btn.disabled         = false;
+                btn.innerHTML        = '<i class="fas fa-paper-plane"></i> Submit Assignment';
+                btn.style.opacity    = '1';
+                btn.style.cursor     = 'pointer';
+            }
+        });
+
+        xhr.addEventListener('error', function () {
+            label.textContent    = '❌ Network Error';
+            status.textContent   = 'Check your connection and try again.';
+            bar.style.background = '#dc2626';
+            btn.disabled         = false;
+            btn.innerHTML        = '<i class="fas fa-paper-plane"></i> Submit Assignment';
+            btn.style.opacity    = '1';
+            btn.style.cursor     = 'pointer';
+        });
+
+        xhr.open('POST', form.action);
+        xhr.send(data);
+    });
+</script>
 
 </body>
 </html>

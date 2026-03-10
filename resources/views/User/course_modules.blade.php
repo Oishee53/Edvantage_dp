@@ -112,8 +112,10 @@
 </head>
 <body class="px-20 pt-5">
     @include('layouts.header')
+    
 
     @php
+    
     $isLiveCourse = $course->course_type === 'live';
     $isHybrid     = !$isLiveCourse; // recorded courses can have hybrid live classes
 
