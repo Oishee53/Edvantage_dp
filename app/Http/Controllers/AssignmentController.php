@@ -54,7 +54,8 @@ if ($request->hasFile('attachment')) {
         }
     }
 
-    return back()->with('success', 'Assignment Created');
+    return redirect()->route('instructor.assignments.index', $request->course_id)
+        ->with('success', 'Assignment created successfully!');
 }
 public function studentAssignments($courseId)
 {
