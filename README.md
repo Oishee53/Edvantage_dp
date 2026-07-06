@@ -1,35 +1,68 @@
 # Edvantage - Your Virtual Classroom
 
-Edvantage is a centralized Learning Management System (LMS) that allows instructors to create and share courses while enabling students to learn through structured content such as videos, PDFs, quizzes, and live classes. The platform ensures content quality through admin approval, tracks student progress, and enhances learning through interactive features like discussion forums, Q&A, and AI-powered chatbots.
+Edvantage is a centralized Learning Management System (LMS) designed to bridge the gap between instructors and students by providing a structured and interactive learning experience.
 
+Instructors can create and manage courses, while students can learn through structured content such as videos, PDFs, quizzes, assignments, and live classes. The platform also includes progress tracking, discussion systems, and AI-powered tools to enhance learning.
 
-Key Features
+---
 
-Authentication and role-based access (Student, Instructor, Admin)
-Course creation, approval, and resource management
-Course browsing, wishlist, cart, and enrollment
-Progress tracking (video completion and quiz performance)
-Lecture-based Q&A system
-Discussion forum with threads, comments, and reactions
-Live class integration with video, audio, screen sharing, and chat
-Online written exams with screen and webcam monitoring
-Assignment creation, submission, and grading
-AI chatbots (platform assistant and document-based Q&A)
-OCR-based exam and quiz generator
-Course rating and filtering system
-Hybrid course recommendation system
-Certificate generation with verification
+## Live Demo
 
+https://edvantage-3a9c.onrender.com/
 
-Tech Stack
+---
 
-Frontend: Laravel (Blade), JavaScript
-Backend: PHP
-Database: MySQL
-Version Control: Git, GitHub
-IDE: Visual Studio Code
-Video Hosting: Cloudinary
+## Key Features
+
+### User Roles & Authentication
+- Role-based access control (Student, Instructor, Admin)
+- Secure authentication system
+
+### Course Management
+- Instructor course creation and content upload
+- Admin approval system for courses
+- Structured lecture-based content organization
+
+### Learning Experience
+- Course browsing and search
+- Wishlist and cart system
+- Course enrollment system
+
+### Progress Tracking
+- Video completion tracking
+- Quiz and assignment performance tracking
+
+### Interaction System
+- Lecture-based Q&A system
+- Discussion forum with threads, comments, and reactions
+
+### Live Classes
+- Real-time video and audio sessions
+- Screen sharing and chat functionality
+
+### Assessments
+- Online quizzes and written exams
+- Assignment submission and grading system
+- Screen and webcam monitoring during exams
+
+### AI Features
+- AI chatbot for platform assistance
+- Document-based Q&A system
+- OCR-based quiz and exam generation
+
+### Certification & Recommendation
+- Automated certificate generation with verification
+- Course recommendation system
+- Course rating and filtering system
+
+---
+
+## Tech Stack
+
+Frontend: Laravel Blade, JavaScript  
+Backend: PHP  
+Database: MySQL  
+Version Control: Git & GitHub  
+IDE: Visual Studio Code  
+Video Hosting: Cloudinary  
 Streaming: Mux
-
-
-Deployed Link: https://edvantage-3a9c.onrender.com/
