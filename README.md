@@ -30,3 +30,4 @@ Version Control: Git, GitHub
 IDE: Visual Studio Code
 Video Hosting: Cloudinary
 Streaming: Mux
+Deployed Link: https://edvantage-3a9c.onrender.com/
